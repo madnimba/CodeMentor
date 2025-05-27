@@ -13,7 +13,7 @@ public class AuthResponse {
     private String token;
     private String username;
     private String email;
-    private Long jobRoleId;
+    private Integer jobRoleId;
     private String themePreference;
     private String languagePreference;
     private Boolean isAdmin;

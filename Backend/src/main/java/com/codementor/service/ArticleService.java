@@ -55,7 +55,7 @@ public class ArticleService {
 
         if (request.getJobRoleIds() != null) {
             Set<JobRole> jobRoles = new HashSet<>();
-            for (Long jobRoleId : request.getJobRoleIds()) {
+            for (Integer jobRoleId : request.getJobRoleIds()) {
                 JobRole jobRole = jobRoleRepository.findById(jobRoleId)
                         .orElseThrow(() -> new ResourceNotFoundException("Job role not found"));
                 jobRoles.add(jobRole);
@@ -65,7 +65,7 @@ public class ArticleService {
 
         if (request.getQuestionIds() != null) {
             Set<Question> questions = new HashSet<>();
-            for (Long questionId : request.getQuestionIds()) {
+            for (Integer questionId : request.getQuestionIds()) {
                 Question question = questionRepository.findById(questionId)
                         .orElseThrow(() -> new ResourceNotFoundException("Question not found"));
                 questions.add(question);
@@ -77,19 +77,20 @@ public class ArticleService {
         return mapToArticleResponse(savedArticle);
     }
 
-    public ArticleResponse getArticleById(Long id) {
+    public ArticleResponse getArticleById(Integer id) {
         Article article = articleRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Article not found"));
         return mapToArticleResponse(article);
     }
 
-    public Page<ArticleResponse> getArticlesByFilters(Long trackId, Long topicId, Long subtopicId, 
-            Long jobRoleId, Pageable pageable) {
+    public Page<ArticleResponse> getArticlesByFilters(Integer trackId, Integer topicId, Integer subtopicId, 
+    Integer jobRoleId, Pageable pageable) {
         Page<Article> articles;
         
-        if (trackId != null) {
-            articles = articleRepository.findByTrackId(trackId, pageable);
-        } else if (topicId != null) {
+        // if (trackId != null) {
+        //     articles = articleRepository.findByTrackId(trackId, pageable);
+        // } else 
+        if (topicId != null) {
             articles = articleRepository.findByTopicId(topicId, pageable);
         } else if (subtopicId != null) {
             articles = articleRepository.findBySubtopicId(subtopicId, pageable);
@@ -103,7 +104,7 @@ public class ArticleService {
     }
 
     @Transactional
-    public ArticleResponse updateArticle(Long id, CreateArticleRequest request) {
+    public ArticleResponse updateArticle(Integer id, CreateArticleRequest request) {
         Article article = articleRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Article not found"));
         
@@ -133,7 +134,7 @@ public class ArticleService {
 
         if (request.getJobRoleIds() != null) {
             Set<JobRole> jobRoles = new HashSet<>();
-            for (Long jobRoleId : request.getJobRoleIds()) {
+            for (Integer jobRoleId : request.getJobRoleIds()) {
                 JobRole jobRole = jobRoleRepository.findById(jobRoleId)
                         .orElseThrow(() -> new ResourceNotFoundException("Job role not found"));
                 jobRoles.add(jobRole);
@@ -143,7 +144,7 @@ public class ArticleService {
 
         if (request.getQuestionIds() != null) {
             Set<Question> questions = new HashSet<>();
-            for (Long questionId : request.getQuestionIds()) {
+            for (Integer questionId : request.getQuestionIds()) {
                 Question question = questionRepository.findById(questionId)
                         .orElseThrow(() -> new ResourceNotFoundException("Question not found"));
                 questions.add(question);
@@ -156,7 +157,7 @@ public class ArticleService {
     }
 
     @Transactional
-    public void deleteArticle(Long id) {
+    public void deleteArticle(Integer id) {
         Article article = articleRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Article not found"));
         
@@ -199,11 +200,11 @@ public class ArticleService {
         response.setIsApproved(article.getIsApproved());
         response.setCreatedAt(article.getCreatedAt());
         
-        Set<Long> jobRoleIds = new HashSet<>();
+        Set<Integer> jobRoleIds = new HashSet<>();
         article.getJobRoles().forEach(jobRole -> jobRoleIds.add(jobRole.getId()));
         response.setJobRoleIds(jobRoleIds);
         
-        Set<Long> questionIds = new HashSet<>();
+        Set<Integer> questionIds = new HashSet<>();
         article.getQuestions().forEach(question -> questionIds.add(question.getId()));
         response.setQuestionIds(questionIds);
         

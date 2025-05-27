@@ -2,7 +2,8 @@ package com.codementor.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.springframework.data.annotation.CreatedDate;
+//import org.springframework.data.annotation.CreatedDate;
+//import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -14,16 +15,33 @@ import java.time.LocalDateTime;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
-    @Column(nullable = false)
-    private String username;
-
-    @Column(nullable = false, unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(unique = true, nullable = false)
+    private String username;
+
     @Column(name = "password_hash", nullable = false)
-    private String passwordHash;
+    private String password;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    // @Column(name = "updated_at")
+    // private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        //updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        //updatedAt = LocalDateTime.now();
+    }
 
     @ManyToOne
     @JoinColumn(name = "job_role_id")
@@ -37,8 +55,4 @@ public class User {
 
     @Column(name = "is_admin")
     private Boolean isAdmin = false;
-
-    @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
 } 

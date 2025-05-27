@@ -15,12 +15,12 @@ public class CreateArticleRequest {
     private String content;
 
     @NotNull(message = "Track ID is required")
-    private Long trackId;
+    private Integer trackId;
 
     @NotNull(message = "Topic ID is required")
-    private Long topicId;
+    private Integer topicId;
 
-    private Long subtopicId;
-    private Set<Long> jobRoleIds;
-    private Set<Long> questionIds;
+    private Integer subtopicId;
+    private Set<Integer> jobRoleIds;
+    private Set<Integer> questionIds;
 } 

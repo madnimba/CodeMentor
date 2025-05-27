@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface TopicRepository extends JpaRepository<Topic, Long> {
+public interface TopicRepository extends JpaRepository<Topic, Integer> {
     Optional<Topic> findByName(String name);
     boolean existsByName(String name);
-    List<Topic> findByTrackId(Long trackId);
+    List<Topic> findByTrackId(Integer trackId);
 } 

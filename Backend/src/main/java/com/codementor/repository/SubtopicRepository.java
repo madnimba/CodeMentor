@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface SubtopicRepository extends JpaRepository<Subtopic, Long> {
+public interface SubtopicRepository extends JpaRepository<Subtopic, Integer> {
     Optional<Subtopic> findByName(String name);
     boolean existsByName(String name);
-    List<Subtopic> findByTopicId(Long topicId);
-    List<Subtopic> findByTrackId(Long trackId);
+    List<Subtopic> findByTopicId(Integer topicId);
+    //List<Subtopic> findByTrackId(Integer trackId);
 } 

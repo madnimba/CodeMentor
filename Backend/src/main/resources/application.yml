@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -16,19 +16,19 @@ spring:
     name: codementor-backend
 
 server:
-  port: 8080
+  port: ${SERVER_PORT}
   servlet:
-    context-path: /api/v1
+    context-path: ${SERVER_CONTEXT_PATH}
 
 jwt:
   secret: ${JWT_SECRET}
-  expiration: 86400000 # 24 hours in milliseconds
+  expiration: ${JWT_EXPIRATION}
 
 logging:
   level:
     org.springframework.security: DEBUG
     com.codementor: DEBUG
 
-supabase:
-  url: ${SUPABASE_URL:https://your-project.supabase.co}
-  api-key: ${SUPABASE_API_KEY:your-api-key} 
+# supabase:
+#   url: https://otjopoosscoadvryvfaf.supabase.co
+#   api-key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90am9wb29zc2NvYWR2cnl2ZmFmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0ODE2NzIxOCwiZXhwIjoyMDYzNzQzMjE4fQ.AbIfaA4yrCE8KdDKGBwnATray1XvzFGU7n9yTPeqV-E

@@ -9,7 +9,7 @@ import lombok.Data;
 public class Subtopic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "topic_id", nullable = false)

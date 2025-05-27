@@ -7,20 +7,20 @@ import java.util.Set;
 
 @Data
 public class ArticleResponse {
-    private Long id;
+    private Integer id;
     private String title;
     private String slug;
     private String content;
-    private Long trackId;
+    private Integer trackId;
     private String trackName;
-    private Long topicId;
+    private Integer topicId;
     private String topicName;
-    private Long subtopicId;
+    private Integer subtopicId;
     private String subtopicName;
-    private Long createdById;
+    private Integer createdById;
     private String createdByUsername;
     private Boolean isApproved;
     private LocalDateTime createdAt;
-    private Set<Long> jobRoleIds;
-    private Set<Long> questionIds;
+    private Set<Integer> jobRoleIds;
+    private Set<Integer> questionIds;
 } 

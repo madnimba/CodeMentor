@@ -16,7 +16,7 @@ import java.util.Set;
 public class Article {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(nullable = false)
     private String title;
@@ -52,7 +52,7 @@ public class Article {
 
     @ManyToMany
     @JoinTable(
-        name = "article_job_roles",
+        name = "articlejobroles",
         joinColumns = @JoinColumn(name = "article_id"),
         inverseJoinColumns = @JoinColumn(name = "job_role_id")
     )
@@ -60,7 +60,7 @@ public class Article {
 
     @ManyToMany
     @JoinTable(
-        name = "article_questions",
+        name = "articlequestions",
         joinColumns = @JoinColumn(name = "article_id"),
         inverseJoinColumns = @JoinColumn(name = "question_id")
     )

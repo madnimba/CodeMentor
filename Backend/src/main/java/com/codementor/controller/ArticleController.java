@@ -25,16 +25,16 @@ public class ArticleController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ArticleResponse>> getArticleById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<ArticleResponse>> getArticleById(@PathVariable Integer id) {
         return ResponseEntity.ok(ApiResponse.success(articleService.getArticleById(id)));
     }
 
     @GetMapping
     public ResponseEntity<ApiResponse<Page<ArticleResponse>>> getArticles(
-            @RequestParam(required = false) Long trackId,
-            @RequestParam(required = false) Long topicId,
-            @RequestParam(required = false) Long subtopicId,
-            @RequestParam(required = false) Long jobRoleId,
+            @RequestParam(required = false) Integer trackId,
+            @RequestParam(required = false) Integer topicId,
+            @RequestParam(required = false) Integer subtopicId,
+            @RequestParam(required = false) Integer jobRoleId,
             Pageable pageable) {
         return ResponseEntity.ok(ApiResponse.success(
             articleService.getArticlesByFilters(trackId, topicId, subtopicId, jobRoleId, pageable)
@@ -44,14 +44,14 @@ public class ArticleController {
     @PutMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<ArticleResponse>> updateArticle(
-            @PathVariable Long id,
+            @PathVariable Integer id,
             @Valid @RequestBody CreateArticleRequest request) {
         return ResponseEntity.ok(ApiResponse.success(articleService.updateArticle(id, request)));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<Void>> deleteArticle(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> deleteArticle(@PathVariable Integer id) {
         articleService.deleteArticle(id);
         return ResponseEntity.ok(ApiResponse.success("Article deleted successfully", null));
     }

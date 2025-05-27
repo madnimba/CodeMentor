@@ -1,12 +1,10 @@
 package com.codementor.controller;
 
 import com.codementor.dto.AuthRequest;
-import com.codementor.dto.AuthResponse;
 import com.codementor.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -17,23 +15,20 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/signup")
-    public Mono<ResponseEntity<AuthResponse>> signUp(@RequestBody AuthRequest request) {
-        return authService.signUp(request)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> Mono.just(ResponseEntity.badRequest().build()));
+    public ResponseEntity<String> signUp(@RequestBody AuthRequest request) {
+        String token = authService.signUp(request.getEmail(), request.getUsername(), request.getPassword());
+        return ResponseEntity.ok(token);
     }
 
     @PostMapping("/signin")
-    public Mono<ResponseEntity<AuthResponse>> signIn(@RequestBody AuthRequest request) {
-        return authService.signIn(request)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> Mono.just(ResponseEntity.badRequest().build()));
+    public ResponseEntity<String> signIn(@RequestBody AuthRequest request) {
+        String token = authService.signIn(request.getUsername(), request.getPassword());
+        return ResponseEntity.ok(token);
     }
 
     @PostMapping("/signout")
-    public Mono<ResponseEntity<AuthResponse>> signOut(@RequestHeader("Authorization") String token) {
-        return authService.signOut(token.replace("Bearer ", ""))
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> Mono.just(ResponseEntity.badRequest().build()));
+    public ResponseEntity<Void> signOut(@RequestHeader("Authorization") String token) {
+        authService.signOut(token.replace("Bearer ", ""));
+        return ResponseEntity.ok().build();
     }
 } 
