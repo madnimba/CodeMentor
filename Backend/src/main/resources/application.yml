@@ -12,6 +12,8 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  application:
+    name: codementor-backend
 
 server:
   port: 8080
@@ -25,4 +27,8 @@ jwt:
 logging:
   level:
     org.springframework.security: DEBUG
-    com.codementor: DEBUG 
+    com.codementor: DEBUG
+
+supabase:
+  url: ${SUPABASE_URL:https://your-project.supabase.co}
+  api-key: ${SUPABASE_API_KEY:your-api-key} 
