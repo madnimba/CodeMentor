@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { AuthResponse } from '../services/auth';
+import { useNavigate } from 'react-router-dom';
+import { AuthResponse, SignUpRequest, SignInRequest } from '../services/auth';
+import { authService } from '../services/auth';
 
 interface AuthContextType {
   user: AuthResponse | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signIn: (data: SignInRequest) => Promise<void>;
+  signUp: (data: SignUpRequest) => Promise<void>;
   signOut: () => void;
 }
 
@@ -14,46 +16,36 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<AuthResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Check for stored auth data
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    // Check for stored token
+    const token = localStorage.getItem('token');
+    if (token) {
+      setUser({ token });
     }
     setLoading(false);
   }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (data: SignInRequest) => {
     try {
-      const response = await fetch('http://localhost:8080/api/auth/signin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await response.json();
-      setUser(data);
-      localStorage.setItem('user', JSON.stringify(data));
+      const response = await authService.signIn(data);
+      setUser(response);
+      localStorage.setItem('token', response.token);
+      navigate('/dashboard');
     } catch (error) {
       console.error('Sign in error:', error);
       throw error;
     }
   };
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (data: SignUpRequest) => {
     try {
-      const response = await fetch('http://localhost:8080/api/auth/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await response.json();
-      setUser(data);
-      localStorage.setItem('user', JSON.stringify(data));
+      const response = await authService.signUp(data);
+      setUser(response);
+      localStorage.setItem('token', response.token);
+      // After successful signup, redirect to signin
+      navigate('/auth?tab=signin');
     } catch (error) {
       console.error('Sign up error:', error);
       throw error;
@@ -62,7 +54,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = () => {
     setUser(null);
-    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    navigate('/auth');
   };
 
   return (

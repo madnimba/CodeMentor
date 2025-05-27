@@ -13,7 +13,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/articles")
+@RequestMapping("/articles")
+// No @CrossOrigin needed: global CORS config is used
 @RequiredArgsConstructor
 public class ArticleController {
     private final ArticleService articleService;

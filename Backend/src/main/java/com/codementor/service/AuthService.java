@@ -37,12 +37,15 @@ public class AuthService {
         user.setEmail(email);
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(password));
-        userRepository.save(user);
-        
+        User savedUser = userRepository.save(user);
+        System.out.println("User saved: " + savedUser);
+
         Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(username, password)
+            new UsernamePasswordAuthenticationToken(email, password)
         );
-        return jwtTokenProvider.generateToken(authentication);
+        String token = jwtTokenProvider.generateToken(authentication);
+        System.out.println("Token: " + token);
+        return token;
     }
     
     public String signIn(String username, String password) {

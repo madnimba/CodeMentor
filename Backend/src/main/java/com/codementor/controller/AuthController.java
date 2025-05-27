@@ -7,12 +7,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:5173") // Your frontend URL
+@RequestMapping("/auth")
 public class AuthController {
 
     @Autowired
     private AuthService authService;
+
+    @GetMapping("/test")
+    public String test() {
+        return "Backend is up!";
+    }
 
     @PostMapping("/signup")
     public ResponseEntity<String> signUp(@RequestBody AuthRequest request) {

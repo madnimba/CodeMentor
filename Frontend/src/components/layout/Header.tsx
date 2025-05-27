@@ -1,23 +1,23 @@
-
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
-import { Code2, Menu, User, Moon, Sun } from "lucide-react";
+import { Code2, Menu, User, Moon, Sun, LogOut } from "lucide-react";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useAuth } from "@/contexts/AuthContext";
+
+const navigation = [
+  { name: "Home", href: "/" },
+  { name: "Study Materials", href: "/study-materials" },
+  { name: "Dashboard", href: "/dashboard" },
+];
 
 export const Header = () => {
-  const [darkMode, setDarkMode] = useState(true);
-
-  const navigation = [
-    { name: "Problems", href: "/problems" },
-    { name: "Study Materials", href: "/study-materials" },
-    { name: "Companies", href: "/companies" },
-    { name: "Dashboard", href: "/dashboard" },
-  ];
+  const [darkMode, setDarkMode] = useState(false);
+  const { user, signOut } = useAuth();
 
   return (
-    <header className="fixed top-0 w-full z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-sm border-b border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -25,24 +25,21 @@ export const Header = () => {
             <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-2 rounded-lg">
               <Code2 className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xl font-bold text-white">CodeMentor BD</span>
-            <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-xs">
-              Beta
-            </Badge>
+            <span className="text-white font-bold text-xl">CodeMentor</span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-8">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
-                className="text-slate-300 hover:text-purple-400 transition-colors duration-200 font-medium"
+                className="text-slate-300 hover:text-white transition-colors duration-200"
               >
                 {item.name}
               </Link>
             ))}
-          </nav>
+          </div>
 
           {/* Right side actions */}
           <div className="flex items-center space-x-4">
@@ -56,12 +53,25 @@ export const Header = () => {
             </Button>
 
             <div className="hidden md:flex items-center space-x-3">
-              <Button asChild variant="ghost" className="text-slate-300 hover:text-white">
-                <Link to="/auth">Sign In</Link>
-              </Button>
-              <Button asChild className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
-                <Link to="/auth">Sign Up</Link>
-              </Button>
+              {user ? (
+                <Button 
+                  variant="ghost" 
+                  className="text-slate-300 hover:text-white flex items-center gap-2"
+                  onClick={signOut}
+                >
+                  <LogOut className="w-4 h-4" />
+                  Log Out
+                </Button>
+              ) : (
+                <>
+                  <Button asChild variant="ghost" className="text-slate-300 hover:text-white">
+                    <Link to="/auth">Sign In</Link>
+                  </Button>
+                  <Button asChild className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+                    <Link to="/auth">Sign Up</Link>
+                  </Button>
+                </>
+              )}
             </div>
 
             {/* Mobile menu */}
@@ -83,12 +93,24 @@ export const Header = () => {
                     </Link>
                   ))}
                   <div className="pt-4 border-t border-slate-800">
-                    <Link to="/auth" className="block py-2 text-slate-300 hover:text-white">
-                      Sign In
-                    </Link>
-                    <Link to="/auth" className="block py-2 text-purple-400 hover:text-purple-300">
-                      Sign Up
-                    </Link>
+                    {user ? (
+                      <button 
+                        onClick={signOut}
+                        className="flex items-center gap-2 w-full py-2 text-slate-300 hover:text-white"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Log Out
+                      </button>
+                    ) : (
+                      <>
+                        <Link to="/auth" className="block py-2 text-slate-300 hover:text-white">
+                          Sign In
+                        </Link>
+                        <Link to="/auth" className="block py-2 text-purple-400 hover:text-purple-300">
+                          Sign Up
+                        </Link>
+                      </>
+                    )}
                   </div>
                 </div>
               </SheetContent>

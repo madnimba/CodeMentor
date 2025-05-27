@@ -1,26 +1,29 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080/api/auth';
+const API_URL = 'http://localhost:8080/api/v1/auth';
 
-export interface AuthRequest {
+export interface SignUpRequest {
   email: string;
+  username: string;
+  password: string;
+}
+
+export interface SignInRequest {
+  username: string;
   password: string;
 }
 
 export interface AuthResponse {
-  access_token: string;
-  refresh_token: string;
-  user_id: string;
-  email: string;
+  token: string;
 }
 
 export const authService = {
-  async signUp(data: AuthRequest): Promise<AuthResponse> {
+  async signUp(data: SignUpRequest): Promise<AuthResponse> {
     const response = await axios.post(`${API_URL}/signup`, data);
     return response.data;
   },
 
-  async signIn(data: AuthRequest): Promise<AuthResponse> {
+  async signIn(data: SignInRequest): Promise<AuthResponse> {
     const response = await axios.post(`${API_URL}/signin`, data);
     return response.data;
   },

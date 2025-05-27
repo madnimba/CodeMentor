@@ -1,5 +1,5 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,12 +8,70 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Code2, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const Auth = () => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { user, signIn, signUp } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [activeTab, setActiveTab] = useState("signin");
+  const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "signin");
+
+  // State for sign in
+  const [signInUsername, setSignInUsername] = useState("");
+  const [signInPassword, setSignInPassword] = useState("");
+  const [signInError, setSignInError] = useState("");
+
+  // State for sign up
+  const [signUpEmail, setSignUpEmail] = useState("");
+  const [signUpUsername, setSignUpUsername] = useState("");
+  const [signUpPassword, setSignUpPassword] = useState("");
+  const [signUpConfirmPassword, setSignUpConfirmPassword] = useState("");
+  const [signUpError, setSignUpError] = useState("");
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
+
+  // Handle sign in
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSignInError("");
+    try {
+      await signIn({ username: signInUsername, password: signInPassword });
+      toast.success("Successfully signed in!");
+    } catch (err) {
+      setSignInError("Invalid username or password");
+      toast.error("Sign in failed. Please check your credentials.");
+    }
+  };
+
+  // Handle sign up
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSignUpError("");
+    if (signUpPassword !== signUpConfirmPassword) {
+      setSignUpError("Passwords do not match");
+      toast.error("Passwords do not match");
+      return;
+    }
+    try {
+      await signUp({
+        email: signUpEmail,
+        username: signUpUsername,
+        password: signUpPassword
+      });
+      toast.success("Account created successfully! Please sign in.");
+    } catch (err) {
+      setSignUpError("Signup failed. Try a different email or username.");
+      toast.error("Sign up failed. Please try again.");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900">
@@ -48,61 +106,51 @@ const Auth = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-slate-300">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="Enter your email"
-                        className="pl-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-500"
-                      />
+                  <form onSubmit={handleSignIn} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="signin-username" className="text-slate-300">Username</Label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
+                        <Input
+                          id="signin-username"
+                          type="text"
+                          placeholder="Enter your username"
+                          className="pl-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-500"
+                          value={signInUsername}
+                          onChange={e => setSignInUsername(e.target.value)}
+                          required
+                        />
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="password" className="text-slate-300">Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
-                      <Input
-                        id="password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Enter your password"
-                        className="pl-10 pr-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-500"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-0 top-0 h-full px-3 text-slate-400 hover:text-white"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </Button>
+                    <div className="space-y-2">
+                      <Label htmlFor="signin-password" className="text-slate-300">Password</Label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
+                        <Input
+                          id="signin-password"
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Enter your password"
+                          className="pl-10 pr-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-500"
+                          value={signInPassword}
+                          onChange={e => setSignInPassword(e.target.value)}
+                          required
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="absolute right-0 top-0 h-full px-3 text-slate-400 hover:text-white"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        id="remember"
-                        className="rounded border-slate-600 bg-slate-900/50"
-                      />
-                      <Label htmlFor="remember" className="text-sm text-slate-400">
-                        Remember me
-                      </Label>
-                    </div>
-                    <Link to="/forgot-password" className="text-sm text-purple-400 hover:text-purple-300">
-                      Forgot password?
-                    </Link>
-                  </div>
-
-                  <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
-                    Sign In
-                  </Button>
-
+                    {signInError && <div className="text-red-400 text-sm">{signInError}</div>}
+                    <Button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
+                      Sign In
+                    </Button>
+                  </form>
                   <div className="text-center text-sm text-slate-400">
                     Don't have an account?{" "}
                     <button
@@ -125,98 +173,90 @@ const Auth = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name" className="text-slate-300">Full Name</Label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
-                      <Input
-                        id="name"
-                        type="text"
-                        placeholder="Enter your full name"
-                        className="pl-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-500"
-                      />
+                  <form onSubmit={handleSignUp} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-username" className="text-slate-300">Username</Label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
+                        <Input
+                          id="signup-username"
+                          type="text"
+                          placeholder="Enter your username"
+                          className="pl-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-500"
+                          value={signUpUsername}
+                          onChange={e => setSignUpUsername(e.target.value)}
+                          required
+                        />
+                      </div>
                     </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-email" className="text-slate-300">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
-                      <Input
-                        id="signup-email"
-                        type="email"
-                        placeholder="Enter your email"
-                        className="pl-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-500"
-                      />
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-email" className="text-slate-300">Email</Label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
+                        <Input
+                          id="signup-email"
+                          type="email"
+                          placeholder="Enter your email"
+                          className="pl-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-500"
+                          value={signUpEmail}
+                          onChange={e => setSignUpEmail(e.target.value)}
+                          required
+                        />
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-password" className="text-slate-300">Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
-                      <Input
-                        id="signup-password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Create a password"
-                        className="pl-10 pr-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-500"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-0 top-0 h-full px-3 text-slate-400 hover:text-white"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </Button>
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-password" className="text-slate-300">Password</Label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
+                        <Input
+                          id="signup-password"
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Create a password"
+                          className="pl-10 pr-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-500"
+                          value={signUpPassword}
+                          onChange={e => setSignUpPassword(e.target.value)}
+                          required
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="absolute right-0 top-0 h-full px-3 text-slate-400 hover:text-white"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="confirm-password" className="text-slate-300">Confirm Password</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
-                      <Input
-                        id="confirm-password"
-                        type={showConfirmPassword ? "text" : "password"}
-                        placeholder="Confirm your password"
-                        className="pl-10 pr-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-500"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-0 top-0 h-full px-3 text-slate-400 hover:text-white"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      >
-                        {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </Button>
+                    <div className="space-y-2">
+                      <Label htmlFor="confirm-password" className="text-slate-300">Confirm Password</Label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
+                        <Input
+                          id="confirm-password"
+                          type={showConfirmPassword ? "text" : "password"}
+                          placeholder="Confirm your password"
+                          className="pl-10 pr-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-400 focus:border-purple-500"
+                          value={signUpConfirmPassword}
+                          onChange={e => setSignUpConfirmPassword(e.target.value)}
+                          required
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="absolute right-0 top-0 h-full px-3 text-slate-400 hover:text-white"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        >
+                          {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="terms"
-                      className="rounded border-slate-600 bg-slate-900/50"
-                    />
-                    <Label htmlFor="terms" className="text-sm text-slate-400">
-                      I agree to the{" "}
-                      <Link to="/terms" className="text-purple-400 hover:text-purple-300">
-                        Terms of Service
-                      </Link>{" "}
-                      and{" "}
-                      <Link to="/privacy" className="text-purple-400 hover:text-purple-300">
-                        Privacy Policy
-                      </Link>
-                    </Label>
-                  </div>
-
-                  <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
-                    Create Account
-                  </Button>
-
+                    {signUpError && <div className="text-red-400 text-sm">{signUpError}</div>}
+                    <Button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
+                      Create Account
+                    </Button>
+                  </form>
                   <div className="text-center text-sm text-slate-400">
                     Already have an account?{" "}
                     <button
