@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -209,5 +211,10 @@ public class ArticleService {
         response.setQuestionIds(questionIds);
         
         return response;
+    }
+
+    public List<ArticleResponse> getArticlesBySubtopicId(Integer subtopicId) {
+        List<Article> articles = articleRepository.findBySubtopicId(subtopicId);
+        return articles.stream().map(this::mapToArticleResponse).collect(Collectors.toList());
     }
 } 

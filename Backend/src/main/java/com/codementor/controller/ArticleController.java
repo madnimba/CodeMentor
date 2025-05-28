@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/articles")
 // No @CrossOrigin needed: global CORS config is used
@@ -55,5 +57,11 @@ public class ArticleController {
     public ResponseEntity<ApiResponse<Void>> deleteArticle(@PathVariable Integer id) {
         articleService.deleteArticle(id);
         return ResponseEntity.ok(ApiResponse.success("Article deleted successfully", null));
+    }
+
+    @GetMapping("/by-subtopic/{subtopicId}")
+    public ResponseEntity<ApiResponse<List<ArticleResponse>>> getArticlesBySubtopicId(@PathVariable Integer subtopicId) {
+        List<ArticleResponse> articles = articleService.getArticlesBySubtopicId(subtopicId);
+        return ResponseEntity.ok(ApiResponse.success(articles));
     }
 } 
