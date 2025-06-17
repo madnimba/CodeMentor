@@ -11,6 +11,9 @@ import Article from "./pages/Article";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
+import Companies from "./pages/Companies";
+import CompanyQuestions from "./pages/CompanyQuestions";
+import LiveCoding from "./pages/LiveCoding";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +50,30 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/companies" 
+              element={
+                <ProtectedRoute>
+                  <Companies />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/companies/:companyId" 
+              element={
+                <ProtectedRoute>
+                  <CompanyQuestions />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/companies/:companyId/questions/:questionId" 
+              element={
+                <ProtectedRoute>
+                  <LiveCoding />
                 </ProtectedRoute>
               } 
             />

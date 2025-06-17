@@ -1,4 +1,3 @@
-
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { 
   Trophy, Target, Clock, TrendingUp, BookOpen, Code2, 
-  CheckCircle, Award, Calendar, ArrowRight, Users, Star 
+  CheckCircle, Award, Calendar, ArrowRight, Users, Star, Building2 
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -47,6 +46,13 @@ const Dashboard = () => {
     { title: "Complete 50 problems this month", progress: 78, deadline: "Dec 31, 2024" },
     { title: "Finish Database Systems track", progress: 65, deadline: "Jan 15, 2025" },
     { title: "Achieve 95% accuracy rate", progress: 91, deadline: "Jan 31, 2025" }
+  ];
+
+  const featuredCompanies = [
+    { id: 1, name: "Google", solved: 45, total: 60, difficulty: "Hard" },
+    { id: 2, name: "Microsoft", solved: 38, total: 55, difficulty: "Hard" },
+    { id: 3, name: "Amazon", solved: 42, total: 58, difficulty: "Hard" },
+    { id: 4, name: "Meta", solved: 35, total: 50, difficulty: "Medium" }
   ];
 
   return (
@@ -209,7 +215,51 @@ const Dashboard = () => {
             </div>
 
             {/* Sidebar */}
-            <div className="space-y-6">
+            <div className="space-y-8">
+              {/* Featured Companies */}
+              <Card className="bg-slate-800/50 border-slate-700">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <Building2 className="w-5 h-5 text-purple-400" />
+                    Featured Companies
+                  </CardTitle>
+                  <CardDescription className="text-slate-400">
+                    Practice questions from top tech companies
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {featuredCompanies.map((company) => (
+                      <div key={company.id} className="flex items-center justify-between p-4 bg-slate-900/50 rounded-lg">
+                        <div>
+                          <h4 className="text-white font-medium">{company.name}</h4>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-slate-400 text-sm">{company.solved}/{company.total} solved</span>
+                            <Badge className={`text-xs ${
+                              company.difficulty === 'Easy' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
+                              company.difficulty === 'Medium' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' :
+                              'bg-red-500/20 text-red-400 border-red-500/30'
+                            }`}>
+                              {company.difficulty}
+                            </Badge>
+                          </div>
+                        </div>
+                        <Button asChild variant="ghost" className="text-purple-400 hover:text-purple-300">
+                          <Link to={`/companies/${company.id}`}>
+                            View <ArrowRight className="ml-2 w-4 h-4" />
+                          </Link>
+                        </Button>
+                      </div>
+                    ))}
+                    <Button asChild className="w-full bg-purple-600 hover:bg-purple-700">
+                      <Link to="/companies">
+                        View All Companies <ArrowRight className="ml-2 w-4 h-4" />
+                      </Link>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Recent Activity */}
               <Card className="bg-slate-800/50 border-slate-700">
                 <CardHeader>
