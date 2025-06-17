@@ -108,7 +108,7 @@ const Auth = () => {
                 <CardContent className="space-y-4">
                   <form onSubmit={handleSignIn} className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="signin-username" className="text-slate-300">Username</Label>
+                      <Label htmlFor="signin-username" className="text-slate-300">Email</Label>
                       <div className="relative">
                         <User className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
                         <Input

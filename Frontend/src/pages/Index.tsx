@@ -51,7 +51,7 @@ const Index = () => {
             <Button asChild size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 text-lg">
               <Link to="/auth">Get Started Free</Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="border-slate-600 text-slate-300 hover:bg-slate-800 px-8 py-3 text-lg">
+            <Button asChild variant="outline" size="lg" className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 text-lg">
               <Link to="/study-materials">Explore Study Materials</Link>
             </Button>
           </div>

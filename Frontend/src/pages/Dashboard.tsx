@@ -58,7 +58,7 @@ const Dashboard = () => {
           {/* Welcome Section */}
           <div className="mb-8">
             <h1 className="text-4xl font-bold text-white mb-2">
-              Welcome back, Rashid! 👋
+              Welcome back! 👋
             </h1>
             <p className="text-slate-400 text-lg">
               Keep up the great work! You're on a {userStats.currentStreak}-day streak.
@@ -107,9 +107,9 @@ const Dashboard = () => {
               <div className="grid md:grid-cols-2 gap-6">
                 <Card className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 border-purple-500/30 hover:border-purple-400/50 transition-colors">
                   <CardHeader>
-                    <Code2 className="w-8 h-8 text-purple-400 mb-2" />
-                    <CardTitle className="text-white">Start Solving</CardTitle>
-                    <CardDescription className="text-slate-300">
+                    <Code2 className="w-8 h-8 text-purple-800 mb-2" />
+                    <CardTitle className="text-purple-800">Start Solving</CardTitle>
+                    <CardDescription className="text-purple-600">
                       Continue your coding journey with curated problems
                     </CardDescription>
                   </CardHeader>
@@ -125,13 +125,13 @@ const Dashboard = () => {
                 <Card className="bg-gradient-to-br from-cyan-600/20 to-blue-600/20 border-cyan-500/30 hover:border-cyan-400/50 transition-colors">
                   <CardHeader>
                     <BookOpen className="w-8 h-8 text-cyan-400 mb-2" />
-                    <CardTitle className="text-white">Study Materials</CardTitle>
-                    <CardDescription className="text-slate-300">
+                    <CardTitle className="text-cyan-800">Study Materials</CardTitle>
+                    <CardDescription className="text-cyan-600">
                       Master concepts with our comprehensive guides
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Button asChild variant="outline" className="w-full border-cyan-500 text-cyan-400 hover:bg-cyan-500/10">
+                    <Button asChild variant="outline" className="w-full border-cyan-700 text-cyan-600 hover:bg-cyan-500/10">
                       <Link to="/study-materials">
                         Start Learning <ArrowRight className="ml-2 w-4 h-4" />
                       </Link>
