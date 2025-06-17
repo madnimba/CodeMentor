@@ -3,15 +3,17 @@ import { Footer } from "@/components/layout/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Building2, ArrowLeft, CheckCircle, Code2, ChevronRight } from "lucide-react";
+import { Building2, ArrowLeft, CheckCircle, Code2, ChevronRight, ChevronDown, ChevronUp } from "lucide-react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import Editor from "@monaco-editor/react";
 
 const CompanyQuestions = () => {
   const { companyId } = useParams();
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [expandedQuestionId, setExpandedQuestionId] = useState<number | null>(null);
   
   // Mock data - in real app, this would come from an API
   const companyData = {
@@ -42,7 +44,24 @@ const CompanyQuestions = () => {
       description: "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.",
       difficulty: "Easy",
       status: "solved",
-      tags: ["Array", "Hash Table"]
+      tags: ["Array", "Hash Table"],
+      solution: `// Time Complexity: O(n)
+// Space Complexity: O(n)
+function twoSum(nums: number[], target: number): number[] {
+    const map = new Map<number, number>();
+    
+    for (let i = 0; i < nums.length; i++) {
+        const complement = target - nums[i];
+        
+        if (map.has(complement)) {
+            return [map.get(complement)!, i];
+        }
+        
+        map.set(nums[i], i);
+    }
+    
+    return [];
+}`
     },
     {
       id: 2,
@@ -50,7 +69,29 @@ const CompanyQuestions = () => {
       description: "You are given two non-empty linked lists representing two non-negative integers. The digits are stored in reverse order, and each of their nodes contains a single digit.",
       difficulty: "Medium",
       status: "attempted",
-      tags: ["Linked List", "Math"]
+      tags: ["Linked List", "Math"],
+      solution: `// Time Complexity: O(max(n, m))
+// Space Complexity: O(max(n, m))
+function addTwoNumbers(l1: ListNode | null, l2: ListNode | null): ListNode | null {
+    const dummy = new ListNode(0);
+    let current = dummy;
+    let carry = 0;
+    
+    while (l1 || l2 || carry) {
+        const x = l1 ? l1.val : 0;
+        const y = l2 ? l2.val : 0;
+        const sum = x + y + carry;
+        
+        carry = Math.floor(sum / 10);
+        current.next = new ListNode(sum % 10);
+        current = current.next;
+        
+        if (l1) l1 = l1.next;
+        if (l2) l2 = l2.next;
+    }
+    
+    return dummy.next;
+}`
     },
     {
       id: 3,
@@ -58,7 +99,27 @@ const CompanyQuestions = () => {
       description: "Given a string s, find the length of the longest substring without repeating characters.",
       difficulty: "Medium",
       status: "unsolved",
-      tags: ["String", "Sliding Window"]
+      tags: ["String", "Sliding Window"],
+      solution: `// Time Complexity: O(n)
+// Space Complexity: O(min(m, n))
+function lengthOfLongestSubstring(s: string): number {
+    const map = new Map<string, number>();
+    let maxLength = 0;
+    let start = 0;
+    
+    for (let end = 0; end < s.length; end++) {
+        const char = s[end];
+        
+        if (map.has(char)) {
+            start = Math.max(start, map.get(char)! + 1);
+        }
+        
+        map.set(char, end);
+        maxLength = Math.max(maxLength, end - start + 1);
+    }
+    
+    return maxLength;
+}`
     },
     {
       id: 4,
@@ -66,9 +127,50 @@ const CompanyQuestions = () => {
       description: "Given two sorted arrays nums1 and nums2 of size m and n respectively, return the median of the two sorted arrays.",
       difficulty: "Hard",
       status: "unsolved",
-      tags: ["Array", "Binary Search"]
+      tags: ["Array", "Binary Search"],
+      solution: `// Time Complexity: O(log(min(m, n)))
+// Space Complexity: O(1)
+function findMedianSortedArrays(nums1: number[], nums2: number[]): number {
+    if (nums1.length > nums2.length) {
+        return findMedianSortedArrays(nums2, nums1);
+    }
+    
+    const x = nums1.length;
+    const y = nums2.length;
+    let low = 0;
+    let high = x;
+    
+    while (low <= high) {
+        const partitionX = Math.floor((low + high) / 2);
+        const partitionY = Math.floor((x + y + 1) / 2) - partitionX;
+        
+        const maxLeftX = partitionX === 0 ? -Infinity : nums1[partitionX - 1];
+        const minRightX = partitionX === x ? Infinity : nums1[partitionX];
+        
+        const maxLeftY = partitionY === 0 ? -Infinity : nums2[partitionY - 1];
+        const minRightY = partitionY === y ? Infinity : nums2[partitionY];
+        
+        if (maxLeftX <= minRightY && maxLeftY <= minRightX) {
+            if ((x + y) % 2 === 0) {
+                return (Math.max(maxLeftX, maxLeftY) + Math.min(minRightX, minRightY)) / 2;
+            } else {
+                return Math.max(maxLeftX, maxLeftY);
+            }
+        } else if (maxLeftX > minRightY) {
+            high = partitionX - 1;
+        } else {
+            low = partitionX + 1;
+        }
+    }
+    
+    return 0;
+}`
     }
   ];
+
+  const toggleAnswer = (questionId: number) => {
+    setExpandedQuestionId(expandedQuestionId === questionId ? null : questionId);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900">
@@ -196,8 +298,20 @@ const CompanyQuestions = () => {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button variant="outline" className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10">
-                        See Solution
+                      <Button 
+                        variant="outline" 
+                        className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
+                        onClick={() => toggleAnswer(question.id)}
+                      >
+                        {expandedQuestionId === question.id ? (
+                          <>
+                            Close <ChevronUp className="ml-2 w-4 h-4" />
+                          </>
+                        ) : (
+                          <>
+                            See Answer <ChevronDown className="ml-2 w-4 h-4" />
+                          </>
+                        )}
                       </Button>
                       <Button 
                         className="bg-purple-600 hover:bg-purple-700"
@@ -207,6 +321,30 @@ const CompanyQuestions = () => {
                       </Button>
                     </div>
                   </div>
+
+                  {/* Expandable Answer Section */}
+                  {expandedQuestionId === question.id && (
+                    <div className="mt-6 border-t border-slate-700 pt-6">
+                      <h4 className="text-lg font-semibold text-white mb-4">Solution</h4>
+                      <div className="h-[300px] border border-slate-700 rounded-lg overflow-hidden">
+                        <Editor
+                          height="100%"
+                          defaultLanguage="typescript"
+                          theme="vs-dark"
+                          value={question.solution}
+                          options={{
+                            readOnly: true,
+                            minimap: { enabled: false },
+                            fontSize: 14,
+                            lineNumbers: "on",
+                            roundedSelection: false,
+                            scrollBeyondLastLine: false,
+                            automaticLayout: true,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}
