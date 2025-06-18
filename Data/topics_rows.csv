@@ -1,0 +1,11 @@
+id,track_id,name
+1,1,Arrays & Strings
+2,1,Linked Lists
+3,1,Trees & Binary Trees
+4,1,Graph Algorithms
+5,1,Dynamic Programming
+6,2,SQL Fundamentals
+7,2,Database Design
+8,2,NoSQL Databases
+9,2,Database Performance
+10,2,Transactions & ACID
