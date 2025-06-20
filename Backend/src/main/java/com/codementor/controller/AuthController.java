@@ -1,6 +1,7 @@
 package com.codementor.controller;
 
 import com.codementor.dto.AuthRequest;
+import com.codementor.dto.JwtResponse;
 import com.codementor.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,15 +20,15 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<String> signUp(@RequestBody AuthRequest request) {
+    public ResponseEntity<JwtResponse> signUp(@RequestBody AuthRequest request) {
         String token = authService.signUp(request.getEmail(), request.getUsername(), request.getPassword());
-        return ResponseEntity.ok(token);
+        return ResponseEntity.ok(new JwtResponse(token));
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<String> signIn(@RequestBody AuthRequest request) {
+    public ResponseEntity<JwtResponse> signIn(@RequestBody AuthRequest request) {
         String token = authService.signIn(request.getUsername(), request.getPassword());
-        return ResponseEntity.ok(token);
+        return ResponseEntity.ok(new JwtResponse(token));
     }
 
     @PostMapping("/signout")
