@@ -29,6 +29,3 @@ logging:
     org.springframework.security: DEBUG
     com.codementor: DEBUG
 
-# supabase:
-#   url: https://otjopoosscoadvryvfaf.supabase.co
-#   api-key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90am9wb29zc2NvYWR2cnl2ZmFmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0ODE2NzIxOCwiZXhwIjoyMDYzNzQzMjE4fQ.AbIfaA4yrCE8KdDKGBwnATray1XvzFGU7n9yTPeqV-E
