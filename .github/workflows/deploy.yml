@@ -20,7 +20,7 @@ jobs:
 
       - name: Run backend tests
         working-directory: ./backend
-        run: ./mvnw test
+        run: mvn test
 
       - name: Setup Node
         uses: actions/setup-node@v3
