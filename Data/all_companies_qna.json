@@ -3,7 +3,7 @@
     "company_name": "AppifyLab Ltd​",
     "company_website": "https://www.appifylab.com/",
     "career_website": "https://www.appifylab.com/career",
-    "introduction": "Appify lab has a LMS(Learning Management System) product nameEzyCourse",
+    "introduction": "Appify lab has a LMS(Learning Management System) product name EzyCourse",
     "interview_stages": [],
     "qna": [
       {
@@ -12,12 +12,12 @@
         "answer": "No answer found"
       },
       {
-        "question": "Given\nNumber of students, games, and connection eventsFor each student, the game they likeA sequence of connections between pairs of students over time\nFor each game, determine the earliest time when all students who like that game become connected (either directly or indirectly). Output-1if they never get connected.",
+        "question": "Given\nNumber of students, games, and connection events For each student, the game they like A sequence of connections between pairs of students over time\nFor each game, determine the earliest time when all students who like that game become connected (either directly or indirectly). Output  -1  if they never get connected.",
         "code_snippet": "",
         "answer": "No answer found"
       },
       {
-        "question": "Given:\nNumber of questionsFor each question: initial score, per-minute penalty, minimum scoreFor each question: submission time and number of submissions (positive if solved, non-positive if unsolved)\nCalculate the total score based on a formula involving penalties and number of attempts. If a question is unsolved, its score is 0.",
+        "question": "Given:\nNumber of questions For each question: initial score, per-minute penalty, minimum score For each question: submission time and number of submissions (positive if solved, non-positive if unsolved)\nCalculate the total score based on a formula involving penalties and number of attempts. If a question is unsolved, its score is 0.",
         "code_snippet": "",
         "answer": "No answer found"
       },
@@ -27,27 +27,27 @@
         "answer": "No answer found"
       },
       {
-        "question": "Given:\nNumber of dishes, adults, and kidsFor each dish: happiness value if eaten by an adult or by a kid\nAssign one dish to each person (adult or kid) to maximize the total happiness. An adult eats the entire dish; a kid partially eats it.",
+        "question": "Given:\nNumber of dishes, adults, and kids For each dish: happiness value if eaten by an adult or by a kid\nAssign one dish to each person (adult or kid) to maximize the total happiness. An adult eats the entire dish; a kid partially eats it.",
         "code_snippet": "",
         "answer": "No answer found"
       },
       {
-        "question": "Given:\nA list of item costsA limit on the total increase Sabbir can apply to the item costs\nSabbir increases item costs (total increment ≤ limit) to minimize the final score difference in a turn-based game where players pick items alternately and optimally.",
+        "question": "Given:\nA list of item costs A limit on the total increase Sabbir can apply to the item costs\nSabbir increases item costs (total increment ≤ limit) to minimize the final score difference in a turn-based game where players pick items alternately and optimally.",
         "code_snippet": "",
         "answer": "No answer found"
       },
       {
-        "question": "Given:\nA circular string of lengthN×Krepresenting N fragments of lengthKA list of G candidate fragments (all distinct)\nDetermine if the circular string can be split into a sequence of N valid fragments (from the candidate list) in some rotation. If possible, output any such valid sequence.",
+        "question": "Given:\nA circular string of length  N×K  representing N fragments of length  K A list of G candidate fragments (all distinct)\nDetermine if the circular string can be split into a sequence of N valid fragments (from the candidate list) in some rotation. If possible, output any such valid sequence.",
         "code_snippet": "",
         "answer": "No answer found"
       },
       {
-        "question": "Given multiple test cases, each with two numbers: total artifactsnand a positionk. Artifacts are arranged in a special sequence: first all odd-numbered ones, then multiples of odd numbers (2×odd, 3×odd, etc.) in order, skipping duplicates. Find which artifact appears at position k.",
+        "question": "Given multiple test cases, each with two numbers: total artifacts  n  and a position  k  . Artifacts are arranged in a special sequence: first all odd-numbered ones, then multiples of odd numbers (2×odd, 3×odd, etc.) in order, skipping duplicates. Find which artifact appears at position k.",
         "code_snippet": "",
         "answer": "No answer found"
       },
       {
-        "question": "Given grid dimensionsn × m. Determine if it is possible to assign pigment values to rows and columns such that every cell in the grid (combining row and column pigment modulo nm) has a unique value. If possible, output the row and column pigments.",
+        "question": "Given grid dimensions  n × m  . Determine if it is possible to assign pigment values to rows and columns such that every cell in the grid (combining row and column pigment modulo nm) has a unique value. If possible, output the row and column pigments.",
         "code_snippet": "",
         "answer": "No answer found"
       },
@@ -57,32 +57,32 @@
         "answer": "No answer found"
       },
       {
-        "question": "Given dimensions of two rectangles, one inside another, where the outer rectangle is(A×B)and inner rectangle is(C×D), withC ≤ AandD ≤ B.\nCompute the area between the two rectangles modulo1,000,000,007.\n💻 Submit Code",
+        "question": "Given dimensions of two rectangles, one inside another, where the outer rectangle is  (A×B)  and inner rectangle is  (C×D)  , with  C ≤ A  and  D ≤ B  .\nCompute the area between the two rectangles modulo  1,000,000,007  .\n💻 Submit Code",
         "code_snippet": "",
         "answer": "No answer found"
       },
       {
-        "question": "GivenNbaskets arranged in a circle with given apples in each and a numberKindicating how many apples one will eat.\nSimulate the person moving right and eating apples if present, and output the number of apples left in each basket after exactly K apples are eaten.",
+        "question": "Given  N  baskets arranged in a circle with given apples in each and a number  K  indicating how many apples one will eat.\nSimulate the person moving right and eating apples if present, and output the number of apples left in each basket after exactly K apples are eaten.",
         "code_snippet": "",
         "answer": "No answer found"
       },
       {
-        "question": "Given a stringsof lengthn. Pick an integerk(1 ≤ k ≤ n)and perform a transformation: reverse each substring of lengthksliding through the string, and find the lexicographically smallest resulting string. Output that string and the smallest such k.\n💻 Submit Code",
+        "question": "Given a string  s  of length  n  . Pick an integer  k   (1 ≤ k ≤ n)  and perform a transformation: reverse each substring of length  k  sliding through the string, and find the lexicographically smallest resulting string. Output that string and the smallest such k.\n💻 Submit Code",
         "code_snippet": "",
         "answer": "No answer found"
       },
       {
-        "question": "Given a simple directed graph withNvertices andMedges. Count how many vertices can be starting points for infinite walks (i.e., they lie on or can reach a cycle).\n💻 Submit Code",
+        "question": "Given a simple directed graph with  N  vertices and  M  edges. Count how many vertices can be starting points for infinite walks (i.e., they lie on or can reach a cycle).\n💻 Submit Code",
         "code_snippet": "",
         "answer": "No answer found"
       },
       {
-        "question": "Given a book withNpages (numbered1toN) and a secret digit (0–9), and you randomly pick a page. Compute the probability that the page number you picked contains the secret digit, expressed as an irreducible fractionP/Q.\n💻 Submit Code",
+        "question": "Given a book with  N  pages (numbered  1  to  N  ) and a secret digit (0–9), and you randomly pick a page. Compute the probability that the page number you picked contains the secret digit, expressed as an irreducible fraction  P/Q  .\n💻 Submit Code",
         "code_snippet": "",
         "answer": "No answer found"
       },
       {
-        "question": "Given Grid sizen×mand manhattan distances from a hidden cell(a, b)to(1, 1)and(1, m). Find the coordinates(a, b)of the hidden cell using the given distances\n💻 Submit Code",
+        "question": "Given Grid size  n×m  and manhattan distances from a hidden cell  (a, b)  to  (1, 1)  and  (1, m)  . Find the coordinates  (a, b)  of the hidden cell using the given distances\n💻 Submit Code",
         "code_snippet": "",
         "answer": "No answer found"
       }
@@ -101,7 +101,7 @@
         "answer": "Answer varies from person to person"
       },
       {
-        "question": "You have been provided a spiral matrix of size NXN along with a coordinate (x, y) as follows. Find the element at the position (x, y) of the matrix. N = 4, x = 2, y =1\n12341213145111615610987",
+        "question": "You have been provided a spiral matrix of size NXN along with a coordinate (x, y) as follows. Find the element at the position (x, y) of the matrix. N = 4, x = 2, y =1\n1 2 3 4 12 13 14 5 11 16 15 6 10 9 8 7",
         "code_snippet": "",
         "answer": "No answer found"
       },
@@ -196,7 +196,7 @@
         "answer": "class Solution {\npublic:\n    int maxDepth(TreeNode* root) {\n        if( root == nullptr ) return 0;\n        return max( maxDepth(root->left), maxDepth(root->right) ) + 1;\n    }\n};"
       },
       {
-        "question": "You are to create a data structure that will support the following operations with the mentioned time complexity\nInsert a number inO(1)Search for a number inO(1)Delete a number inO(1)Return a number from the container with equal probability inO(1)\nYou can use existing containers of your favourite language.",
+        "question": "You are to create a data structure that will support the following operations with the mentioned time complexity\nInsert a number in  O(1) Search for a number in  O(1) Delete a number in  O(1) Return a number from the container with equal probability in  O(1)\nYou can use existing containers of your favourite language.",
         "code_snippet": "",
         "answer": "No answer found"
       },
@@ -211,7 +211,7 @@
         "answer": "No answer found"
       },
       {
-        "question": "You are givenrow x colgrid representing a map wheregrid[i][j] = 1represents land andgrid[i][j] = 0represents water.\nGrid cells are connected horizontally/vertically (not diagonally). Thegridis completely surrounded by water, and there is exactly one island (i.e., one or more connected land cells).\nThe island doesn't have \"lakes\", meaning the water inside isn't connected to the water around the island. One cell is a square with side length 1. Thegridis rectangular, width and height don't exceed 100. Determine the perimeter of the island.\n💻 Submit Code",
+        "question": "You are given  row x col  grid representing a map where  grid[i][j] = 1  represents land and  grid[i][j] = 0  represents water.\nGrid cells are connected horizontally/vertically (not diagonally). The  grid  is completely surrounded by water, and there is exactly one island (i.e., one or more connected land cells).\nThe island doesn't have \"lakes\", meaning the water inside isn't connected to the water around the island. One cell is a square with side length 1. The  grid  is rectangular, width and height don't exceed 100. Determine the perimeter of the island.\n💻 Submit Code",
         "code_snippet": "class Solution {\npublic:\n    bool isLand(vector<vector<int>>& grid, int x, int y){\n        if( x < 0 or x >= grid.size() or y < 0 or y >= grid[0].size()  ) return false;\n        return grid[x][y] == 1;\n    }\n    int islandPerimeter(vector<vector<int>>& grid) {\n        int dx[] = {1,-1,0,0};\n        int dy[] = {0,0,1,-1};\n        int perimeter = 0;\n        for(int ux = 0; ux < grid.size(); ux ++){\n            for(int uy = 0; uy < grid[ux].size(); uy ++){\n                if( !isLand(grid, ux, uy) ) continue;\n                for(int i = 0; i < 4; i ++) {\n                    int vx = ux + dx[i];\n                    int vy = uy + dy[i];\n                    if( !isLand(grid, vx, vy) ) perimeter ++;\n                }\n            }\n        }\n        return perimeter;\n    }\n};",
         "answer": "class Solution {\npublic:\n    bool isLand(vector<vector<int>>& grid, int x, int y){\n        if( x < 0 or x >= grid.size() or y < 0 or y >= grid[0].size()  ) return false;\n        return grid[x][y] == 1;\n    }\n    int islandPerimeter(vector<vector<int>>& grid) {\n        int dx[] = {1,-1,0,0};\n        int dy[] = {0,0,1,-1};\n        int perimeter = 0;\n        for(int ux = 0; ux < grid.size(); ux ++){\n            for(int uy = 0; uy < grid[ux].size(); uy ++){\n                if( !isLand(grid, ux, uy) ) continue;\n                for(int i = 0; i < 4; i ++) {\n                    int vx = ux + dx[i];\n                    int vy = uy + dy[i];\n                    if( !isLand(grid, vx, vy) ) perimeter ++;\n                }\n            }\n        }\n        return perimeter;\n    }\n};"
       }
@@ -221,7 +221,7 @@
     "company_name": "Bevy Commerce​",
     "company_website": "Not found",
     "career_website": "Not found",
-    "introduction": "Bevy Commerceis a software development studio specializing in cutting-edge eCommerce solutions. They build tailored, innovative products that drive sales and elevate the customer experience for industry giants such as Canadian Tire, Alo Yoga, Authentic Brands Group, and Shopify corporate.",
+    "introduction": "Bevy Commerce is a software development studio specializing in cutting-edge eCommerce solutions. They build tailored, innovative products that drive sales and elevate the customer experience for industry giants such as Canadian Tire, Alo Yoga, Authentic Brands Group, and Shopify corporate.",
     "interview_stages": [],
     "qna": [
       {
@@ -257,21 +257,21 @@
     "career_website": "https://erp.bs-23.com/jobs",
     "introduction": "Brain Station 23 is at the forefront of global digital transformation, delivering state-of-the-art technology solutions designed to propel businesses into the future. With expertise spanning software development, cloud computing, enterprise-grade mobile applications, AI and machine learning, and blockchain technology, they offer bespoke solutions that drive innovation and efficiency.",
     "interview_stages": [
-      "Online MCQ Exam:Everyone who applies for the program will be given the opportunity to sit for this round. Questions are asked from computer science subjects. The topics generally cover programming, data-algo, OOP, databases, etc. Those who do well in this exam are shortlisted for the next step.",
-      "Onsite Exam:This round is onsite, a 2-3 hour written exam. Candidates have to take an online exam on problem solving, data algorithms, databases, etc. No internet access is given for this stage.",
-      "Day long Assessment Test:This is an interesting round. There are various events throughout the day. Teamwork, idea generation, fun, etc. It is a lot like a hackathon. Presentations have to be given. It takes place in their office from morning to evening. Candidates are given a scenario and some questions. They have to come up with a solution and present it. The submissions are ERD, wireframe, SQL etc.",
-      "Technical Interview:Candidates may be interviewed about the project they developed in Step 3. They may also be asked about problem solving and computer science fundamentals",
+      "Online MCQ Exam: Everyone who applies for the program will be given the opportunity to sit for this round. Questions are asked from computer science subjects. The topics generally cover programming, data-algo, OOP, databases, etc. Those who do well in this exam are shortlisted for the next step.",
+      "Onsite Exam: This round is onsite, a 2-3 hour written exam. Candidates have to take an online exam on problem solving, data algorithms, databases, etc. No internet access is given for this stage.",
+      "Day long Assessment Test: This is an interesting round. There are various events throughout the day. Teamwork, idea generation, fun, etc. It is a lot like a hackathon. Presentations have to be given. It takes place in their office from morning to evening. Candidates are given a scenario and some questions. They have to come up with a solution and present it. The submissions are ERD, wireframe, SQL etc.",
+      "Technical Interview: Candidates may be interviewed about the project they developed in Step 3. They may also be asked about problem solving and computer science fundamentals",
       "HR Interview",
-      "Client Facing Interview:Sometimes candidates are tasked to conduct a real client facing interview. This stage is not applicable for everyone and only given occasionally."
+      "Client Facing Interview: Sometimes candidates are tasked to conduct a real client facing interview. This stage is not applicable for everyone and only given occasionally."
     ],
     "qna": [
       {
         "question": "Mr. Joy is planning to build a web browser. Now he is analyzing requirements for the navigation system of his web browser, which will preserve the browsing history. What is the appropriate data structure to use for the navigation system?",
         "code_snippet": "",
-        "answer": "The appropriate data structure to use for the navigation system of a web browser is aStack. A stack follows the Last In First Out (LIFO) principle, which is suitable for maintaining the browsing history."
+        "answer": "The appropriate data structure to use for the navigation system of a web browser is a  Stack  . A stack follows the Last In First Out (LIFO) principle, which is suitable for maintaining the browsing history."
       },
       {
-        "question": "In the following code snippet, what does the keyword 'this' refer to\njavaclassEmployee{privateString name;publicEmployee(Stringname) {this.name=name;}}",
+        "question": "In the following code snippet, what does the keyword 'this' refer to\njava classEmployee{privateString name;publicEmployee(Stringname) {this.name=name;}}",
         "code_snippet": "",
         "answer": "The keyword 'this' refers to the current instance of the class. In this context, 'this.name' refers to the instance variable 'name' of the current Employee object."
       },
@@ -281,9 +281,9 @@
         "answer": "Let the number of black balls be 3x and the number of red balls be 7x. After adding 20 more black balls, the ratio becomes 1:2. So, the number of black balls is 3x + 20 and the number of red balls is 7x. According to the given condition, (3x + 20) / 7x = 1 / 2. Solving this equation, we get x = 40. Therefore, the number of red balls is 7x = 280."
       },
       {
-        "question": "which of the following is false about RDBMS (Relational Database Management System)?\nRDBMS supports concurrency control to handle multiple transactions simultaneously.RDBMS uses tables to store data in rows and columns.In RDBMS, a unique constraint prevents null values in a column.RDBMS ensures data integrity using ACID properties.",
+        "question": "which of the following is false about RDBMS (Relational Database Management System)?\nRDBMS supports concurrency control to handle multiple transactions simultaneously. RDBMS uses tables to store data in rows and columns. In RDBMS, a unique constraint prevents null values in a column. RDBMS ensures data integrity using ACID properties.",
         "code_snippet": "",
-        "answer": "The false statement about RDBMS is:In RDBMS, a unique constraint prevents null values in a column.A unique constraint ensures that all values in a column are unique, but it does not prevent null values."
+        "answer": "The false statement about RDBMS is:  In RDBMS, a unique constraint prevents null values in a column.  A unique constraint ensures that all values in a column are unique, but it does not prevent null values."
       },
       {
         "question": "A train leaves station A at 7 AM with the speed of 60 kmph, and another train leaves the A station at 8 AM with the speed of 90 kmph..when will the second train catch the first train?",
@@ -291,9 +291,9 @@
         "answer": "No answer found"
       },
       {
-        "question": "What will be the output of the following code?\ncpp#include<stdio.h>intmain() {intsum=7+6/3+14*2;printf(\"%d\", sum);return0;}",
+        "question": "What will be the output of the following code?\ncpp #include<stdio.h>intmain() {intsum=7+6/3+14*2;printf(\"%d\", sum);return0;}",
         "code_snippet": "",
-        "answer": "Division and multiplication have higher precedence than addition. So, the expression will be evaluated as7 + 2 + 28 = 37"
+        "answer": "Division and multiplication have higher precedence than addition. So, the expression will be evaluated as  7 + 2 + 28 = 37"
       },
       {
         "question": "If the area of a rectangular region is equal to the area of a square, then the perimeter of the rectangular must be",
@@ -321,9 +321,9 @@
         "answer": "In Agile methodology, a \"sprint\" is a short, time-boxed period where a team focuses on completing a specific set of work, essentially a dedicated cycle within a project where a defined amount of functionality is developed and ready for review."
       },
       {
-        "question": "What does thestatickeyword mean when used with a method?",
+        "question": "What does the  static  keyword mean when used with a method?",
         "code_snippet": "",
-        "answer": "When thestatickeyword is used with a method, it means that the method belongs to the class itself rather than an instance of the class. Static methods can be called without creating an instance of the class.When we declare a field static, exactly a single copy of that field is created and shared among all instances of that class. Similar to static fields, static methods also belong to a class instead of an object. So, we can invoke them without instantiating the class."
+        "answer": "When the  static  keyword is used with a method, it means that the method belongs to the class itself rather than an instance of the class. Static methods can be called without creating an instance of the class. When we declare a field static, exactly a single copy of that field is created and shared among all instances of that class. Similar to static fields, static methods also belong to a class instead of an object. So, we can invoke them without instantiating the class."
       },
       {
         "question": "Why are immutable objects often preferred in OOP design?",
@@ -338,32 +338,32 @@
       {
         "question": "What is the time complexity of searching for an element in a balanced binary search tree?",
         "code_snippet": "",
-        "answer": "The time complexity of searching for an element in a balanced binary search tree isO(log n), wherenis the number of nodes in the tree."
+        "answer": "The time complexity of searching for an element in a balanced binary search tree is  O(log n)  , where  n  is the number of nodes in the tree."
       },
       {
-        "question": "There are 100 light bulbs and 100 people. Initially, all bulbs are off. Person 1 flips every bulb(1, 2, 3, 4, …). Person 2 flips every 2nd bulb(2, 4, 6, …). Person 3 flips every 3rd bulb(3, 6, 9, …), and so on, until all 100 people have acted. How many people would have flipped bulb number 72?",
+        "question": "There are 100 light bulbs and 100 people. Initially, all bulbs are off. Person 1 flips every bulb  (1, 2, 3, 4, …)  . Person 2 flips every 2nd bulb  (2, 4, 6, …)  . Person 3 flips every 3rd bulb  (3, 6, 9, …)  , and so on, until all 100 people have acted. How many people would have flipped bulb number 72?",
         "code_snippet": "",
-        "answer": "We need to find the factors of 72 to determine how many people would have flipped bulb number 72. The factors of 72 are1, 2, 3, 4, 6, 8, 9, 12, 18, 24, 36, 72. Therefore, 12 people would have flipped bulb number 72."
+        "answer": "We need to find the factors of 72 to determine how many people would have flipped bulb number 72. The factors of 72 are  1, 2, 3, 4, 6, 8, 9, 12, 18, 24, 36, 72  . Therefore, 12 people would have flipped bulb number 72."
       },
       {
-        "question": "A circular queue has a size of5and currently contains3elements. How many more elements can you insert?",
+        "question": "A circular queue has a size of  5  and currently contains  3  elements. How many more elements can you insert?",
         "code_snippet": "",
-        "answer": "We can insert2more elements into the circular queue, as it has a size of5and currently contains3elements."
+        "answer": "We can insert  2  more elements into the circular queue, as it has a size of  5  and currently contains  3  elements."
       },
       {
-        "question": "You are given the head of a circular singly linked list and an integern. How would you remove thenth node from the end of the list efficiently?",
+        "question": "You are given the head of a circular singly linked list and an integer  n  . How would you remove the  n  th node from the end of the list efficiently?",
         "code_snippet": "",
         "answer": "Use two pointer; fast and slow. Move the fast pointer n steps ahead, then move both fast and slow until fast reaches the last node. Delete slow->next by updating slow->next = slow->next->next. Handle edge cases separately."
       },
       {
-        "question": "You are working with a binary search tree (BST) and need to find the lowest common ancestor (LCA) of two nodes,uandv. Which of the following is the most efficient approach for finding the LCA in a BST, assuming no additional balancing is applied?",
+        "question": "You are working with a binary search tree (BST) and need to find the lowest common ancestor (LCA) of two nodes,  u  and  v  . Which of the following is the most efficient approach for finding the LCA in a BST, assuming no additional balancing is applied?",
         "code_snippet": "",
-        "answer": "The most efficient approach is to traverse the BST from the root, moving left if both u and v are smaller, right if both are larger, and stopping when the current node is between u and v (i.e., the LCA). Time Complexity: O(h), where h is the tree height. Provided the tree is balanced, the height islog(n)."
+        "answer": "The most efficient approach is to traverse the BST from the root, moving left if both u and v are smaller, right if both are larger, and stopping when the current node is between u and v (i.e., the LCA). Time Complexity: O(h), where h is the tree height. Provided the tree is balanced, the height is  log(n)  ."
       },
       {
-        "question": "What is the next term in the series:1, 4, 9, 16, 25, __?",
+        "question": "What is the next term in the series:  1, 4, 9, 16, 25, __  ?",
         "code_snippet": "",
-        "answer": "The next term in the series is36. The series represents the squares of natural numbers:1^2, 2^2, 3^2, 4^2, 5^2, 6^2."
+        "answer": "The next term in the series is  36  . The series represents the squares of natural numbers:  1^2, 2^2, 3^2, 4^2, 5^2, 6^2  ."
       },
       {
         "question": "In a many-to-many relationship between two database tables, which of the following is typically used to model the relationship?",
@@ -386,7 +386,7 @@
         "answer": "No answer found"
       },
       {
-        "question": "A game development team is working on a character system where all characters have afight()method. Characters like Warrior, Mage, and Archer implement this method differently. Which concept ensures the correct method is executed based on the character type?",
+        "question": "A game development team is working on a character system where all characters have a  fight()  method. Characters like Warrior, Mage, and Archer implement this method differently. Which concept ensures the correct method is executed based on the character type?",
         "code_snippet": "",
         "answer": "The concept of polymorphism ensures the correct method is executed based on the character type. Polymorphism allows objects of different classes to be treated as objects of a common superclass."
       },
@@ -396,7 +396,7 @@
         "answer": "No answer found"
       },
       {
-        "question": "In a network of cities and roads, you are givenncities andmroads between them. Your task is to determine the minimum number of new roads required to ensure that there is a path between every pair of cities. What is the most suitable approach to solve this problem?",
+        "question": "In a network of cities and roads, you are given  n  cities and  m  roads between them. Your task is to determine the minimum number of new roads required to ensure that there is a path between every pair of cities. What is the most suitable approach to solve this problem?",
         "code_snippet": "",
         "answer": "The most suitable approach is to create a connected graph using a Union-Find algorithm. The cities will be connected in multiple components. Each city in a component is connected to any other city in the same component using some series of roads. The minimum number of new roads required is the number of components minus one."
       },
@@ -411,9 +411,9 @@
         "answer": "Function overloading is an example of compile-time polymorphism. It allows multiple functions with the same name but different parameters to be defined in a class."
       },
       {
-        "question": "You are given a list of n unique room numbers belonging to guests at a hotel. These numbers are in the range[0, n], but one guest's room number is missing from the list. What is the best possible space complexity for solving this problem?",
+        "question": "You are given a list of n unique room numbers belonging to guests at a hotel. These numbers are in the range  [0, n]  , but one guest's room number is missing from the list. What is the best possible space complexity for solving this problem?",
         "code_snippet": "",
-        "answer": "The best possible space complexity isO(1). We can use the XOR operation to find the missing room number without using additional space. XOR all the room numbers in a variablex. Then XORxwith the range[0, n]and the missing room number will be the result."
+        "answer": "The best possible space complexity is  O(1)  . We can use the XOR operation to find the missing room number without using additional space. XOR all the room numbers in a variable  x  . Then XOR  x  with the range  [0, n]  and the missing room number will be the result."
       },
       {
         "question": "Identify the What type of casting is demonstrated in a code segment?",
@@ -426,9 +426,9 @@
         "answer": "A bipartite graph is a graph whose vertices can be divided into two disjoint sets such that no two vertices within the same set are adjacent. A graph that contains an odd-length cycle is not a bipartite graph."
       },
       {
-        "question": "What is the purpose of thefinalkeyword in OOP?",
+        "question": "What is the purpose of the  final  keyword in OOP?",
         "code_snippet": "",
-        "answer": "Thefinalkeyword in OOP is used to restrict the user. It can be used with variables, methods, and classes. When a variable is declared with thefinalkeyword, its value cannot be changed. When a method is declared with thefinalkeyword, it cannot be overridden by subclasses. When a class is declared. with thefinalkeyword, it cannot be subclassed."
+        "answer": "The  final  keyword in OOP is used to restrict the user. It can be used with variables, methods, and classes. When a variable is declared with the  final  keyword, its value cannot be changed. When a method is declared with the  final  keyword, it cannot be overridden by subclasses. When a class is declared. with the  final  keyword, it cannot be subclassed."
       },
       {
         "question": "Write a SQL query to retrieve the names of all customers who have placed an order with a total value greater than $1000. Orders are in the orders table and customer information is in the customers table.",
@@ -441,42 +441,42 @@
         "answer": "No answer found"
       },
       {
-        "question": "Given a numbern, write a program to reverse the digits of the number.\n💻 Submit Code",
+        "question": "Given a number  n  , write a program to reverse the digits of the number.\n💻 Submit Code",
         "code_snippet": "class Solution {\npublic:\n    int reverse(int x) {\n        int reverse = 0;\n        while( x ) {\n            if( reverse > INT_MAX/10 || reverse < INT_MIN/10  ) return 0;\n            reverse = reverse * 10 + x % 10;\n            x /= 10;\n        }\n        return reverse;\n    }\n};",
         "answer": "class Solution {\npublic:\n    int reverse(int x) {\n        int reverse = 0;\n        while( x ) {\n            if( reverse > INT_MAX/10 || reverse < INT_MIN/10  ) return 0;\n            reverse = reverse * 10 + x % 10;\n            x /= 10;\n        }\n        return reverse;\n    }\n};"
       },
       {
-        "question": "Given a numbern, write a program to find if the number is an armstrong number or not.\nAn Armstrong number is a number that is equal to the sum of its digits, each raised to the power of the number of digits in the number. For example,153is an Armstrong number because1^3+5^3+3^3=153",
+        "question": "Given a number  n  , write a program to find if the number is an armstrong number or not.\nAn Armstrong number is a number that is equal to the sum of its digits, each raised to the power of the number of digits in the number. For example,  153  is an Armstrong number because  1^3+5^3+3^3=153",
         "code_snippet": "class Solution {\npublic:\n    bool armstrongNumber(int n) {\n        int n_ = n;\n        int a = 0;\n        while( n > 0 ){\n            int d = n % 10;\n            a = a + d * d * d;\n            n = n / 10;\n        }\n        if( n_ ==  a) return true;\n        else return false;\n    }\n};",
         "answer": "class Solution {\npublic:\n    bool armstrongNumber(int n) {\n        int n_ = n;\n        int a = 0;\n        while( n > 0 ){\n            int d = n % 10;\n            a = a + d * d * d;\n            n = n / 10;\n        }\n        if( n_ ==  a) return true;\n        else return false;\n    }\n};"
       },
       {
-        "question": "Write a program to print a string by removing\nleading, trailing space,if there's two or more space between two chars replace it with one space.",
+        "question": "Write a program to print a string by removing\nleading, trailing space, if there's two or more space between two chars replace it with one space.",
         "code_snippet": "class Solution {\npublic:\n    string removeSpaces(string s) {\n        string trimmed = \"\";\n        bool seenSpace = true;\n        for(auto c:s){\n            if (c != ' ') {\n                result +=c;\n                seenSpace = false;  // Reset space flag\n            } else if (!seenSpace) {  // If it's the first space after a word\n                trimmed += ' ';\n                seenSpace = true;\n            }\n        }\n        while( trimmed.size() and trimmed.back() == ' ' ) trimmed.pop_back();\n        return trimmed;\n    }\n};",
         "answer": "class Solution {\npublic:\n    string removeSpaces(string s) {\n        string trimmed = \"\";\n        bool seenSpace = true;\n        for(auto c:s){\n            if (c != ' ') {\n                result +=c;\n                seenSpace = false;  // Reset space flag\n            } else if (!seenSpace) {  // If it's the first space after a word\n                trimmed += ' ';\n                seenSpace = true;\n            }\n        }\n        while( trimmed.size() and trimmed.back() == ' ' ) trimmed.pop_back();\n        return trimmed;\n    }\n};"
       },
       {
-        "question": "Write a program which will do the following for i = 1 to N .\nif i is divisible by 3 then print 'Star',if i is divisible by 5 'Coder'if i is divisible by 3 and 5 both print 'StarCoder'else just print the number",
+        "question": "Write a program which will do the following for i = 1 to N .\nif i is divisible by 3 then print 'Star', if i is divisible by 5 'Coder' if i is divisible by 3 and 5 both print 'StarCoder' else just print the number",
         "code_snippet": "class Solution {\npublic:\n    void fooBar(int n) {\n        for( int i = 1; i <= n; i++ ) {\n            string output = \"\";\n            if( i % 3 == 0 ) output += \"Star\";\n            if( i % 5 == 0 ) output += \"Coder\";\n            if( output != \"\" ) cout << output << endl;\n            else cout << i << endl;\n        }\n    }\n};",
         "answer": "class Solution {\npublic:\n    void fooBar(int n) {\n        for( int i = 1; i <= n; i++ ) {\n            string output = \"\";\n            if( i % 3 == 0 ) output += \"Star\";\n            if( i % 5 == 0 ) output += \"Coder\";\n            if( output != \"\" ) cout << output << endl;\n            else cout << i << endl;\n        }\n    }\n};"
       },
       {
-        "question": "Given an integer arraynums, rotate the array to the right byksteps, wherekis non-negative.\n💻 Submit Code",
+        "question": "Given an integer array  nums  , rotate the array to the right by  k  steps, where  k  is non-negative.\n💻 Submit Code",
         "code_snippet": "class Solution {\npublic:\n    void rotate(vector<int>& nums, int k) {\n        int n = nums.size();\n        k = k % n;\n        reverse(nums.begin(), nums.end());\n        reverse(nums.begin(), nums.begin() + k);\n        reverse(nums.begin() + k, nums.end());\n    }\n};",
         "answer": "class Solution {\npublic:\n    void rotate(vector<int>& nums, int k) {\n        int n = nums.size();\n        k = k % n;\n        reverse(nums.begin(), nums.end());\n        reverse(nums.begin(), nums.begin() + k);\n        reverse(nums.begin() + k, nums.end());\n    }\n};"
       },
       {
-        "question": "Given a numbern, print its factorial i.e.n!",
+        "question": "Given a number  n  , print its factorial i.e.  n!",
         "code_snippet": "class Solution {\npublic:\n    void factorial(int n) {\n        if( n < 0 ) return 0;\n        if( n == 0 ) return 1;\n        return n * factorial(n-1);\n    }\n};",
         "answer": "class Solution {\npublic:\n    void factorial(int n) {\n        if( n < 0 ) return 0;\n        if( n == 0 ) return 1;\n        return n * factorial(n-1);\n    }\n};"
       },
       {
-        "question": "Given an unsorted array of integersnums, return the length of the longest consecutive elements sequence.:\nEx: Input:5 3 2 1After Sort:1 2 3 5Ans:3Bonus: Write an algorithm that runs inO(n)time.\n💻 Submit Code",
+        "question": "Given an unsorted array of integers  nums  , return the length of the longest consecutive elements sequence.:\nEx: Input:  5 3 2 1  After Sort:  1 2 3 5  Ans:  3  Bonus: Write an algorithm that runs in  O(n)  time.\n💻 Submit Code",
         "code_snippet": "class Solution {\npublic:\n    int longestConsecutive(vector<int>& nums) {\n        if( nums.size() == 0 )  return 0;\n        sort(nums.begin(), nums.end());\n        int seq_length = 1;\n        int max_length = 1;\n        for(int i = 1; i < nums.size(); i++){\n            if( nums[i] == nums[i-1] ) continue;\n            else if( nums[i] == nums[i-1] + 1 ) seq_length++;\n            else seq_length = 1;\n            max_length = max(max_length, seq_length);\n        }\n        return max_length;\n    }\n};",
         "answer": "class Solution {\npublic:\n    int longestConsecutive(vector<int>& nums) {\n        if( nums.size() == 0 )  return 0;\n        sort(nums.begin(), nums.end());\n        int seq_length = 1;\n        int max_length = 1;\n        for(int i = 1; i < nums.size(); i++){\n            if( nums[i] == nums[i-1] ) continue;\n            else if( nums[i] == nums[i-1] + 1 ) seq_length++;\n            else seq_length = 1;\n            max_length = max(max_length, seq_length);\n        }\n        return max_length;\n    }\n};"
       },
       {
-        "question": "Given two integers N (upto 18 digits) and M(≤100): Digits of the New Number:\nThe new number should be formed by permuting the digits of N.The new number must not have any leading zeros.The new number must be divisible by M. find the num of numbers that match these conditions.\nInput: 104 2Output: 3→104, 140, 410",
+        "question": "Given two integers N (upto 18 digits) and M(≤100): Digits of the New Number:\nThe new number should be formed by permuting the digits of N. The new number must not have any leading zeros. The new number must be divisible by M. find the num of numbers that match these conditions.\nInput: 104 2Output: 3→104, 140, 410",
         "code_snippet": "",
         "answer": "No answer found"
       },
@@ -596,7 +596,7 @@
     "company_name": "DSI​",
     "company_website": "https://www.dsinnovators.com/",
     "career_website": "https://app.hrythmic.com/recruit/openings/company/dsinnovators/",
-    "introduction": "Dynamic Solution Innovators Ltdis an international software company based in Dhaka, Bangladesh. They have been successfully providing software services since 2001 in both the local and global market.",
+    "introduction": "Dynamic Solution Innovators Ltd is an international software company based in Dhaka, Bangladesh. They have been successfully providing software services since 2001 in both the local and global market.",
     "interview_stages": [],
     "qna": [
       {
@@ -625,7 +625,7 @@
         "answer": "No answer found"
       },
       {
-        "question": "Apply database normalization technique to the following table\nstudent table:\nstudent_idnamecourse_namecourse_fee1shakibDSA4002rakibAlgorithms1003showrovNetworking3004kalamAlgorithms100",
+        "question": "Apply database normalization technique to the following table\nstudent table:\nstudent_id name course_name course_fee 1 shakib DSA 400 2 rakib Algorithms 100 3 showrov Networking 300 4 kalam Algorithms 100",
         "code_snippet": "",
         "answer": "No answer found"
       },
@@ -650,7 +650,7 @@
         "answer": "No answer found"
       },
       {
-        "question": "Given three valuea,b,c, write a program to determine if we can make a traingle using these as side lengths.",
+        "question": "Given three value  a,b,c  , write a program to determine if we can make a traingle using these as side lengths.",
         "code_snippet": "",
         "answer": "No answer found"
       }
@@ -660,23 +660,23 @@
     "company_name": "Exabyting​",
     "company_website": "http://exabyting.com/",
     "career_website": "https://exabyting.com/join-our-team/",
-    "introduction": "Exabytingis an international software company based in Dhaka, Bangladesh. They have been successfully providing software services since 2018 in both the local and global market.",
+    "introduction": "Exabyting is an international software company based in Dhaka, Bangladesh. They have been successfully providing software services since 2018 in both the local and global market.",
     "interview_stages": [],
     "qna": [
       {
         "question": "Difference between Array and Linked List.",
         "code_snippet": "",
-        "answer": "Read more fromArray vs Linked List | GeeksforGeeks"
+        "answer": "Read more from Array vs Linked List | GeeksforGeeks"
       },
       {
         "question": "Which sorting algorithm works better in the average case?",
         "code_snippet": "",
-        "answer": "Merge sort and Quick sort work better in the average case. Merge sort has a time complexity ofO(nlogn)in the worst case. Quick sort has a time complexity ofO(nlogn)in the average case. Both are stable sorting algorithms and work well with large and medium datasets."
+        "answer": "Merge sort and Quick sort work better in the average case. Merge sort has a time complexity of  O(nlogn)  in the worst case. Quick sort has a time complexity of  O(nlogn)  in the average case. Both are stable sorting algorithms and work well with large and medium datasets."
       },
       {
         "question": "Suppose, you have to sort 1000 numbers, numbers can be positive and negative. Which algorithm will you use?",
         "code_snippet": "",
-        "answer": "We can use merge sort to sort the 1000 numbers. Merge sort has a time complexity ofO(nlogn)in the worst case. It is a stable sorting algorithm and works well with large and medium datasets. Merge sort is a divide and conquer algorithm."
+        "answer": "We can use merge sort to sort the 1000 numbers. Merge sort has a time complexity of  O(nlogn)  in the worst case. It is a stable sorting algorithm and works well with large and medium datasets. Merge sort is a divide and conquer algorithm."
       },
       {
         "question": "What is Stack, Queue and Priority Queue?",
@@ -691,7 +691,7 @@
       {
         "question": "When we type a web address (www.google.com) in a web browser, what happens before we get the response?",
         "code_snippet": "",
-        "answer": "This is a very important question and aims to check the knowledge of networking. A very thorough explanation of this question is answered here inWhat Happens When"
+        "answer": "This is a very important question and aims to check the knowledge of networking. A very thorough explanation of this question is answered here in What Happens When"
       },
       {
         "question": "Difference between TCP and UDP.",
@@ -706,22 +706,22 @@
       {
         "question": "Difference between SQL and NoSQL.",
         "code_snippet": "",
-        "answer": "Read more fromUnderstanding SQL vs NoSQL Databases | MongoDB"
+        "answer": "Read more from Understanding SQL vs NoSQL Databases | MongoDB"
       },
       {
         "question": "Difference between Compiler and Interpreter.",
         "code_snippet": "",
-        "answer": "To learn more about the difference between Compiler and Interpreter, read this article:Difference between Compiler and Interpreter"
+        "answer": "To learn more about the difference between Compiler and Interpreter, read this article: Difference between Compiler and Interpreter"
       },
       {
         "question": "Explain BST.",
         "code_snippet": "",
-        "answer": "Binary Search Tree: A binary search tree is a binary tree in which the value of the left child is less than the parent node and the value of the right child is greater than the parent node."
+        "answer": "Binary Search Tree : A binary search tree is a binary tree in which the value of the left child is less than the parent node and the value of the right child is greater than the parent node."
       },
       {
-        "question": "Suppose, we insert[1, 2, 3, 4]this array in BST. What will it look like after insertion? What is the search complexity in this tree? What if we want to make the search complexity O(logn)?",
+        "question": "Suppose, we insert  [1, 2, 3, 4]  this array in BST. What will it look like after insertion? What is the search complexity in this tree? What if we want to make the search complexity O(logn)?",
         "code_snippet": "    1\n     \\\n      2\n       \\\n        3\n         \\\n          4",
-        "answer": "And the search complexity will beO(n)in this case. To make the search complexityO(logn), we have to make the tree balanced. We can use AVL tree or Red-Black tree to make the tree balanced."
+        "answer": "And the search complexity will be  O(n)  in this case. To make the search complexity  O(logn)  , we have to make the tree balanced. We can use AVL tree or Red-Black tree to make the tree balanced."
       },
       {
         "question": "Left Join VS Full Join. Describe a scenario where we need to use Left Join.",
@@ -781,7 +781,7 @@
       {
         "question": "Explain var, let, const in JavaScript.",
         "code_snippet": "",
-        "answer": "Read more fromVar, Let, and Const – What's the Difference? | FreeCodeCamp"
+        "answer": "Read more from Var, Let, and Const – What's the Difference? | FreeCodeCamp"
       },
       {
         "question": "Explain hoisting.",
@@ -791,7 +791,7 @@
       {
         "question": "Explain primitive and reference data types.",
         "code_snippet": "",
-        "answer": "Read more fromJavaScript Primitive Values vs Reference Values | FreeCodeCamp"
+        "answer": "Read more from JavaScript Primitive Values vs Reference Values | FreeCodeCamp"
       },
       {
         "question": "Explain closure. The inner function (which is returned) of the closure has access to its outer scope, how is it possible, where the variable is stored in that time?",
@@ -831,7 +831,7 @@
       {
         "question": "Explain the map, unordered_map and their complexity. Why does the complexity of the unordered_map go to O(n) in some cases?",
         "code_snippet": "",
-        "answer": "Read more fromMap vs Unordered Map in C++ | GeeksforGeeks"
+        "answer": "Read more from Map vs Unordered Map in C++ | GeeksforGeeks"
       },
       {
         "question": "Explain the four principles of OOP.",
@@ -856,20 +856,20 @@
       {
         "question": "Is HTTPS stateful or stateless? If stateless, then how can we browse Facebook after login once?",
         "code_snippet": "",
-        "answer": "HTTPS itself is stateless because it follows the HTTP protocol, which does not retain session information between requests. However, websites like Facebook manage user sessions usingcookiesandtokensto maintain state."
+        "answer": "HTTPS itself is stateless because it follows the HTTP protocol, which does not retain session information between requests. However, websites like Facebook manage user sessions using cookies and tokens to maintain state."
       },
       {
         "question": "Explain cookie-based authentication. How can we blacklist a cookie?",
         "code_snippet": "",
-        "answer": "Cookie-based authenticationis a method where a server issues a session cookie upon successful login. This cookie, stored in the user's browser, is sent with every subsequent request, allowing the server to identify the user without requiring reauthentication. The server typically stores session details in a database or in-memory store (e.g., Redis). Cookies can have attributes like HttpOnly (prevents JavaScript access), Secure (only sent over HTTPS), and SameSite (prevents CSRF attacks)."
+        "answer": "Cookie-based authentication is a method where a server issues a session cookie upon successful login. This cookie, stored in the user's browser, is sent with every subsequent request, allowing the server to identify the user without requiring reauthentication. The server typically stores session details in a database or in-memory store (e.g., Redis). Cookies can have attributes like HttpOnly (prevents JavaScript access), Secure (only sent over HTTPS), and SameSite (prevents CSRF attacks)."
       },
       {
         "question": "Do you know the structure of JWT? Explain.",
         "code_snippet": "",
-        "answer": "JWT (JSON Web Token) is a compact, URL-safe means of representing claims to be transferred between two parties. The structure of a JWT consists of three parts separated by dots:xxxxx.yyyyy.zzzzz"
+        "answer": "JWT (JSON Web Token) is a compact, URL-safe means of representing claims to be transferred between two parties. The structure of a JWT consists of three parts separated by dots:  xxxxx.yyyyy.zzzzz"
       },
       {
-        "question": "Problem Statement:You'll be given two stringsAandB, with lengths1 <= length <= 10^6. The strings will contain only1's and0's. To makeAa good string, you can insertBintoAat any place, as many times as you want (or don't insert if you don't want). You have to printYESorNOdepending on whether makingAas a good string is possible.",
+        "question": "Problem Statement: You'll be given two strings  A  and  B  , with lengths  1 <= length <= 10^6  . The strings will contain only  1  's and  0  's. To make  A  a good string, you can insert  B  into  A  at any place, as many times as you want (or don't insert if you don't want). You have to print  YES  or  NO  depending on whether making  A  as a good string is possible.",
         "code_snippet": "",
         "answer": "No answer found"
       },
@@ -894,7 +894,7 @@
     "company_name": "Fringecore​",
     "company_website": "https://fringecore.sh/",
     "career_website": "https://work-pool.notion.site/FringeCore_-Careers-cd5106060028424383fcbbb7fc885e38",
-    "introduction": "Fringecoreis a team of engineers and designers, who build software, hack hardware and apply design thinking in-order to tame the chaos in business processes.",
+    "introduction": "Fringecore is a team of engineers and designers, who build software, hack hardware and apply design thinking in-order to tame the chaos in business processes.",
     "interview_stages": [],
     "qna": [
       {
@@ -963,7 +963,7 @@
     "company_name": "Inverse.Ai​",
     "company_website": "https://inverseai.com/",
     "career_website": "https://inverseai.com/career",
-    "introduction": "Inverse.Aispecializes in app development that primarily focus on video, audio and image manipulation. Their porfolio contains massive hits apps with more than 15M downloads.",
+    "introduction": "Inverse.Ai specializes in app development that primarily focus on video, audio and image manipulation. Their porfolio contains massive hits apps with more than 15M downloads.",
     "interview_stages": [],
     "qna": [
       {
@@ -977,12 +977,12 @@
         "answer": "No answer found"
       },
       {
-        "question": "You are given a chess board of size (2n)(2n), some of the color of the board is flipped and the board is broken down in 4 square piece each with size nn. You can join the 4 pieces in any order without rotating or flipping. As the some of the colors were flipped, so to get a valid chessboard there must need to be some recoloring. Output the minimum number of recoloring such that the 4 pieces can be joined to get a valid chessboard.\n💻 Submit Code",
+        "question": "You are given a chess board of size (2n) (2n), some of the color of the board is flipped and the board is broken down in 4 square piece each with size n n. You can join the 4 pieces in any order without rotating or flipping. As the some of the colors were flipped, so to get a valid chessboard there must need to be some recoloring. Output the minimum number of recoloring such that the 4 pieces can be joined to get a valid chessboard.\n💻 Submit Code",
         "code_snippet": "",
         "answer": "No answer found"
       },
       {
-        "question": "You have a string of N decimal digits.\nNow you are given M queries, each of whom is of following two types.\n- Type 1: 1 X Y: Replace A[X] by Y.- Type 2: 2 C D: Print the number of sub-strings divisible by 3 of the string denoted by A[C],A[C+1] ... A[D].\nFormally, you have to print the number of pairs (i,j) such that the stringA[i],A[i+1]...A[j],(C ≤ i ≤ j ≤ D), when considered as a decimal number, is divisible by 3\n💻 Submit Code",
+        "question": "You have a string of N decimal digits.\nNow you are given M queries, each of whom is of following two types.\n- Type 1: 1 X Y: Replace A[X] by Y.- Type 2: 2 C D: Print the number of sub-strings divisible by 3 of the string denoted by A[C],A[C+1] ... A[D].\nFormally, you have to print the number of pairs (i,j) such that the string  A[i],A[i+1]...A[j]  ,  (C ≤ i ≤ j ≤ D)  , when considered as a decimal number, is divisible by 3\n💻 Submit Code",
         "code_snippet": "",
         "answer": "No answer found"
       },
@@ -1007,7 +1007,7 @@
     "company_name": "IQVIA​",
     "company_website": "https://www.iqvia.com/",
     "career_website": "https://jobs.iqvia.com/en/search-jobs",
-    "introduction": "IQVIAis an American Fortune 500 and S&P 500 multinational company serving the combined industries of health information technology and clinical research. They hire professionals from Bangladesh as remote.",
+    "introduction": "IQVIA is an American Fortune 500 and S&P 500 multinational company serving the combined industries of health information technology and clinical research. They hire professionals from Bangladesh as remote.",
     "interview_stages": [],
     "qna": [
       {
@@ -1026,7 +1026,7 @@
         "answer": "// src: https://www.geeksforgeeks.org/area-of-intersection-of-two-circles/\n\n#include <bits/stdc++.h>\nusing namespace std;\n#define ld long double\n// Function to return area of intersection\nlong long int\nintersectionArea(long double X1, long double Y1,\n                    long double R1, long double X2,\n                    long double Y2, long double R2){\n\tlong double Pi = 3.14;\n\tlong double d, alpha, beta, a1, a2;\n\tlong long int ans;\n\n\t// Calculate the euclidean distance\n\t// between the two points\n\td = sqrt((X2 - X1) * (X2 - X1) + (Y2 - Y1) * (Y2 - Y1));\n\n\tif (d > R1 + R2)\n\t\tans = 0;\n\telse if (d <= (R1 - R2) && R1 >= R2)\n\t\tans = floor(Pi * R2 * R2);\n\telse if (d <= (R2 - R1) && R2 >= R1)\n\t\tans = floor(Pi * R1 * R1);\n\telse {\n\t\talpha = acos((R1 * R1 + d * d - R2 * R2) / (2 * R1 * d))* 2;\n\t\tbeta = acos((R2 * R2 + d * d - R1 * R1) / (2 * R2 * d))* 2;\n\t\ta1 = 0.5 * beta * R2 * R2 - 0.5 * R2 * R2 * sin(beta);\n\t\ta2 = 0.5 * alpha * R1 * R1 - 0.5 * R1 * R1 * sin(alpha);\n\t\tans = floor(a1 + a2);\n\t}\n\n\treturn ans;\n}"
       },
       {
-        "question": "Given a list of ranges. Find the length covered by at least one of the range.input: [[1,3],[2,5],[6,7]]output: 5explanation: range [1,5],[6,7] are covered by at least one range",
+        "question": "Given a list of ranges. Find the length covered by at least one of the range. input: [[1,3],[2,5],[6,7]] output: 5 explanation: range [1,5],[6,7] are covered by at least one range",
         "code_snippet": "int solve(vector<pair<int,int>> ranges) {\n    sort(ranges.begin(),ranges.end());\n    int covered = 0;\n    int st = ranges[0].first;\n    int en = ranges[0].second;\n    for(int i=1;i<ranges.size();i++){\n        if( ranges[i].first > en ) {\n            covered += en - st;\n            st = ranges[i].first;\n            en = ranges[i].second;\n        }\n        en = max(en,ranges[i].second);\n    }\n    covered += en - st;\n    return covered;\n}",
         "answer": "int solve(vector<pair<int,int>> ranges) {\n    sort(ranges.begin(),ranges.end());\n    int covered = 0;\n    int st = ranges[0].first;\n    int en = ranges[0].second;\n    for(int i=1;i<ranges.size();i++){\n        if( ranges[i].first > en ) {\n            covered += en - st;\n            st = ranges[i].first;\n            en = ranges[i].second;\n        }\n        en = max(en,ranges[i].second);\n    }\n    covered += en - st;\n    return covered;\n}"
       },
@@ -1073,7 +1073,7 @@
       {
         "question": "What happens when you type google.com and press enter in your search bar",
         "code_snippet": "",
-        "answer": "This is a very important question and aims to check the knowledge of networking. A very thorough explanation of this question is answered here inWhat Happens When"
+        "answer": "This is a very important question and aims to check the knowledge of networking. A very thorough explanation of this question is answered here in What Happens When"
       },
       {
         "question": "Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.\n💻 Submit Code",
@@ -1111,7 +1111,7 @@
     "company_name": "Priyo sys​",
     "company_website": "https://www.priyo.com/",
     "career_website": "Not found",
-    "introduction": "Priyois a finance based tech company operating in US market. They operate from Bangladesh.",
+    "introduction": "Priyo is a finance based tech company operating in US market. They operate from Bangladesh.",
     "interview_stages": [],
     "qna": [
       {
@@ -1155,11 +1155,11 @@
     "company_name": "Kite Games Studio​",
     "company_website": "https://www.kitegamesstudio.com/",
     "career_website": "https://www.kitegamesstudio.com/",
-    "introduction": "Kite Games Studio (KGS), founded in 2014, is a leading mobile application development firm in Bangladesh. Based in Mohakhali DOHS, Dhaka, KGS specializes in developing software for both iOS and Android platforms, along with building websites. The company is known for its emphasis on competitive programming skills, making it an excellent choice for talentedcompetitive programmerslooking to join a dynamic and innovative team.",
+    "introduction": "Kite Games Studio (KGS) , founded in 2014, is a leading mobile application development firm in Bangladesh. Based in Mohakhali DOHS, Dhaka, KGS specializes in developing software for both iOS and Android platforms, along with building websites. The company is known for its emphasis on competitive programming skills, making it an excellent choice for talented competitive programmers looking to join a dynamic and innovative team.",
     "interview_stages": [],
     "qna": [
       {
-        "question": "A permutationPis good ifP[i] % i == 0ori % P[i] == 0for1 ≤ i ≤ N. GivenN ≤ 20, count the number of good permutations.",
+        "question": "A permutation  P  is good if  P[i] % i == 0  or  i % P[i] == 0  for  1 ≤ i ≤ N  . Given  N ≤ 20  , count the number of good permutations.",
         "code_snippet": "#include <iostream>\n#include <vector>\n\nusing namespace std;\n\nint N; // Global variable for the size of the permutation\nvector<int> dp; // DP array to store results of subproblems\n\n// Recursive function to count the number of good permutations using Bitmask DP\nint solve(int mask) {\n    if (mask == (1 << N) - 1) return 1; // Base case: all elements are placed\n    if (dp[mask] != -1) return dp[mask]; // Return already computed result\n\n    int pos = __builtin_popcount(mask) + 1; // Position to place the next element (1-based)\n    dp[mask] = 0; // Initialize current DP state\n\n    for (int i = 0; i < N; i++) {\n        // Check if the i-th element is not used and it satisfies the condition\n        if (!(mask & (1 << i)) && (pos % (i + 1) == 0 || (i + 1) % pos == 0)) {\n            dp[mask] += solve(mask | (1 << i)); // Recur with updated mask\n        }\n    }\n    return dp[mask];\n}\n\nint main() {\n    cout << \"Enter the value of N (N <= 20): \";\n    cin >> N;\n\n    dp.assign(1 << N, -1); // Initialize DP array with -1 for all masks\n    int result = solve(0); // Start with an empty mask\n    cout << \"Number of good permutations for N = \" << N << \" is: \" << result << endl;\n\n    return 0;\n}",
         "answer": "The final solution uses Bitmask DP to efficiently count the number of good permutations that satisfy the given condition."
       },
@@ -1176,70 +1176,70 @@
       {
         "question": "Implement the Singleton pattern.",
         "code_snippet": "",
-        "answer": "Solution:Below is the implementation of the Singleton pattern in Java:"
+        "answer": "Solution: Below is the implementation of the Singleton pattern in Java:"
       },
       {
-        "question": "Given a stringsand multiple queries. Each query consists of a stringt. Check iftis a subsequence ofs.2025\n💻 Submit Code",
+        "question": "Given a string  s  and multiple queries. Each query consists of a string  t  . Check if  t  is a subsequence of  s  . [ 2025 ]\n💻 Submit Code",
         "code_snippet": "",
         "answer": "No answer found"
       },
       {
-        "question": "You are given an integer arraynumsand two integersindexDiffandvalueDiff. Find a pair of indices(i, j)such that:i != j,abs(i - j) <= indexDiffandabs(nums[i] - nums[j]) <= valueDiff.2025\n💻 Submit Code",
+        "question": "You are given an integer array  nums  and two integers  indexDiff  and  valueDiff  . Find a pair of indices  (i, j)  such that:  i != j  ,  abs(i - j) <= indexDiff  and  abs(nums[i] - nums[j]) <= valueDiff  . [ 2025 ]\n💻 Submit Code",
         "code_snippet": "bool containsNearbyAlmostDuplicate(vector<int>& nums, int indexDiff, int valueDiff) {\n    set<pair<int,int>> st;\n    for(int i=0;i<nums.size();i++){\n        if( i>indexDiff ) st.erase({nums[i-indexDiff-1],i-indexDiff-1});\n        auto it = st.lower_bound({nums[i],0});\n        if ( it != st.end() ) {\n            if ( abs(nums[i] - it->first) <= valueDiff ) \n                return true;\n        }\n        if( it != st.begin() ){\n            it--;\n            if ( abs(nums[i] - it->first) <= valueDiff ) \n                return true;\n        }\n        st.insert({nums[i],i});\n    }\n    return false;\n}",
         "answer": "bool containsNearbyAlmostDuplicate(vector<int>& nums, int indexDiff, int valueDiff) {\n    set<pair<int,int>> st;\n    for(int i=0;i<nums.size();i++){\n        if( i>indexDiff ) st.erase({nums[i-indexDiff-1],i-indexDiff-1});\n        auto it = st.lower_bound({nums[i],0});\n        if ( it != st.end() ) {\n            if ( abs(nums[i] - it->first) <= valueDiff ) \n                return true;\n        }\n        if( it != st.begin() ){\n            it--;\n            if ( abs(nums[i] - it->first) <= valueDiff ) \n                return true;\n        }\n        st.insert({nums[i],i});\n    }\n    return false;\n}"
       },
       {
-        "question": "You're at a buffet with various food items. Each food item has a deliciousness factor and nutrient values. You need to maximize the total deliciousness of the foods you eat. Additionally, for health reasons, each nutrient value must occur in an odd number of food items.2024\n💻 Submit Code",
+        "question": "You're at a buffet with various food items. Each food item has a deliciousness factor and nutrient values. You need to maximize the total deliciousness of the foods you eat. Additionally, for health reasons, each nutrient value must occur in an odd number of food items. [ 2024 ]\n💻 Submit Code",
         "code_snippet": "#include <bits/stdc++.h>\nusing namespace std;\n\n#define endl \"\\n\"\n#define MOD 1000000007\n#define MAX 1003\n\ntypedef long long ll;\n\n#define bitToggle(n, i) ((1LL << i) ^ n)\n\nint deliciousness[MAX], nutrientMask[MAX], numItems, numNutrients;\nll dp[MAX][1035];\n\nll maximizeDeliciousness(int itemIndex, int nutrientState) {\n    if (itemIndex == numItems) {\n        if (nutrientState == ((1 << numNutrients) - 1)) return 0LL;\n        return -1e15;\n    }\n    if (~dp[itemIndex][nutrientState]) return dp[itemIndex][nutrientState];\n    return dp[itemIndex][nutrientState] = max(\n        maximizeDeliciousness(itemIndex + 1, nutrientState),\n        deliciousness[itemIndex] + maximizeDeliciousness(itemIndex + 1, nutrientState ^ nutrientMask[itemIndex])\n    );\n}\n\nvoid solve() {\n    cin >> numItems >> numNutrients;\n    for (int i = 0; i < numItems; i++) {\n        int numNutrientsInItem; cin >> deliciousness[i] >> numNutrientsInItem;\n        nutrientMask[i] = 0;\n        for (int j = 0; j < numNutrientsInItem; j++) {\n            int nutrient; cin >> nutrient;\n            nutrientMask[i] = bitToggle(nutrientMask[i], nutrient - 1);\n        }\n    }\n    memset(dp, -1, sizeof dp);\n    cout << max(0LL, maximizeDeliciousness(0, 0)) << \"\\n\";\n}\n\nint32_t main() {\n    ios_base::sync_with_stdio(false); cin.tie(NULL);\n\n    int testCases = 1;\n    cin >> testCases;\n\n    for (int caseNum = 1; caseNum <= testCases; caseNum++) {\n        cout << \"Case #\" << caseNum << \": \";\n        solve();\n    }\n\n    return 0;\n}",
         "answer": "Solution:"
       },
       {
-        "question": "You have a 2D grid representing a village. 'X' denotes farmer-owned land, and '.' denotes government-owned land. Connected 'X' areas belong to the same farmer. If two connected 'X' areas match under any 90° rotation, they also belong to the same farmer. Count the number of unique farmers in the village.2024\n💻 Submit Code",
+        "question": "You have a 2D grid representing a village. 'X' denotes farmer-owned land, and '.' denotes government-owned land. Connected 'X' areas belong to the same farmer. If two connected 'X' areas match under any 90° rotation, they also belong to the same farmer. Count the number of unique farmers in the village. [ 2024 ]\n💻 Submit Code",
         "code_snippet": "#include <bits/stdc++.h>\nusing namespace std;\n\n#define endl \"\\n\"\n#define MOD 1000000007\n#define MAX 200005\n\ntypedef long long ll;\ntypedef vector<string> Grid; \n\nstring grid[55];\nmap<Grid, int> farmerMap;\nint numRows, numCols, farmerCount, visited[55][55];\n\nint rowOffsets[] = {+1, -1, +0, +0};\nint colOffsets[] = {+0, +0, +1, -1};\n\n#define isValid(nx, ny) (nx >= 0 && nx < numRows && ny >= 0 && ny < numCols)\n\nstruct Region {\n    int xMin, xMax, yMin, yMax;\n    Region() {\n        xMin = 100;\n        xMax = -100;\n        yMin = 100;\n        yMax = -100;\n    }\n    Region(int a, int b, int c, int d) {\n        xMin = a;\n        xMax = b;\n        yMin = c;\n        yMax = d;\n    }\n};\n\nRegion mergeRegions(Region a, Region b) {\n    Region result;\n    result.xMin = min(a.xMin, b.xMin);\n    result.xMax = max(a.xMax, b.xMax);\n    result.yMin = min(a.yMin, b.yMin);\n    result.yMax = max(a.yMax, b.yMax);\n    return result;\n}\n\nRegion exploreRegion(int x, int y) {\n    visited[x][y] = 1;\n    Region result(x, x, y, y);\n    for (int i = 0; i < 4; i++) {\n        int newX = x + rowOffsets[i];\n        int newY = y + colOffsets[i];\n        if (isValid(newX, newY) && !visited[newX][newY] && grid[newX][newY] == 'X') {\n            result = mergeRegions(result, exploreRegion(newX, newY));\n        }\n    }\n    return result;\n}\n\nGrid rotateGrid(Grid v) {\n    int curRows = v.size(), curCols = v[0].size();\n    Grid rotated;\n    for (int j = 0; j < curCols; j++) {\n        string row(curRows, '?');\n        rotated.push_back(row);\n    }\n\n    for (int i = 0; i < curRows; i++) {\n        for (int j = 0; j < curCols; j++) {\n            rotated[j][curRows - i - 1] = v[i][j];\n        }\n    }\n\n    return rotated;\n}\n\nint checkRegion(Region region) {\n    Grid subgrid;\n    for (int i = region.xMin; i <= region.xMax; i++) {\n        string row = \"\";\n        for (int j = region.yMin; j <= region.yMax; j++) {\n            row += grid[i][j];\n        }\n        subgrid.push_back(row);\n    }\n    \n    if (farmerMap[subgrid]) return 0;\n    \n    Grid rotated = rotateGrid(subgrid);\n    if (farmerMap[rotated]) return 0;\n    \n    rotated = rotateGrid(rotated);\n    if (farmerMap[rotated]) return 0;\n    \n    rotated = rotateGrid(rotated);\n    if (farmerMap[rotated]) return 0;\n    \n    farmerMap[subgrid] = 1;\n    return 1;\n}\n\nvoid solve() {\n    string line;\n    while (getline(cin, line)) {\n        grid[numRows++] = line;\n    }\n    numCols = grid[0].size();\n\n    for (int i = 0; i < numRows; i++) {\n        for (int j = 0; j < numCols; j++) {\n            if (grid[i][j] == 'X' && !visited[i][j]) {\n                Region region = exploreRegion(i, j);\n                farmerCount += checkRegion(region);\n            }\n        }\n    }\n\n    cout << farmerCount << \"\\n\";\n}\n\nint32_t main() {\n    ios_base::sync_with_stdio(false); cin.tie(NULL);\n\n    int testCases = 1;\n    cin >> testCases;\n    cin.ignore(); // Ignore the newline after the number of test cases\n\n    for (int caseNum = 1; caseNum <= testCases; caseNum++) {\n        cout << \"Case #\" << caseNum << \": \";\n        solve();\n    }\n\n    return 0;\n}",
         "answer": "Solution:"
       },
       {
-        "question": "You need to write a program to simulate a Linux terminal on an old computer. You'll be given commands like \"mkdir\", \"ls\", \"rm\", \"pwd\", and \"cd\", and you need to simulate their behavior, printing the appropriate output or error messages.2024\n💻 Submit Code",
+        "question": "You need to write a program to simulate a Linux terminal on an old computer. You'll be given commands like \"mkdir\", \"ls\", \"rm\", \"pwd\", and \"cd\", and you need to simulate their behavior, printing the appropriate output or error messages. [ 2024 ]\n💻 Submit Code",
         "code_snippet": "#include<bits/stdc++.h>\nusing namespace std;\n\n#define endl \"\\n\"\n#define MOD 1000000007\n#define MAX 200005\n\ntypedef long long ll;\n\nset<string> folder[MAX];\nmap<string, int> get_idx;\nmap<int, string> get_name;\nint par[MAX];\n\nstring get_sub(string &s) {\n\tstring sub = \"\";\n\tfor(int i = (int)s.size() - 1; i >= 0; i--) {\n\t\tif(s[i] == '/')\n\t\t\tbreak;\n\t\tsub = s[i] + sub;\n\t}\n\treturn sub;\n}\n\nvoid dfs(int idx) {\n\tfor(auto sub : folder[idx]) {\n\t\tint cur = get_idx[sub];\n\t\tdfs(cur);\n\t}\n\tfolder[idx].clear();\n}\nvoid solve() {\n    string s;\n    int avail = 2;\n    \n    par[1] = 1;\n    get_idx[\"KGS\"] = 1;\n    get_name[1] = \"KGS\";\n    int idx = 1;\n\n    while(getline(cin, s)) {\n    \tif(s.size() == 0)\n    \t\tcontinue;\n    \tif(s[0] == 'm') {\n    \t\tstring sub = get_name[idx] + \"/\" + s.substr(6);\n\n    \t\tif(folder[idx].find(sub) != folder[idx].end()) {\n    \t\t\tcout << \"Error: Already Exists\\n\";\n    \t\t} else {\n    \t\t\tfolder[idx].insert(sub);\n    \t\t\tget_idx[sub] = avail;\n    \t\t\tget_name[avail] = sub;\n    \t\t\tpar[avail] = idx;\n    \t\t\tavail++;\n    \t\t}\n    \t} else if(s[0] == 'l') {\n    \t\tfor(auto sub : folder[idx]) {\n    \t\t\tcout << get_sub(sub) << \"\\n\";\n    \t\t}\n    \t} else if(s[0] == 'r') {\n    \t\tstring sub = get_name[idx] + \"/\" + s.substr(3);\n    \t\tif(folder[idx].find(sub) == folder[idx].end()) {\n    \t\t\tcout << \"Error: No Such Directory\\n\";\n    \t\t} else {\n    \t\t\tfolder[idx].erase(folder[idx].find(sub));\n    \t\t\tdfs(get_idx[sub]);\n    \t\t}\n    \t} else if(s[0] == 'p') {\n    \t\tcout << get_name[idx] << \"\\n\";\n    \t} else if(s[0] == 'c' && s.back() != '.') {\n    \t\tstring sub = get_name[idx] + \"/\" + s.substr(3);\n    \t\tif(folder[idx].find(sub) == folder[idx].end()) {\n    \t\t\tcout << \"Error: No Such Directory\\n\";\n    \t\t} else {\n    \t\t\tidx = get_idx[sub];\n    \t\t}\n    \t} else if(s[0] == 'c' && s.back() == '.') {\n    \t\tidx = par[idx];\n    \t}\n    }\n}\n\nint32_t main() {\n    ios_base::sync_with_stdio(false); cin.tie(NULL);\n\n    int TC = 1;\n\n    //cin >> TC;\n\n    for(int cs = 1; cs <= TC; cs++) {\n        //cout << \"Case \" << cs << \": \";\n        solve();\n    }\n\n    return 0;\n}",
         "answer": "Solution:"
       },
       {
-        "question": "You have a 2D grid representing a field with crop fields and godowns. Harvesters start at godowns and collect crops from fields, bringing them back to their godown. The first harvester must collect from a specific number of fields. You need to calculate the minimum total time for all harvesters to collect all crops.2024\n💻 Submit Code",
+        "question": "You have a 2D grid representing a field with crop fields and godowns. Harvesters start at godowns and collect crops from fields, bringing them back to their godown. The first harvester must collect from a specific number of fields. You need to calculate the minimum total time for all harvesters to collect all crops. [ 2024 ]\n💻 Submit Code",
         "code_snippet": "",
         "answer": "No answer found"
       },
       {
-        "question": "You have a list of unique strings and an empty list. You'll be given queries to add strings to the empty list, delete strings from it, and count the number of strings between two given strings in the list after sorting it.2024\n💻 Submit Code",
+        "question": "You have a list of unique strings and an empty list. You'll be given queries to add strings to the empty list, delete strings from it, and count the number of strings between two given strings in the list after sorting it. [ 2024 ]\n💻 Submit Code",
         "code_snippet": "",
         "answer": "Solution:"
       },
       {
-        "question": "Given a numberN, find the number of integers between[1,N]that has odd number of divisors.Jr SWE 2025\n💻 Submit Code",
+        "question": "Given a number  N  , find the number of integers between  [1,N]  that has odd number of divisors. [ Jr SWE 2025 ]\n💻 Submit Code",
         "code_snippet": "long long solve(long long n) {\n    long long sq = sqrtl(n);\n    if( (sq+1)*(sq+1) == n ) sq++;\n    return sq;\n}",
         "answer": "long long solve(long long n) {\n    long long sq = sqrtl(n);\n    if( (sq+1)*(sq+1) == n ) sq++;\n    return sq;\n}"
       },
       {
-        "question": "Given an array of pairs indicating the size and reward of each item. You will be given a minimum and maximum size of the bag. You need to find the maximum reward you can get by filling the bag with items.Jr SWE 2025\n💻 Submit Code",
+        "question": "Given an array of pairs indicating the size and reward of each item. You will be given a minimum and maximum size of the bag. You need to find the maximum reward you can get by filling the bag with items. [ Jr SWE 2025 ]\n💻 Submit Code",
         "code_snippet": "#include<bits/stdc++.h>\nusing namespace std;\n\nconst int N = 50004;\nlong long dp[N];\nbool pos[N];\nint fruits[N], taste[N];\nlong long segTree[4*N];\n\nlong long build(int node, int l, int r) {\n    if( l>r ) return 0;\n    if( l == r ){\n        return segTree[node] = dp[l];\n    }\n    int mid = (l+r)/2;\n    return segTree[node] = max(build(node*2,l,mid),build(node*2+1,mid+1,r));\n}\n\nlong long query(int node,int L, int R, int l, int r){\n    if( l>r or l>R or r<L ) return 0;\n    if( l>=L and r<=R ) return segTree[node];\n    int mid = (l+r)/2;\n    return max( query(node*2,L,R,l,mid),query(node*2+1,L,R,mid+1,r) );\n}\n\nvoid solve() {\n    int n,q;\n    cin>>n>>q;\n    for(int i=0;i<N;i++) dp[i] = 0, pos[i] = false;\n    for(int i=0;i<n;i++) cin>>fruits[i]>>taste[i];\n    pos[0] = true; dp[0] = 1;\n    for(int i=0;i<n;i++){\n        for(int j=N - fruits[i]-1;j>=0;j--){\n            if( pos[j] ) {\n                dp[j+fruits[i]] = max( dp[j+fruits[i]], dp[j] + taste[i] );\n                pos[j+fruits[i]] = true;\n            }\n        }\n    }\n    build(1,0,N-1);\n    while(q--){\n        int l,r;\n        cin>>l>>r;\n        cout<<query(1,l,r, 0,N-1)-1<<endl;\n    }\n}\n\nint main() {\n    int tc;\n    cin>>tc;\n    while(tc--) solve();\n}",
         "answer": "#include<bits/stdc++.h>\nusing namespace std;\n\nconst int N = 50004;\nlong long dp[N];\nbool pos[N];\nint fruits[N], taste[N];\nlong long segTree[4*N];\n\nlong long build(int node, int l, int r) {\n    if( l>r ) return 0;\n    if( l == r ){\n        return segTree[node] = dp[l];\n    }\n    int mid = (l+r)/2;\n    return segTree[node] = max(build(node*2,l,mid),build(node*2+1,mid+1,r));\n}\n\nlong long query(int node,int L, int R, int l, int r){\n    if( l>r or l>R or r<L ) return 0;\n    if( l>=L and r<=R ) return segTree[node];\n    int mid = (l+r)/2;\n    return max( query(node*2,L,R,l,mid),query(node*2+1,L,R,mid+1,r) );\n}\n\nvoid solve() {\n    int n,q;\n    cin>>n>>q;\n    for(int i=0;i<N;i++) dp[i] = 0, pos[i] = false;\n    for(int i=0;i<n;i++) cin>>fruits[i]>>taste[i];\n    pos[0] = true; dp[0] = 1;\n    for(int i=0;i<n;i++){\n        for(int j=N - fruits[i]-1;j>=0;j--){\n            if( pos[j] ) {\n                dp[j+fruits[i]] = max( dp[j+fruits[i]], dp[j] + taste[i] );\n                pos[j+fruits[i]] = true;\n            }\n        }\n    }\n    build(1,0,N-1);\n    while(q--){\n        int l,r;\n        cin>>l>>r;\n        cout<<query(1,l,r, 0,N-1)-1<<endl;\n    }\n}\n\nint main() {\n    int tc;\n    cin>>tc;\n    while(tc--) solve();\n}"
       },
       {
-        "question": "Given an arrayAof sizeNand some queries. Each query will ask forf(l,r)where the function computes the sum of the greatest common divisors over all prefixes of some range[l,r].Jr SWE 2025\n💻 Submit Code",
+        "question": "Given an array  A  of size  N  and some queries. Each query will ask for  f(l,r)  where the function computes the sum of the greatest common divisors over all prefixes of some range  [l,r]  . [ Jr SWE 2025 ]\n💻 Submit Code",
         "code_snippet": "",
         "answer": "No answer found"
       },
       {
-        "question": "Given a permutation of sizeN. You will change the permutation repeatedly. In each operation, you will create a new permutation b such thatb[i] = a[a[i]]for all1 ≤ i ≤ n. Then replaceawithb. You need to find the number of operations required to make the permutation sorted or report that it is impossible.Jr SWE 2025\n💻 Submit Code",
+        "question": "Given a permutation of size  N  . You will change the permutation repeatedly. In each operation, you will create a new permutation b such that  b[i] = a[a[i]]  for all  1 ≤ i ≤ n  . Then replace  a  with  b  . You need to find the number of operations required to make the permutation sorted or report that it is impossible. [ Jr SWE 2025 ]\n💻 Submit Code",
         "code_snippet": "",
         "answer": "No answer found"
       },
       {
-        "question": "Given a tree withNnodes. You will need to chose an optimal start nodessuch that the round trip distance fromsto some given target nodes is minimized.Jr SWE 2025\n💻 Submit Code",
+        "question": "Given a tree with  N  nodes. You will need to chose an optimal start node  s  such that the round trip distance from  s  to some given target nodes is minimized. [ Jr SWE 2025 ]\n💻 Submit Code",
         "code_snippet": "const int N = 100005;\nvector<int> adj[N];\nlong long child[N];\nlong long cost[N];\nlong long total_child = 0;\nvoid dfs1(int u, int p){\n    \n    for(auto v:adj[u]){\n        if( v == p ) continue;\n        dfs1(v,u);\n        child[u] += child[v];\n        cost[u] += 2*child[v]+cost[v];\n    }\n}\n\npair<long long,int> mn;\nvoid dfs2(int u, int p, long long c) {\n    //cout<<u<<\" \"<<c<<endl;\n    mn = min(mn,{c,u});\n    for(auto v:adj[u]){\n        if( v == p ) continue;\n        long long new_cost = c - 4*child[v] + 2*total_child;\n        dfs2(v,u,new_cost);\n    }\n}\n\nvoid solve(){\n    int n,q;\n    cin>>n;\n    for(int i=1;i<=n;i++) {\n        adj[i].clear();\n        cost[i] = child[i] = 0;\n    }\n    total_child = 0;\n    for(int i=0;i<n-1;i++) {\n        int u,v; cin>>u>>v;\n        adj[u].push_back(v);\n        adj[v].push_back(u);\n    }\n    total_child = 0;\n    cin>>q;\n    while(q--) {\n        int c,t;\n        cin>>c>>t;\n        child[c] += t;\n        total_child += t;\n    }\n    dfs1(1, 0);\n    mn = {cost[1],1};\n    dfs2(1,0,cost[1]);\n    cout<<mn.second<<\" \"<<mn.first<<endl;\n}",
         "answer": "const int N = 100005;\nvector<int> adj[N];\nlong long child[N];\nlong long cost[N];\nlong long total_child = 0;\nvoid dfs1(int u, int p){\n    \n    for(auto v:adj[u]){\n        if( v == p ) continue;\n        dfs1(v,u);\n        child[u] += child[v];\n        cost[u] += 2*child[v]+cost[v];\n    }\n}\n\npair<long long,int> mn;\nvoid dfs2(int u, int p, long long c) {\n    //cout<<u<<\" \"<<c<<endl;\n    mn = min(mn,{c,u});\n    for(auto v:adj[u]){\n        if( v == p ) continue;\n        long long new_cost = c - 4*child[v] + 2*total_child;\n        dfs2(v,u,new_cost);\n    }\n}\n\nvoid solve(){\n    int n,q;\n    cin>>n;\n    for(int i=1;i<=n;i++) {\n        adj[i].clear();\n        cost[i] = child[i] = 0;\n    }\n    total_child = 0;\n    for(int i=0;i<n-1;i++) {\n        int u,v; cin>>u>>v;\n        adj[u].push_back(v);\n        adj[v].push_back(u);\n    }\n    total_child = 0;\n    cin>>q;\n    while(q--) {\n        int c,t;\n        cin>>c>>t;\n        child[c] += t;\n        total_child += t;\n    }\n    dfs1(1, 0);\n    mn = {cost[1],1};\n    dfs2(1,0,cost[1]);\n    cout<<mn.second<<\" \"<<mn.first<<endl;\n}"
       },
       {
-        "question": "Given a grid of sizeNandMwith digit0and1. The grid indicates some patterns which are not connected. The patterns can be rotated or stretched too. You will need to find the patterns present in the grid.Jr SWE 2025\n💻 Submit Code",
+        "question": "Given a grid of size  N  and  M  with digit  0  and  1  . The grid indicates some patterns which are not connected. The patterns can be rotated or stretched too. You will need to find the patterns present in the grid. [ Jr SWE 2025 ]\n💻 Submit Code",
         "code_snippet": "",
         "answer": "No answer found"
       }
@@ -1253,7 +1253,7 @@
     "interview_stages": [],
     "qna": [
       {
-        "question": "You are given an HTML string. Your task is to determine the number of characters encompassed by each HTML tag in the string. For each tag, count the number of characters that are enclosed between the opening () tags.\nA tag is composed of one or more lowercase English letters (a-z). For example:<div> ... </div>,<span>..</span>. It can be followed by digits (0-9) i.e<h1>..</h1>.\nThe content between the tags can consist of:\nEnglish characters (a-z, A-Z).Digits (0-9).Punctuation marks: period (.), comma (,), and spaces(' ').\nNote: When a character is encompassed by a same tag multiple times, count only once for that tag. A tag can have 0 characters. In that case don't print that tag. Spaces(' ') between the tags are not counted.\n💻 Submit Code",
+        "question": "You are given an HTML string. Your task is to determine the number of characters encompassed by each HTML tag in the string. For each tag, count the number of characters that are enclosed between the opening ( ) tags.\nA tag is composed of one or more lowercase English letters (a-z). For example:  <div> ... </div>  ,  <span>..</span>  . It can be followed by digits (0-9) i.e  <h1>..</h1>  .\nThe content between the tags can consist of:\nEnglish characters (a-z, A-Z). Digits (0-9). Punctuation marks: period (.), comma (,), and spaces(' ').\nNote: When a character is encompassed by a same tag multiple times, count only once for that tag. A tag can have 0 characters. In that case don't print that tag. Spaces(' ') between the tags are not counted.\n💻 Submit Code",
         "code_snippet": "string consume(string &s,int st){\n    string tag;\n    while(s[st]!='>') tag+=s[st++];\n    return tag;\n}\n\nvoid solve(string s) {\n    // the total character inside a tag\n    map<string,int> totalCharCount;\n    // to find the nesting level of a tag\n    // eg. <p><p></p></p>, here p is nested two times\n    map<string,int> nestedTagLevel;\n\n    vector<string> tags;\n    vector<int> charCount;\n\n    // signifies root level tag\n    // helps to simplify code logic\n    tags.push_back(\"\");\n    charCount.push_back(0);\n\n    for(int i=0;i<s.size();i++){\n        if( s[i] == '<' and s[i+1]!='/'  ){\n            // starting tag\n            string tag = consume(s,i+1);\n            // advance pointer by the consumer\n            // character count\n            i+=tag.size()+1;\n            tags.push_back(tag);\n            charCount.push_back(0);\n            nestedTagLevel[tag]++;\n        }else if( s[i] == '<' and s[i+1] == '/' ){\n            // ending tag\n            string tag = consume(s,i+2);\n             // advance pointer by the consumer\n            // character count\n            i+=tag.size()+2;\n            int cnt = charCount.back();\n            nestedTagLevel[tag]--;\n\n            // increment count only if it has no parent\n            // tag of same type\n            if( nestedTagLevel[tag] == 0 ){\n                totalCharCount[tags.back()] += cnt;\n            }\n            charCount.pop_back();\n            tags.pop_back();\n            // propagate the character count to its\n            // parents too\n            charCount.back()+=cnt;\n\n        }else{\n            if(s[i] != ' ') charCount.back()++;\n        }\n    }\n\n    for(auto [tag,cnt]:totalCharCount){\n        if(cnt) {\n            cout<<tag<<\": \"<<cnt<<endl;\n        }\n    }\n}",
         "answer": "string consume(string &s,int st){\n    string tag;\n    while(s[st]!='>') tag+=s[st++];\n    return tag;\n}\n\nvoid solve(string s) {\n    // the total character inside a tag\n    map<string,int> totalCharCount;\n    // to find the nesting level of a tag\n    // eg. <p><p></p></p>, here p is nested two times\n    map<string,int> nestedTagLevel;\n\n    vector<string> tags;\n    vector<int> charCount;\n\n    // signifies root level tag\n    // helps to simplify code logic\n    tags.push_back(\"\");\n    charCount.push_back(0);\n\n    for(int i=0;i<s.size();i++){\n        if( s[i] == '<' and s[i+1]!='/'  ){\n            // starting tag\n            string tag = consume(s,i+1);\n            // advance pointer by the consumer\n            // character count\n            i+=tag.size()+1;\n            tags.push_back(tag);\n            charCount.push_back(0);\n            nestedTagLevel[tag]++;\n        }else if( s[i] == '<' and s[i+1] == '/' ){\n            // ending tag\n            string tag = consume(s,i+2);\n             // advance pointer by the consumer\n            // character count\n            i+=tag.size()+2;\n            int cnt = charCount.back();\n            nestedTagLevel[tag]--;\n\n            // increment count only if it has no parent\n            // tag of same type\n            if( nestedTagLevel[tag] == 0 ){\n                totalCharCount[tags.back()] += cnt;\n            }\n            charCount.pop_back();\n            tags.pop_back();\n            // propagate the character count to its\n            // parents too\n            charCount.back()+=cnt;\n\n        }else{\n            if(s[i] != ' ') charCount.back()++;\n        }\n    }\n\n    for(auto [tag,cnt]:totalCharCount){\n        if(cnt) {\n            cout<<tag<<\": \"<<cnt<<endl;\n        }\n    }\n}"
       },
@@ -1273,7 +1273,7 @@
     "company_name": "Optimizely Bangladesh​",
     "company_website": "https://www.optimizely.com/",
     "career_website": "https://careers.optimizely.com/search/",
-    "introduction": "Optimizelyhas recently expanded its global operations with the establishment of a new office in Bangladesh. Optimizely is a leading software company specializing in digital experience platforms (DXP) that empower businesses to enhance their marketing and product strategies. Optimizely offers a comprehensive suite of tools, including a robust Content Management System (CMS) and an integrated Content Marketing Platform (CMP).",
+    "introduction": "Optimizely has recently expanded its global operations with the establishment of a new office in Bangladesh. Optimizely is a leading software company specializing in digital experience platforms (DXP) that empower businesses to enhance their marketing and product strategies. Optimizely offers a comprehensive suite of tools, including a robust Content Management System (CMS) and an integrated Content Marketing Platform (CMP).",
     "interview_stages": [],
     "qna": [
       {
@@ -1301,12 +1301,12 @@
     "interview_stages": [],
     "qna": [
       {
-        "question": "Select The Company name which has the lowest total emoployee count.\nCompanyPositionEmployeeABCblah20ABCblah15ABCblah5XYZblah10XYZblah12XYZblah5MNOblah20MNOblah5",
+        "question": "Select The Company name which has the lowest total emoployee count.\nCompany Position Employee ABC blah 20 ABC blah 15 ABC blah 5 XYZ blah 10 XYZ blah 12 XYZ blah 5 MNO blah 20 MNO blah 5",
         "code_snippet": "",
         "answer": "No answer found"
       },
       {
-        "question": "Problem Solving\nThere is a food track consisting of cells marked with 0, 1, or other numbers. Here, 0 signifies the cell is not traceable, 1 signifies it is traceable, and any other number represents the destination. Starting from the top-left point, determine the longest path to reach the destination. If no path exists, print -1.\n111101191",
+        "question": "Problem Solving\nThere is a food track consisting of cells marked with 0, 1, or other numbers. Here, 0 signifies the cell is not traceable, 1 signifies it is traceable, and any other number represents the destination. Starting from the top-left point, determine the longest path to reach the destination. If no path exists, print -1.\n1 1 1 1 0 1 1 9 1",
         "code_snippet": "",
         "answer": "No answer found"
       },
@@ -1316,7 +1316,7 @@
         "answer": "No answer found"
       },
       {
-        "question": "Problem Solving\nYour task is to write a function in the C programming language to find an optimal route cost to a target location inside a maze and return the highest 4 bits (MSB + 3 bits) of the optimal route cost value. Your function should take as input two integer numbers for the starting index on the maze array. An optimal route is defined as a complete path from the start point to the target location that requires the least effort/cost. Diagonal movement in the maze is not allowed. An example maze is given below:\n43783654-1236-1-1-1-1-1-1520947-1-116-1-171-1-15115250356-16269-1-121-1-1-1-15-122-1-122-1-15-14-178-1-126-1-15-13-1620534112311-12-152-1-1-1-1-120-12-144-14-1-1-14-11-136788765104-12\nMaze Details:\nThe starting block location will be provided as a function parameter (Blue block in the example).Blocks with a value of -1 are impassable (Grey blocks in the example).The Goal block and only the Goal block will always have a cost of 0 (Green blocks in the example).The maze will not have any circular routes that do not go through the Goal block first.The maze is stored in a 2D array. The 2D maze array will be defined globally.The maze size will be a pair of positive integer numbers, you can assume that the size parameters, length, and height of the maze will fit in a C integer (int) type.The cost values, excluding the impassable blocks, will always be a positive integer that will fit in a C integer (int) type.The maze length and height are not guaranteed to be equal but will be global fixed defined constants for each problem.",
+        "question": "Problem Solving\nYour task is to write a function in the C programming language to find an optimal route cost to a target location inside a maze and return the highest 4 bits (MSB + 3 bits) of the optimal route cost value. Your function should take as input two integer numbers for the starting index on the maze array. An optimal route is defined as a complete path from the start point to the target location that requires the least effort/cost. Diagonal movement in the maze is not allowed. An example maze is given below:\n4 3 7 8 3 6 5 4 -1 2 3 6 -1 -1 -1 -1 -1 -1 5 2 0 94 7 -1 -1 16 -1 -1 7 1 -1 -1 5 1 15 25 0 3 5 6 -1 6 2 6 9 -1 -1 21 -1 -1 -1 -1 5 -1 2 2 -1 -1 22 -1 -1 5 -1 4 -1 7 8 -1 -1 26 -1 -1 5 -1 3 -1 6 20 5 3 4 11 23 11 -1 2 -1 5 2 -1 -1 -1 -1 -1 20 -1 2 -1 4 4 -1 4 -1 -1 -1 4 -1 1 -1 3 6 7 8 8 7 6 5 10 4 -1 2\nMaze Details:\nThe starting block location will be provided as a function parameter (Blue block in the example). Blocks with a value of -1 are impassable (Grey blocks in the example). The Goal block and only the Goal block will always have a cost of 0 (Green blocks in the example). The maze will not have any circular routes that do not go through the Goal block first. The maze is stored in a 2D array. The 2D maze array will be defined globally. The maze size will be a pair of positive integer numbers, you can assume that the size parameters, length, and height of the maze will fit in a C integer (int) type. The cost values, excluding the impassable blocks, will always be a positive integer that will fit in a C integer (int) type. The maze length and height are not guaranteed to be equal but will be global fixed defined constants for each problem.",
         "code_snippet": "",
         "answer": "No answer found"
       }
@@ -1326,11 +1326,11 @@
     "company_name": "RoBenDevs​",
     "company_website": "https://robendevs.com/",
     "career_website": "https://robendevs.com/careers/",
-    "introduction": "RoBenDevsspecializes in building SaaS solutions.",
+    "introduction": "RoBenDevs specializes in building SaaS solutions.",
     "interview_stages": [],
     "qna": [
       {
-        "question": "Given therootof a binary tree, return the inorder traversal of its nodes values.\n💻 Submit Code",
+        "question": "Given the  root  of a binary tree, return the inorder traversal of its nodes values.\n💻 Submit Code",
         "code_snippet": "",
         "answer": "No answer found"
       },
@@ -1340,7 +1340,7 @@
         "answer": "No answer found"
       },
       {
-        "question": "Given theheadof a linked list, remove thenth node from the end of the list and return its head.\n💻 Submit Code",
+        "question": "Given the  head  of a linked list, remove the  n  th node from the end of the list and return its head.\n💻 Submit Code",
         "code_snippet": "",
         "answer": "No answer found"
       },
@@ -1350,7 +1350,7 @@
         "answer": "No answer found"
       },
       {
-        "question": "Given therootof a binary tree, invert/mirror the tree, and return its root.\n💻 Submit Code",
+        "question": "Given the  root  of a binary tree, invert/mirror the tree, and return its root.\n💻 Submit Code",
         "code_snippet": "",
         "answer": "No answer found"
       },
@@ -1375,11 +1375,11 @@
     "company_name": "Shanghai Baud Data Communication Co. Ltd.​",
     "company_website": "https://www.bdcom.cn",
     "career_website": "Not found",
-    "introduction": "BDCOMis a Chinese company specializing in networking and communication solutions. It has established its Research & Development(R&D) department in Bangladesh and recruit intern R&D engineer which is a 6 months program to be a Junior R&D Engineer.",
+    "introduction": "BDCOM is a Chinese company specializing in networking and communication solutions. It has established its Research & Development(R&D) department in Bangladesh and recruit intern R&D engineer which is a 6 months program to be a Junior R&D Engineer.",
     "interview_stages": [],
     "qna": [
       {
-        "question": "Discuss what led to the need for process scheduling in modern operating systems.Explain how multitasking and limited CPU resources made it necessary to manage processes efficiently, and describe the objectives of a process scheduler (e.g., fairness, responsiveness, throughput, CPU utilization).",
+        "question": "Discuss what led to the need for process scheduling in modern operating systems. Explain how multitasking and limited CPU resources made it necessary to manage processes efficiently, and describe the objectives of a process scheduler (e.g., fairness, responsiveness, throughput, CPU utilization).",
         "code_snippet": "",
         "answer": "No answer found"
       },
@@ -1401,20 +1401,20 @@
       {
         "question": "What happens when you type google.com and press enter in your search bar",
         "code_snippet": "",
-        "answer": "This is a very important question and aims to check the knowledge of networking. A very thorough explanation of this question is answered here inWhat Happens When"
+        "answer": "This is a very important question and aims to check the knowledge of networking. A very thorough explanation of this question is answered here in What Happens When"
       },
       {
-        "question": "There areNtrain coaches numbered from1toNplaced in sequence on a left track. The coaches can be moved either directly to the right track or temporarily to a spur track (which behaves like a stack). Once a coach moves from the left track to either the spur or the right, it cannot return to the left.Print all possible valid output sequences (permutations) in which the coaches can arrive at the right track using the spur as intermediate storage.",
+        "question": "There are  N  train coaches numbered from  1  to  N  placed in sequence on a left track. The coaches can be moved either directly to the right track or temporarily to a spur track (which behaves like a stack). Once a coach moves from the left track to either the spur or the right, it cannot return to the left. Print all possible valid output sequences (permutations) in which the coaches can arrive at the right track using the spur as intermediate storage.",
         "code_snippet": "",
         "answer": "No answer found"
       },
       {
-        "question": "There are1000liquid bottles. One of the bottles contains poisoned liquid. A rat dies after one hour of drinking the poisoned wine. How many minimum rats are needed to figure out which bottle contains poison in hour? [Also called the Poison and Rat problem]",
+        "question": "There are  1000  liquid bottles. One of the bottles contains poisoned liquid. A rat dies after one hour of drinking the poisoned wine. How many minimum rats are needed to figure out which bottle contains poison in hour? [Also called the Poison and Rat problem]",
         "code_snippet": "",
         "answer": "No answer found"
       },
       {
-        "question": "Four people need to cross a bridge at night. They have one torch and the bridge can only hold two people at a time. Each person walks at a different speed:1,2,5, and10minutes. If two people cross together, they must go at the slower person’s pace. What is the minimum total time required for all four people to cross the bridge?",
+        "question": "Four people need to cross a bridge at night. They have one torch and the bridge can only hold two people at a time. Each person walks at a different speed:  1  ,  2  ,  5  , and  10  minutes. If two people cross together, they must go at the slower person’s pace. What is the minimum total time required for all four people to cross the bridge?",
         "code_snippet": "",
         "answer": "No answer found"
       },
@@ -1424,7 +1424,7 @@
         "answer": "No answer found"
       },
       {
-        "question": "There are10jars of pills. One jar contains pills that weigh9grams each, while the others contain pills weighing10grams each. Using a weighing scale only once, how can you determine which jar contains the lighter pills?",
+        "question": "There are  10  jars of pills. One jar contains pills that weigh  9  grams each, while the others contain pills weighing  10  grams each. Using a weighing scale only once, how can you determine which jar contains the lighter pills?",
         "code_snippet": "",
         "answer": "No answer found"
       },
@@ -1434,7 +1434,7 @@
         "answer": "No answer found"
       },
       {
-        "question": "You are given1000unsorted numbers and need to find the10smallest elements efficiently. Which sorting or selection algorithm would be most optimal to solve this problem and why?",
+        "question": "You are given  1000  unsorted numbers and need to find the  10  smallest elements efficiently. Which sorting or selection algorithm would be most optimal to solve this problem and why?",
         "code_snippet": "",
         "answer": "No answer found"
       },
@@ -1454,12 +1454,12 @@
         "answer": "No answer found"
       },
       {
-        "question": "You are given unlimited coins of denominations1,2, and5cents. How many different ways can you make a total of1dollar (100cents) using these coins?",
+        "question": "You are given unlimited coins of denominations  1  ,  2  , and  5  cents. How many different ways can you make a total of  1  dollar (  100  cents) using these coins?",
         "code_snippet": "",
         "answer": "No answer found"
       },
       {
-        "question": "Explain the difference between linear and non-linear data structures with examples.Mention the advantages and typical use cases of each.",
+        "question": "Explain the difference between linear and non-linear data structures with examples. Mention the advantages and typical use cases of each.",
         "code_snippet": "",
         "answer": "No answer found"
       }
@@ -1508,21 +1508,21 @@
     "company_name": "SRBD​",
     "company_website": "https://research.samsung.com/srbd",
     "career_website": "Not found",
-    "introduction": "Samsung R&D Institute Bangladesh (SRBD)started its journey in February 2011. Located in the heart of Dhaka, it is the first ever R&D hub set up by a multinational company in Bangladesh.",
+    "introduction": "Samsung R&D Institute Bangladesh (SRBD) started its journey in February 2011. Located in the heart of Dhaka, it is the first ever R&D hub set up by a multinational company in Bangladesh.",
     "interview_stages": [],
     "qna": [
       {
-        "question": "You are givennballoons, indexed from0ton - 1. Each balloon is painted with a number on it represented by an arraynums. You are asked to burst all the balloons.\nIf you burst theithballoon, you will getnums[i - 1] * nums[i] * nums[i + 1]coins. Ifi - 1ori + 1goes out of bounds of the array, then treat it as if there is a balloon with a1painted on it.\nReturn the maximum coins you can collect by bursting the balloons wisely.\nVariants: coins achieved is nums[i-1]*nums[i+1]\n💻 Submit Code",
+        "question": "You are given  n  balloons, indexed from  0  to  n - 1  . Each balloon is painted with a number on it represented by an array  nums  . You are asked to burst all the balloons.\nIf you burst the  ith  balloon, you will get  nums[i - 1] * nums[i] * nums[i + 1]  coins. If  i - 1  or  i + 1  goes out of bounds of the array, then treat it as if there is a balloon with a  1  painted on it.\nReturn the maximum coins you can collect by bursting the balloons wisely.\nVariants: coins achieved is nums[i-1]*nums[i+1]\n💻 Submit Code",
         "code_snippet": "",
         "answer": "No answer found"
       },
       {
-        "question": "A linked list of lengthnis given such that each node contains an additional random pointer, which could point to any node in the list, or null. Construct a deep copy of the list.\nThe deep copy should consist of exactlynbrand new nodes, where each new node has its value set to the value of its corresponding original node. Both the next and random pointer of the new nodes should point to new nodes in the copied list such that the pointers in the original list and copied list represent the same list state. None of the pointers in the new list should point to nodes in the original list.",
+        "question": "A linked list of length  n  is given such that each node contains an additional random pointer, which could point to any node in the list, or null. Construct a deep copy of the list.\nThe deep copy should consist of exactly  n  brand new nodes, where each new node has its value set to the value of its corresponding original node. Both the next and random pointer of the new nodes should point to new nodes in the copied list such that the pointers in the original list and copied list represent the same list state. None of the pointers in the new list should point to nodes in the original list.",
         "code_snippet": "class Solution {\npublic:\n    unordered_map<Node*,Node*> random;\n    Node* copyRandomList(Node* head) {\n        if( head == NULL ) return NULL;\n        Node* node = new Node(head->val);\n        random[head] = node;\n        node->next = copyRandomList(head->next);\n        node->random = random[head->random];\n        return node;\n    }\n};",
         "answer": "class Solution {\npublic:\n    unordered_map<Node*,Node*> random;\n    Node* copyRandomList(Node* head) {\n        if( head == NULL ) return NULL;\n        Node* node = new Node(head->val);\n        random[head] = node;\n        node->next = copyRandomList(head->next);\n        node->random = random[head->random];\n        return node;\n    }\n};"
       },
       {
-        "question": "Mr. Kim has to deliver refrigerators toNcustomers. From the office, he is going to visit all the customers and then return to his home. Each location of the office, his home, and the customers is given in the form of integer coordinates (x,y) (0≤x≤100, 0≤y≤100) . The distance between two arbitrary locations (x1, y1) and (x2, y2) is computed by |x1-x2| + |y1-y2|, where |x| denotes the absolute value of x; for instance, |3|=|-3|=3. The locations of the office, his home, and the customers are all distinct. You should plan an optimal way to visit all the N customers and return to his among all the possibilities.\nYou are given the locations of the office, Mr. Kim’s home, and the customers; the number of the customers is in the range of 5 to 10.\nWrite a program that, starting at the office, finds a (the) shortest path visiting all the customers and returning to his home. Your program only have to report the distance of a (the) shortest path.",
+        "question": "Mr. Kim has to deliver refrigerators to  N  customers. From the office, he is going to visit all the customers and then return to his home. Each location of the office, his home, and the customers is given in the form of integer coordinates (x,y) (0≤x≤100, 0≤y≤100) . The distance between two arbitrary locations (x1, y1) and (x2, y2) is computed by |x1-x2| + |y1-y2|, where |x| denotes the absolute value of x; for instance, |3|=|-3|=3. The locations of the office, his home, and the customers are all distinct. You should plan an optimal way to visit all the N customers and return to his among all the possibilities.\nYou are given the locations of the office, Mr. Kim’s home, and the customers; the number of the customers is in the range of 5 to 10.\nWrite a program that, starting at the office, finds a (the) shortest path visiting all the customers and returning to his home. Your program only have to report the distance of a (the) shortest path.",
         "code_snippet": "",
         "answer": "No answer found"
       },
@@ -1532,9 +1532,9 @@
         "answer": "#include<bits/stdc++.h>\nusing namespace std;\nint firstNodeOfTheCycle, lastNodeOfTheCycle;\nbool detectCycle(int node, vector<vector<int>>& adjList, vector<bool> &visited, vector<bool> &dfsVisited, vector<int> &parent){\n    visited[node] = true;\n    dfsVisited[node] = true;\n\n    for(auto neighbour : adjList[node]){\n        if(!visited[neighbour]){\n            parent[neighbour] = node;\n            bool isCycleDetected = detectCycle(node, adjList, visited, dfsVisited, parent);\n            if(isCycleDetected){\n                firstNodeOfTheCycle = neighbour, lastNodeOfTheCycle = node;\n                return true;\n            }\n        }\n    }\n\n    dfsVisited[node] = false;\n    return false;\n}\n\nvoid calculateCycle(vector<int>& ans, vector<int>& parent){\n    int curNode = lastNodeOfTheCycle;\n    while(curNode != firstNodeOfTheCycle){\n        ans.push_back(curNode);\n        curNode = parent[curNode];\n    }\n    ans.push_back(curNode);\n}\nint main(){\n    int tc = 10;\n    for(int t = 1; t < tc; t++){\n        int n,m;\n        bool wasVisited = false;\n        cin >> n >> m;\n        vector<vector<int>>& adjList(n + 1);\n        vector<bool> visited(n + 1, false), dfsVisited(n + 1, false);\n        vector<int> parent(n + 1, -1), ans;\n        for(int i = 0; i < m; i++){\n            int u, v;\n            cin >> u >> v;\n            adjList[u].push_back(v);\n        }\n        for(int i = 1; i <= n; i++){\n            if(!visited[i]){\n                bool isCycleDetected = detectCycle(i, adjList, visited, dfsVisited, parent);\n                if(isCycleDetected){\n                    wasVisited = true;\n                    calculateCycle(ans, parent);\n                    sort(ans.begin(), ans.end());\n                    cout<<\"#\"<<t;\n                    for(auto it: ans){\n                        cout<<\" \"<<it;\n                    }\n                    cout<<endl;\n                    break;\n                }\n            }\n        }\n        if(!wasVisited){\n            cout<<\"#\"<<t<<\" \"<<endl;\n        }\n    }\n}"
       },
       {
-        "question": "You have string with repeated character. Example :abcaade. Count the number of characters that occur more than once. You can’t use array or map.",
+        "question": "You have string with repeated character. Example :  abcaade  . Count the number of characters that occur more than once. You can’t use array or map.",
         "code_snippet": "",
-        "answer": "[Answer 1] My approach : Sort & search concurrent characternlog(n)."
+        "answer": "[Answer 1] My approach : Sort & search concurrent character  nlog(n)  ."
       },
       {
         "question": "In pen and paper write the inner workings of a BST. How does a BST work? How to insert and retrieve a value from a BST?",
@@ -1544,7 +1544,7 @@
       {
         "question": "Thread A and Thread B are running parallely. What will be the output of following code?",
         "code_snippet": "",
-        "answer": "Unpredictable. It is not guaranteed that which thread is currently accessing thecntvariable. Was asked a follow up question on how to solve this issue?"
+        "answer": "Unpredictable. It is not guaranteed that which thread is currently accessing the  cnt  variable. Was asked a follow up question on how to solve this issue?"
       },
       {
         "question": "Given 5 element. We want to search million time that will return if the searched element is present or no. What is the best time complexity.",
@@ -1576,12 +1576,12 @@
         "answer": "class Solution {\npublic:\n    vector<int> order;\n    vector<int> graph[2005];\n    int color[2005] = {0};\n\n    bool dfs(int u){\n        color[u] = 1;\n        for(auto v : graph[u]){\n            if( color[v] == 1 ) return false;\n            if( color[v] == 2 ) continue;\n            bool possible = dfs(v);\n            if( !possible ) return false;\n        }\n        color[u] = 2;\n        order.push_back(u);\n        return true;\n    }\n\n    vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites) {\n        for(auto prerequisite : prerequisites){\n            graph[prerequisite[1]].push_back(prerequisite[0]);\n        }\n        for(int i = 0; i < numCourses; i++){\n            if( color[i] == 0 ) {\n                bool possible = dfs(i);\n                if( !possible ) return vector<int>{};\n            }\n        }\n        reverse(order.begin(), order.end());\n        return order;\n    }\n};"
       },
       {
-        "question": "Given an integer array of size n, find all elements that appear more than⌊n/3⌋times.\n💻 Submit Code",
+        "question": "Given an integer array of size n, find all elements that appear more than  ⌊n/3⌋  times.\n💻 Submit Code",
         "code_snippet": "class Solution {\npublic:\n    vector<int> majorityElement(vector<int>& nums) {\n        sort(nums.begin(),nums.end());\n        vector<int> majors;\n        int count = 1;\n\n        for(int i = 1; i < nums.size(); i++){\n            if( nums[i] != nums[i-1] ){\n                if( count > nums.size()/3 ) majors.push_back(nums[i-1]);\n                count = 0;\n            }\n            count++;\n        }\n\n        if( count > nums.size()/3 ) majors.push_back(nums.back());\n        return majors;\n    }\n};",
         "answer": "class Solution {\npublic:\n    vector<int> majorityElement(vector<int>& nums) {\n        sort(nums.begin(),nums.end());\n        vector<int> majors;\n        int count = 1;\n\n        for(int i = 1; i < nums.size(); i++){\n            if( nums[i] != nums[i-1] ){\n                if( count > nums.size()/3 ) majors.push_back(nums[i-1]);\n                count = 0;\n            }\n            count++;\n        }\n\n        if( count > nums.size()/3 ) majors.push_back(nums.back());\n        return majors;\n    }\n};"
       },
       {
-        "question": "Given string num representing a non-negative integernum, and an integerk, return the smallest possible integer after removingkdigits from num.\n💻 Submit Code",
+        "question": "Given string num representing a non-negative integer  num  , and an integer  k  , return the smallest possible integer after removing  k  digits from num.\n💻 Submit Code",
         "code_snippet": "class Solution {\npublic:\n    string removeKdigits(string num, int k) {\n       \n        string newNum = \"\";\n        // remove digits that are greater than the next digit\n        for(int i=0;i<num.size();i++){\n            while( k and newNum.size() and newNum.back() > num[i] ){\n                k--;\n                newNum.pop_back();\n            }\n            newNum += num[i];\n        }\n        // remove leading zeros\n        reverse(newNum.begin(),newNum.end());\n        while( newNum.size() and newNum.back() == '0' ) newNum.pop_back();\n        reverse(newNum.begin(),newNum.end());\n        // remove remaining k digits if any\n        while(k and newNum.size()) {\n            newNum.pop_back();\n            k--;\n        }\n        // if newNum is empty, return 0\n        if( newNum.size() == 0 ) newNum = \"0\";\n        return newNum;\n    }\n};",
         "answer": "class Solution {\npublic:\n    string removeKdigits(string num, int k) {\n       \n        string newNum = \"\";\n        // remove digits that are greater than the next digit\n        for(int i=0;i<num.size();i++){\n            while( k and newNum.size() and newNum.back() > num[i] ){\n                k--;\n                newNum.pop_back();\n            }\n            newNum += num[i];\n        }\n        // remove leading zeros\n        reverse(newNum.begin(),newNum.end());\n        while( newNum.size() and newNum.back() == '0' ) newNum.pop_back();\n        reverse(newNum.begin(),newNum.end());\n        // remove remaining k digits if any\n        while(k and newNum.size()) {\n            newNum.pop_back();\n            k--;\n        }\n        // if newNum is empty, return 0\n        if( newNum.size() == 0 ) newNum = \"0\";\n        return newNum;\n    }\n};"
       },
@@ -1596,7 +1596,7 @@
     "company_name": "Therap​",
     "company_website": "https://therapbd.com/",
     "career_website": "https://therap.hire.trakstar.com/",
-    "introduction": "Therap (BD) Ltd.is a US-based Software Company registered in Bangladesh, operating since 2004. They have their office in Dhaka, Bangladesh, and affiliate offices in the USA and Canada. Therap has multiple roles.",
+    "introduction": "Therap (BD) Ltd. is a US-based Software Company registered in Bangladesh, operating since 2004. They have their office in Dhaka, Bangladesh, and affiliate offices in the USA and Canada. Therap has multiple roles.",
     "interview_stages": [],
     "qna": []
   },
@@ -1613,7 +1613,7 @@
         "answer": "int maxProfit(vector<int>& prices) {\n    int buy = prices[0];\n    int profit = 0;\n    for(int i=1;i<prices.size();i++){\n        if( prices[i]-buy > profit ) profit = prices[i] - buy;\n        if( prices[i] < buy ) buy = prices[i];\n    }\n    return profit;\n}"
       },
       {
-        "question": "Given an array of n integers. You need to take all zeroes in array to the end without changing the relative order of remaining element. eg:[2,0,0,3,1,0,5]=>[2,3,1,5,0,0,0]\n💻 Submit Code",
+        "question": "Given an array of n integers. You need to take all zeroes in array to the end without changing the relative order of remaining element. eg:  [2,0,0,3,1,0,5]  =>  [2,3,1,5,0,0,0]\n💻 Submit Code",
         "code_snippet": "void moveZeroes(vector<int>& nums) {\n    int i = 0;\n    for(int j=0;j<nums.size();j++){\n        swap(nums[i], nums[j]);\n        if( nums[i] != 0 ) i++;\n    }\n}",
         "answer": "void moveZeroes(vector<int>& nums) {\n    int i = 0;\n    for(int j=0;j<nums.size();j++){\n        swap(nums[i], nums[j]);\n        if( nums[i] != 0 ) i++;\n    }\n}"
       },
@@ -1643,7 +1643,7 @@
         "answer": "bool isSameTree(TreeNode* p, TreeNode* q) {\n    if( p == nullptr and q != nullptr ) return false;\n    if( p != nullptr and q == nullptr ) return false;\n    if( p == nullptr and q == nullptr ) return true;\n\n    if( p->val != q->val ) return false;\n\n    return isSameTree(p->left,q->left) &&\n            isSameTree(p->right,q->right);\n}"
       },
       {
-        "question": "Given two array of integers. Find the common elements between them.\nUnique :💻 Submit CodeRepeats:💻 Submit Code",
+        "question": "Given two array of integers. Find the common elements between them.\nUnique : 💻 Submit Code Repeats: 💻 Submit Code",
         "code_snippet": "vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {\n    set<int> st;\n    for(auto num:nums1) st.insert(num);\n    set<int> res;\n    for(auto num:nums2) if( st.count(num) == 1 ) res.insert(num);\n    vector<int> ret;\n    for(auto num:res) ret.push_back(num);\n    return ret;\n}",
         "answer": "vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {\n    set<int> st;\n    for(auto num:nums1) st.insert(num);\n    set<int> res;\n    for(auto num:nums2) if( st.count(num) == 1 ) res.insert(num);\n    vector<int> ret;\n    for(auto num:res) ret.push_back(num);\n    return ret;\n}"
       },
@@ -1653,12 +1653,12 @@
         "answer": "class Solution\n{\npublic:\n    vector<pair<int, int>> findPairsWithGivenSum(Node *head, int target)\n    {\n        vector<pair<int,int>> ans;\n        \n        Node* left = head;\n        \n        /// traverse to the end of the list\n        while(head!= nullptr && head->next!=nullptr){\n            head = head->next;\n        }\n        Node* right = head;\n        \n        while(left!= right && left->prev != right){\n            if(left->data + right->data == target){\n                ans.push_back(make_pair(left->data, right->data));\n                left = left->next;\n                right = right->prev;\n            }\n            else if(left->data + right->data > target){\n                right = right->prev;\n            }else{\n                left = left->next;\n            }\n        }\n        \n        return ans;    \n        \n    }\n};"
       },
       {
-        "question": "Solve the problem using Object Oriented Programming\nC++intmain(){intsquare1width=50;intsquare2width=80;intrectangle1width=30, rectangle1height=40;intrectangle2width=20, rectangle2height=40;intsquare1area=square1width*square1width;intsquare2area=square2width*square2width;intrectangle1area=rectangle1height*rectangle1width;intrectangle2area=rectangle2width*rectangle2height;}",
+        "question": "Solve the problem using Object Oriented Programming\nC++ intmain(){intsquare1width=50;intsquare2width=80;intrectangle1width=30, rectangle1height=40;intrectangle2width=20, rectangle2height=40;intsquare1area=square1width*square1width;intsquare2area=square2width*square2width;intrectangle1area=rectangle1height*rectangle1width;intrectangle2area=rectangle2width*rectangle2height;}",
         "code_snippet": "#include <iostream>\nusing namespace std;\n\n// Abstract base class\nclass Shape {\npublic:\n    virtual int area() const = 0;  // Pure virtual function for area\n};\n\nclass Square : public Shape {\nprivate:\n    int width;\npublic:\n    Square(int w) : width(w) {}  // Constructor to initialize width\n\n    int area() const override {\n        return width * width;  // Area of square\n    }\n};\n\nclass Rectangle : public Shape {\nprivate:\n    int width;\n    int height;\npublic:\n    Rectangle(int w, int h) : width(w), height(h) {}  // Constructor to initialize width and height\n\n    int area() const override {\n        return width * height;  // Area of rectangle\n    }\n};\n\nint main() {\n    \n    Square square1(50);\n    Square square2(80);\n    Rectangle rectangle1(30, 40);\n    Rectangle rectangle2(20, 40);\n\n    cout << \"Square 1 area: \" << square1.area() << endl;\n    cout << \"Square 2 area: \" << square2.area() << endl;\n    cout << \"Rectangle 1 area: \" << rectangle1.area() << endl;\n    cout << \"Rectangle 2 area: \" << rectangle2.area() << endl;\n    return 0;\n}",
         "answer": "#include <iostream>\nusing namespace std;\n\n// Abstract base class\nclass Shape {\npublic:\n    virtual int area() const = 0;  // Pure virtual function for area\n};\n\nclass Square : public Shape {\nprivate:\n    int width;\npublic:\n    Square(int w) : width(w) {}  // Constructor to initialize width\n\n    int area() const override {\n        return width * width;  // Area of square\n    }\n};\n\nclass Rectangle : public Shape {\nprivate:\n    int width;\n    int height;\npublic:\n    Rectangle(int w, int h) : width(w), height(h) {}  // Constructor to initialize width and height\n\n    int area() const override {\n        return width * height;  // Area of rectangle\n    }\n};\n\nint main() {\n    \n    Square square1(50);\n    Square square2(80);\n    Rectangle rectangle1(30, 40);\n    Rectangle rectangle2(20, 40);\n\n    cout << \"Square 1 area: \" << square1.area() << endl;\n    cout << \"Square 2 area: \" << square2.area() << endl;\n    cout << \"Rectangle 1 area: \" << rectangle1.area() << endl;\n    cout << \"Rectangle 2 area: \" << rectangle2.area() << endl;\n    return 0;\n}"
       },
       {
-        "question": "Given an array of sides of triangles, return an array of strings. The strings would be either “yes” or “no”, corresponding to whether the same indexed triangle is a right triangle or not.\nInput:[[3,4,5], [5,9,12], [6,8,10]]Output:[\"yes\",\"no\",\"yes\"]",
+        "question": "Given an array of sides of triangles, return an array of strings. The strings would be either “yes” or “no”, corresponding to whether the same indexed triangle is a right triangle or not.\nInput:  [[3,4,5], [5,9,12], [6,8,10]]  Output:  [\"yes\",\"no\",\"yes\"]",
         "code_snippet": "def areRightTriangles(triangles):\n    res = []\n    \n    for sides in triangles:\n        sides.sort()\n        a,b,c = sides\n        if a**2 + b**2 == c**2:\n            res.append(True)\n        else:\n            res.append(False)\n    \n    return res",
         "answer": "def areRightTriangles(triangles):\n    res = []\n    \n    for sides in triangles:\n        sides.sort()\n        a,b,c = sides\n        if a**2 + b**2 == c**2:\n            res.append(True)\n        else:\n            res.append(False)\n    \n    return res"
       },
@@ -1668,7 +1668,7 @@
         "answer": "def search(words, target):\n        l, r = 0, len(words) - 1\n\n        while l <= r:\n            m = (l + r) // 2\n            if words[m] == target:\n                return m\n            \n            if words[l] <= words[m]:\n                if target < words[l] or target > words[m]:\n                    l = m + 1\n                else :\n                    r = m - 1\n            \n            else:\n                if target > words[r] or target < words[m] :\n                    r = m - 1\n                else :\n                    l = m + 1\n\n        return -1"
       },
       {
-        "question": "Given two strings s1, s2, return whether a substring of s1 is an anagram of s2\nInput:s1 = \"hello\", s2 = \"lol\"Output:TrueInput:s1 = \"hello\", s2 = \"loa\"Output:False",
+        "question": "Given two strings s1, s2, return whether a substring of s1 is an anagram of s2\nInput:  s1 = \"hello\", s2 = \"lol\"  Output:  True  Input:  s1 = \"hello\", s2 = \"loa\"  Output:  False",
         "code_snippet": "def containsAnagram(s1, s2):\n    ara1 = [0]*26\n    ara2 = [0]*26\n\n    for i in range(len(s2)):\n        ara1[ord(s1[i])-ord(('a'))] += 1\n        ara2[ord(s2[i])-ord(('a'))] += 1\n\n    l, r = 0, len(s2)\n    while r < len(s1):\n        if ara1 == ara2:\n            return True\n        ara1[ord(s1[l])-ord(('a'))] -= 1\n        ara1[ord(s1[r])-ord(('a'))] += 1\n        l += 1\n        r += 1\n\n    return ara1 == ara2",
         "answer": "def containsAnagram(s1, s2):\n    ara1 = [0]*26\n    ara2 = [0]*26\n\n    for i in range(len(s2)):\n        ara1[ord(s1[i])-ord(('a'))] += 1\n        ara2[ord(s2[i])-ord(('a'))] += 1\n\n    l, r = 0, len(s2)\n    while r < len(s1):\n        if ara1 == ara2:\n            return True\n        ara1[ord(s1[l])-ord(('a'))] -= 1\n        ara1[ord(s1[r])-ord(('a'))] += 1\n        l += 1\n        r += 1\n\n    return ara1 == ara2"
       },
@@ -1678,17 +1678,17 @@
         "answer": "def subtract(num1, num2):\n    num1, num2 = num1[::-1], num2[::-1]   \n    res = \"\"\n    carry = 0\n\n    for i in range(len(num1)):\n        digit1 = int(num1[i])\n        digit2 = int(num2[i]) if i < len(num2) else 0\n        diff = digit1 - digit2 - carry\n\n        if diff < 0:\n            diff += 10\n            carry = 1\n\n        else:\n            carry = 0\n\n        res += str(diff)\n\n    # Remove leading zeros\n    res = res.rstrip(\"0\")\n\n    return res[::-1]"
       },
       {
-        "question": "Given an array containing 0,1,2 sort it.\nInput:[2,0,1,1,0,2]Output:[0,0,1,1,2,2]",
+        "question": "Given an array containing 0,1,2 sort it.\nInput:  [2,0,1,1,0,2]  Output:  [0,0,1,1,2,2]",
         "code_snippet": "def bring2Front(ara,start,target):\n    target_index = start\n    for i in range(start,len(ara)):\n        ara[i],ara[target_index] = ara[target_index],ara[i]\n        if ara[target_index] == target:\n            target_index += 1\n    return target_index\n\ndef sortNums(ara):\n    target_index = bring2Front(ara,0,0)\n    bring2Front(ara,target_index,1)\n    return ara",
         "answer": "def bring2Front(ara,start,target):\n    target_index = start\n    for i in range(start,len(ara)):\n        ara[i],ara[target_index] = ara[target_index],ara[i]\n        if ara[target_index] == target:\n            target_index += 1\n    return target_index\n\ndef sortNums(ara):\n    target_index = bring2Front(ara,0,0)\n    bring2Front(ara,target_index,1)\n    return ara"
       },
       {
-        "question": "Using no loops, print this pattern for a given number n:\nn, n-5, n-10,....0,....,n-10,n-5,n. Example:7, 2, -3, 2, 7",
+        "question": "Using no loops, print this pattern for a given number n:\nn, n-5, n-10,....0,....,n-10,n-5,n  . Example:  7, 2, -3, 2, 7",
         "code_snippet": "def recursiveAdd(ara, n):\n    ara.append(n)\n    if n > 0:\n        recursiveAdd(ara, n-5)\n        ara.append(n)\n\ndef solution(n):\n    ara = []\n    recursiveAdd(ara, n)\n    return ara",
         "answer": "def recursiveAdd(ara, n):\n    ara.append(n)\n    if n > 0:\n        recursiveAdd(ara, n-5)\n        ara.append(n)\n\ndef solution(n):\n    ara = []\n    recursiveAdd(ara, n)\n    return ara"
       },
       {
-        "question": "Design this legacy table for using in a relational database.\nIDNameEmailSubjectCourses1Rahimrahim@gmail.comCSECSE101, CSE102, EEE101, CIVIL1042karimkarim@gmail.comEEEEEE101, EEE102, CSE102, CIVIL1043Josimjosim@gmail.comBMEEEE101, CSE101, BME1014Belalbelal@gmail.comCIVILCIVIL101, CIVIL102, MECHA101, EEE1015Rakibrakib@gmail.comMECHACSE101, BME101, MECHA101, MECHA101",
+        "question": "Design this legacy table for using in a relational database.\nID Name Email Subject Courses 1 Rahim rahim@gmail.com CSE CSE101, CSE102, EEE101, CIVIL104 2 karim karim@gmail.com EEE EEE101, EEE102, CSE102, CIVIL104 3 Josim josim@gmail.com BME EEE101, CSE101, BME101 4 Belal belal@gmail.com CIVIL CIVIL101, CIVIL102, MECHA101, EEE101 5 Rakib rakib@gmail.com MECHA CSE101, BME101, MECHA101, MECHA101",
         "code_snippet": "",
         "answer": "No answer found"
       }
@@ -1757,7 +1757,7 @@
         "answer": "No answer found"
       },
       {
-        "question": "A schema has entities like CUSTOMERS, ORDERS, ORDER_ITEMS, PRODUCTS, PRODUCT_DETAILS, WAREHOUSES, INVENTORIES. Data fields of entities and cardinality relationships were given in the figure. Questions included from <>\nGroup by, Order by, Join <>Extracting month and year from oracle dates <>Find ranks based on some criterion. The extremely hard question was - find top 10 customers based on their total amount spent in 2023. This one involved the following topics: aggregation, join of multiple tables, nested sub-query, year extraction from date. The book of Sukarna sir contains one/two such exercises. Practise them properly",
+        "question": "A schema has entities like CUSTOMERS, ORDERS, ORDER_ITEMS, PRODUCTS, PRODUCT_DETAILS, WAREHOUSES, INVENTORIES. Data fields of entities and cardinality relationships were given in the figure. Questions included from <>\nGroup by, Order by, Join <> Extracting month and year from oracle dates <> Find ranks based on some criterion. The extremely hard question was - find top 10 customers based on their total amount spent in 2023. This one involved the following topics: aggregation, join of multiple tables, nested sub-query, year extraction from date. The book of Sukarna sir contains one/two such exercises. Practise them properly",
         "code_snippet": "",
         "answer": "No answer found"
       }
@@ -1781,7 +1781,7 @@
         "answer": "No answer found"
       },
       {
-        "question": "For a binary tree, you are given a table of two columns N and P, where N represents the id of a node in the tree and P represents the parent of that node in the tree. Write a SQL query to find which theleaf,rootandinnernodes and output a table fo the following format\nNNodeType5root2inner3leaf4leaf8inner6leaf",
+        "question": "For a binary tree, you are given a table of two columns N and P, where N represents the id of a node in the tree and P represents the parent of that node in the tree. Write a SQL query to find which the  leaf  ,  root  and  inner  nodes and output a table fo the following format\nN NodeType 5 root 2 inner 3 leaf 4 leaf 8 inner 6 leaf",
         "code_snippet": "",
         "answer": "No answer found"
       },
@@ -1791,7 +1791,7 @@
         "answer": "No answer found"
       },
       {
-        "question": "You need to create a model that classified news articles into three categories,\nsportspoliticsentertainment\nYou have large amount of data but there is no labelled data. The model has to handle very high throughput of hundreds of articles per second at inference time.\nDescribe how you would approach this problem.",
+        "question": "You need to create a model that classified news articles into three categories,\nsports politics entertainment\nYou have large amount of data but there is no labelled data. The model has to handle very high throughput of hundreds of articles per second at inference time.\nDescribe how you would approach this problem.",
         "code_snippet": "",
         "answer": "No answer found"
       },
@@ -1811,7 +1811,7 @@
     "company_name": "WSD​",
     "company_website": "https://wsd.com/",
     "career_website": "https://wsd.com/career/",
-    "introduction": "WSDor Wall Street Docs is a US based company trying to expand in Bangladesh.",
+    "introduction": "WSD or Wall Street Docs is a US based company trying to expand in Bangladesh.",
     "interview_stages": [],
     "qna": [
       {
@@ -1884,7 +1884,7 @@
     "interview_stages": [],
     "qna": [
       {
-        "question": "What will the output of this code in C Programming Language and why?\nCintarr[3]={1,2,3};if(&arr[0]==&arr){printf(\"They are the same!\");}else{printf(\"Not same\");}",
+        "question": "What will the output of this code in C Programming Language and why?\nC intarr[3]={1,2,3};if(&arr[0]==&arr){printf(\"They are the same!\");}else{printf(\"Not same\");}",
         "code_snippet": "",
         "answer": "The name of the array is a pointer to the first item of the Array. So it will print \"They are the same!\""
       },
@@ -1894,9 +1894,9 @@
         "answer": "It will print the address of the first item of the array. In C, you can't pass array to functions by \"Pass by value\". So when you pass an array to an function (for example: printf(arr)), the compiler will actually pass the pointer to the first element. You can easily test this hypothesis by doing something like this:"
       },
       {
-        "question": "What is the time complexity of the print statement? if it'sO(1)why is that? Is it the same case for Linked List? If it's not, why it isn't the same case?\npythonarr=[1,2,3,4]print(arr[2])",
+        "question": "What is the time complexity of the print statement? if it's  O(1)  why is that? Is it the same case for Linked List? If it's not, why it isn't the same case?\npython arr=[1,2,3,4]print(arr[2])",
         "code_snippet": "",
-        "answer": "Tip:Learn about stack and heap memory and their use cases when memory is allocated. Learn about compile time and runtime memory allocation."
+        "answer": "Tip:  Learn about stack and heap memory and their use cases when memory is allocated. Learn about compile time and runtime memory allocation."
       },
       {
         "question": "Can we run binary search on a sorted LinkedList? If we can, what issues we might face?",
@@ -1909,12 +1909,12 @@
         "answer": "No answer found"
       },
       {
-        "question": "pythondeffn(n):ifn==0:return0returnn+fn(n-1)\nGiven the above function, rename the function according to what the function tries to achive.\n2nd Iteration:Write the same function but in a iterative manner. Does the both implementations have same Time Complexity and Space Complxity?",
+        "question": "python deffn(n):ifn==0:return0returnn+fn(n-1)\nGiven the above function, rename the function according to what the function tries to achive.\n2nd Iteration:  Write the same function but in a iterative manner. Does the both implementations have same Time Complexity and Space Complxity?",
         "code_snippet": "",
         "answer": "No answer found"
       },
       {
-        "question": "What is the time complexity of the following code?\nCintfun(intn) {if(n<=1)returnn;intx=fun(n-1);inty=fun(n-2);returnx+y;}",
+        "question": "What is the time complexity of the following code?\nC intfun(intn) {if(n<=1)returnn;intx=fun(n-1);inty=fun(n-2);returnx+y;}",
         "code_snippet": "",
         "answer": "No answer found"
       },
@@ -2014,7 +2014,7 @@
         "answer": "// src: https://www.geeksforgeeks.org/largest-rectangular-area-in-a-histogram-using-stack/\nint largestRectangleArea(vector<int>& hist) {\n    int n = hist.size();\n    stack<int> s;\n\n    int max_area = 0;\n    int tp;\n    int area_with_top;\n    int i = 0;\n    while (i < n) {\n        if (s.empty() || hist[s.top()] <= hist[i]){\n            s.push(i++);\n        } else {\n            tp = s.top();\n            s.pop();\n\n            area_with_top = hist[tp] * (s.empty() ? i : i - s.top() - 1);\n            max_area = max(max_area,area_with_top);\n        }\n    }\n\n    while (s.empty() == false) {\n        tp = s.top();\n        s.pop();\n\n        area_with_top = hist[tp] * (s.empty() ? i : i - s.top() - 1);\n        max_area = max(max_area,area_with_top);\n    }\n\n    return max_area;\n}"
       },
       {
-        "question": "You have an-story building, and two eggs. An egg will break if dropped from a certain height (ie above a floorf). Determine the minimum number of moves that you need to determine with certainty what the value offis.\n💻 Submit Code",
+        "question": "You have a  n  -story building, and two eggs. An egg will break if dropped from a certain height (ie above a floor  f  ). Determine the minimum number of moves that you need to determine with certainty what the value of  f  is.\n💻 Submit Code",
         "code_snippet": "class Solution {\npublic:\n    int twoEggDrop(int n) {\n        int sq = sqrt(2*n);\n        if ( sq * (sq+1) < 2*n ) sq++;\n        return sq;\n    }\n};",
         "answer": "class Solution {\npublic:\n    int twoEggDrop(int n) {\n        int sq = sqrt(2*n);\n        if ( sq * (sq+1) < 2*n ) sq++;\n        return sq;\n    }\n};"
       },
