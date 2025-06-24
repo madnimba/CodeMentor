@@ -44,12 +44,13 @@ public class AuthService {
         User savedUser = userRepository.save(user);
         System.out.println("User saved: " + savedUser);
 
-        Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(username, password)
-        );
-        String token = jwtTokenProvider.generateToken(authentication);
-        //System.out.println("Token: " + token);
-        return token;
+        // Authentication authentication = authenticationManager.authenticate(
+        //     new UsernamePasswordAuthenticationToken(username, password)
+        // );
+        // String token = jwtTokenProvider.generateToken(authentication);
+        // //System.out.println("Token: " + token);
+        // return token;
+        return "User saved";
     }
     
     public String signIn(String username, String password) {

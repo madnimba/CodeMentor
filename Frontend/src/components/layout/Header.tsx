@@ -65,10 +65,10 @@ export const Header = () => {
               ) : (
                 <>
                   <Button asChild variant="ghost" className="text-slate-300 hover:text-white">
-                    <Link to="/auth">Sign In</Link>
+                    <Link to="/auth?tab=signin">Sign In</Link>
                   </Button>
                   <Button asChild className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
-                    <Link to="/auth">Sign Up</Link>
+                    <Link to="/auth?tab=signup">Sign Up</Link>
                   </Button>
                 </>
               )}
@@ -103,10 +103,10 @@ export const Header = () => {
                       </button>
                     ) : (
                       <>
-                        <Link to="/auth" className="block py-2 text-slate-300 hover:text-white">
+                        <Link to="/auth?tab=signin" className="block py-2 text-slate-300 hover:text-white">
                           Sign In
                         </Link>
-                        <Link to="/auth" className="block py-2 text-purple-400 hover:text-purple-300">
+                        <Link to="/auth?tab=signup" className="block py-2 text-purple-400 hover:text-purple-300">
                           Sign Up
                         </Link>
                       </>
