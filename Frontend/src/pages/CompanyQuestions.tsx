@@ -260,7 +260,6 @@ function findMedianSortedArrays(nums1: number[], nums2: number[]): number {
             </CardContent>
           </Card>
 
-          {/* Questions List */}
           <div className="space-y-6">
             {questions.map((question) => (
               <Card key={question.id} className="bg-slate-800/50 border-slate-700 hover:border-purple-500/50 transition-colors">

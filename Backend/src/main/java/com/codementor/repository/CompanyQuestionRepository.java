@@ -7,6 +7,8 @@ import java.util.List;
 
 @Repository
 public interface CompanyQuestionRepository extends JpaRepository<CompanyQuestion, Integer> {
+    @Query("SELECT cq FROM companyquestions cq JOIN FETCH cq.question WHERE cq.company.id = :companyId")
     List<CompanyQuestion> findByCompanyId(Integer companyId);
     CompanyQuestion findByCompanyIdAndQuestionId(Integer companyId, Integer questionId);
+    int countByCompanyId(Integer companyId);
 }   
