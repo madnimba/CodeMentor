@@ -5,15 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Code2, Play, CheckCircle, AlertCircle, ChevronDown, Loader2 } from "lucide-react";
-import { Link, useParams } from "react-router-dom";
+import { ArrowLeft, Code2, Play, CheckCircle, AlertCircle, ChevronDown, Loader2, Search } from "lucide-react";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Editor from "@monaco-editor/react";
 import { useToast } from "@/components/ui/use-toast";
 import { judge0Service, CodeExecutionResponse } from "@/services/judge0";
+import { api } from "@/services/api";
 
 const LiveCoding = () => {
   const { companyId, questionId } = useParams();
+  const navigate = useNavigate();
+  
+  console.log('LiveCoding component - companyId:', companyId, 'questionId:', questionId);
+  
   const [activeTab, setActiveTab] = useState("description");
   const [selectedLanguage, setSelectedLanguage] = useState("javascript");
   const [code, setCode] = useState(`// Write your solution here
@@ -56,7 +61,120 @@ console.log("Output:", solution([3,3], 6));`);
   const [isRunning, setIsRunning] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [serverHealth, setServerHealth] = useState<any>(null);
+  const [questions, setQuestions] = useState<any[]>([]);
+  const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
+
+  // Fetch questions from the database
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      if (!companyId) return;
+      
+      setIsLoadingQuestions(true);
+      try {
+        console.log('Fetching questions for company:', companyId);
+        console.log('API URL:', `/companies/${companyId}/questions`);
+        
+        const response = await api.get(`/companies/${companyId}/questions`);
+        console.log('API Response:', response);
+        console.log('Questions data:', response.data);
+        
+        setQuestions(response.data);
+        
+        // If questionId is provided, find and set the selected question
+        if (questionId) {
+          const question = response.data.find((q: any) => q.id === parseInt(questionId));
+          if (question) {
+            setSelectedQuestion(question);
+            updateQuestionData(question);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching questions:', error);
+        console.error('Error details:', error.response?.data);
+        console.error('Error status:', error.response?.status);
+        toast({
+          title: "Error",
+          description: "Failed to load questions",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoadingQuestions(false);
+      }
+    };
+
+    fetchQuestions();
+  }, [companyId, questionId]);
+
+  // Update question data when a question is selected
+  const updateQuestionData = (question: any) => {
+    setSelectedQuestion(question);
+    
+    // Update code template based on the question
+    const templates = {
+      javascript: `// ${question.title}
+// ${question.description}
+
+function solution() {
+    // Your solution here
+    return null;
+}
+
+// Test your solution here
+console.log("Testing solution...");`,
+      python: `# ${question.title}
+# ${question.description}
+
+def solution():
+    # Your solution here
+    return None
+
+# Test your solution here
+print("Testing solution...")`,
+      cpp: `#include <iostream>
+#include <vector>
+using namespace std;
+
+// ${question.title}
+// ${question.description}
+
+// Your solution here
+void solution() {
+    // Implementation
+}
+
+int main() {
+    cout << "Testing solution..." << endl;
+    return 0;
+}`,
+      java: `import java.util.*;
+
+// ${question.title}
+// ${question.description}
+
+class Solution {
+    public void solution() {
+        // Your solution here
+    }
+}
+
+class Main {
+    public static void main(String[] args) {
+        System.out.println("Testing solution...");
+    }
+}`
+    };
+    
+    setCode(templates[selectedLanguage as keyof typeof templates] || templates.javascript);
+  };
+
+  // Filter questions based on search term
+  const filteredQuestions = questions.filter(question =>
+    question.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    question.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   // Check server health on component mount
   useEffect(() => {
@@ -238,7 +356,7 @@ class Main {
   };
 
   // Mock data - in real app, this would come from an API
-  const questionData = {
+  const questionData = selectedQuestion || {
     id: questionId,
     title: "Two Sum",
     description: `Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.
@@ -311,8 +429,78 @@ You can return the answer in any order.`,
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left Panel - Question Description */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Panel - Question Selector */}
+            <div className="space-y-6">
+              <Card className="bg-slate-800/50 border-slate-700">
+                <CardHeader>
+                  <CardTitle className="text-white">Question Selector</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {/* Search Input */}
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+                      <input
+                        type="text"
+                        placeholder="Search questions..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      />
+                    </div>
+
+                    {/* Questions List */}
+                    <div className="h-[400px] overflow-y-auto space-y-2">
+                      {isLoadingQuestions ? (
+                        <div className="flex items-center justify-center h-32">
+                          <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
+                        </div>
+                      ) : filteredQuestions.length === 0 ? (
+                        <div className="text-center text-slate-400 py-8">
+                          {searchTerm ? 'No questions found' : 'No questions available'}
+                        </div>
+                      ) : (
+                        filteredQuestions.map((question) => (
+                          <div
+                            key={question.id}
+                            onClick={() => {
+                              updateQuestionData(question);
+                              navigate(`/companies/${companyId}/questions/${question.id}/live-coding`);
+                            }}
+                            className={`p-4 rounded-lg cursor-pointer transition-colors ${
+                              selectedQuestion?.id === question.id
+                                ? 'bg-purple-600/20 border border-purple-500/30'
+                                : 'bg-slate-700/50 border border-slate-600 hover:bg-slate-700'
+                            }`}
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <h3 className="text-white font-medium text-sm mb-1 line-clamp-2">
+                                  {question.title}
+                                </h3>
+                                <p className="text-slate-400 text-xs line-clamp-2">
+                                  {question.description}
+                                </p>
+                              </div>
+                              <Badge className={`ml-2 text-xs ${
+                                question.difficulty === 'Easy' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
+                                question.difficulty === 'Medium' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' :
+                                'bg-red-500/20 text-red-400 border-red-500/30'
+                              }`}>
+                                {question.difficulty}
+                              </Badge>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Middle Panel - Question Description */}
             <div className="space-y-6">
               <Card className="bg-slate-800/50 border-slate-700">
                 <CardHeader>
@@ -333,7 +521,7 @@ You can return the answer in any order.`,
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {questionData.examples.map((example, index) => (
+                    {questionData.examples?.map((example: any, index: number) => (
                       <div key={index} className="bg-slate-900/50 p-4 rounded-lg">
                         <div className="text-slate-400 mb-2">Example {index + 1}:</div>
                         <div className="space-y-2">
@@ -351,7 +539,11 @@ You can return the answer in any order.`,
                           </div>
                         </div>
                       </div>
-                    ))}
+                    )) || (
+                      <div className="text-slate-400 text-center py-4">
+                        No examples available for this question
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -362,12 +554,16 @@ You can return the answer in any order.`,
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    {questionData.hints.map((hint, index) => (
+                    {questionData.hints?.map((hint: string, index: number) => (
                       <div key={index} className="flex items-start gap-2 text-slate-300">
                         <span className="text-purple-400">{index + 1}.</span>
                         <span>{hint}</span>
                       </div>
-                    ))}
+                    )) || (
+                      <div className="text-slate-400 text-center py-4">
+                        No hints available for this question
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -437,7 +633,7 @@ You can return the answer in any order.`,
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {questionData.testCases.map((testCase, index) => (
+                    {questionData.testCases?.map((testCase: any, index: number) => (
                       <div key={index} className="bg-slate-900/50 p-4 rounded-lg">
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-slate-400">Test Case {index + 1}</span>
@@ -456,7 +652,11 @@ You can return the answer in any order.`,
                           </div>
                         </div>
                       </div>
-                    ))}
+                    )) || (
+                      <div className="text-slate-400 text-center py-4">
+                        No test cases available for this question
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>

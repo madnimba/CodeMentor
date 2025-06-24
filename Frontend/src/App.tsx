@@ -78,6 +78,14 @@ const App = () => (
               } 
             />
             <Route 
+              path="/companies/:companyId/questions/:questionId/live-coding" 
+              element={
+                <ProtectedRoute>
+                  <LiveCoding />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
               path="/coding-editor" 
               element={
                 <ProtectedRoute>

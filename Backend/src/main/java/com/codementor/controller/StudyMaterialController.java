@@ -17,6 +17,11 @@ import java.util.List;
 public class StudyMaterialController {
     private final StudyMaterialService studyMaterialService;
 
+    @GetMapping("/test")
+    public ResponseEntity<ApiResponse<String>> testConnection() {
+        return ResponseEntity.ok(ApiResponse.success("Database connection test successful"));
+    }
+
     @GetMapping("/tracks")
     public ResponseEntity<ApiResponse<List<TrackResponse>>> getAllTracks() {
         return ResponseEntity.ok(ApiResponse.success(studyMaterialService.getAllTracks()));

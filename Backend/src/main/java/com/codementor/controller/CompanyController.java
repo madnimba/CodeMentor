@@ -41,4 +41,10 @@ public class CompanyController {
             @PathVariable Integer questionId) {
         return ResponseEntity.ok(companyQuestionService.getCompanyQuestion(companyId, questionId));
     }
+    
+    // Test endpoint to check database connection
+    @GetMapping("/test")
+    public ResponseEntity<String> testEndpoint() {
+        return ResponseEntity.ok("Backend is running!");
+    }
 }

@@ -12,5 +12,6 @@ public interface SubtopicRepository extends JpaRepository<Subtopic, Integer> {
     Optional<Subtopic> findByName(String name);
     boolean existsByName(String name);
     List<Subtopic> findByTopicId(Integer topicId);
+    List<Subtopic> findByTopicIdIn(List<Integer> topicIds);
     //List<Subtopic> findByTrackId(Integer trackId);
 } 
