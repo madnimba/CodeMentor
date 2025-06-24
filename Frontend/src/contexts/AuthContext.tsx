@@ -41,11 +41,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUp = async (data: SignUpRequest) => {
     try {
-      const response = await authService.signUp(data);
-      setUser(response);
-      localStorage.setItem('token', response.token);
-      // After successful signup, redirect to signin
-      navigate('/auth?tab=signin');
+      await authService.signUp(data);
+      // Do not set user or token, do not navigate here. Let Auth page handle tab switching.
     } catch (error) {
       console.error('Sign up error:', error);
       throw error;

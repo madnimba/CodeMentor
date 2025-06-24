@@ -190,7 +190,7 @@ const Companies = () => {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {featuredCompanies.map((company) => (
-                  <Card key={company.id} className="bg-slate-800/50 border-slate-700 hover:border-purple-500/50 transition-colors">
+                  <Card key={company.id} className="bg-slate-800/50 border-slate-700 hover:border-purple-500/50 transition-colors flex flex-col h-full">
                     <CardHeader>
                       <div className="flex items-center gap-2 mb-2">
                         <Building2 className="w-6 h-6 text-purple-400" />
@@ -200,8 +200,8 @@ const Companies = () => {
                         {company.description}
                       </CardDescription>
                     </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
+                    <CardContent className="flex flex-col flex-grow justify-end h-full">
+                      <div className="mt-auto space-y-4">
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
                             <span className="text-slate-400">Progress</span>
@@ -269,7 +269,7 @@ const Companies = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredAndSortedCompanies.map((company) => (
-                <Card key={company.id} className="bg-slate-800/50 border-slate-700 hover:border-purple-500/50 transition-colors">
+                <Card key={company.id} className="bg-slate-800/50 border-slate-700 hover:border-purple-500/50 transition-colors flex flex-col h-full">
                   <CardHeader>
                     <div className="flex items-center gap-2 mb-2">
                       <Building2 className="w-6 h-6 text-purple-400" />
@@ -279,8 +279,8 @@ const Companies = () => {
                       {company.description}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
+                  <CardContent className="flex flex-col flex-grow justify-end h-full">
+                    <div className="mt-auto space-y-4">
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
                           <span className="text-slate-400">Progress</span>
