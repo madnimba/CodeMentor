@@ -33,7 +33,6 @@ def extract_qna_from_soup(soup):
         intro_p = intro_header.find_next("p")
         if intro_p:
             introduction = intro_p.get_text(strip=True)
-            introduction = introduction.replace('\n', ' ')
 
     # Get the interview stages
     stages_header = soup.find("h2", id="star-coder-interview-stages")
@@ -41,56 +40,48 @@ def extract_qna_from_soup(soup):
     if stages_header:
         stage_list = stages_header.find_next("ol")
         if stage_list:
-            interview_stages = [li.get_text(strip=True).replace('\n', ' ') for li in stage_list.find_all("li")]
+            interview_stages = [li.get_text(strip=True) for li in stage_list.find_all("li")]
 
     # Extract Q&A pairs
     articles = soup.find_all("article")
     qna_list = []
     for article in articles:
-        question_parts = []
+        question_html = ""
+        answer_html = "No answer found"
 
-        # Extract all direct children (excluding <details>) as part of question
+        # Extract question: content from <p> and everything after it before any <details>
+        first_p = article.find("p")
+        details_tags = article.find_all("details")
+        first_details = details_tags[0] if details_tags else None
+        collecting = False
         for child in article.children:
-            if getattr(child, 'name', None) == "details":
+            if not hasattr(child, 'name'):
                 continue
-            if child.name == "pre":
-                lines = child.find_all("span", class_="line")
-                question_parts.append("\n".join(line.get_text().replace('\n', ' ') for line in lines))
-            else:
-                text = child.get_text(strip=True).replace('\n', ' ') if child else ""
-                if text:
-                    question_parts.append(text)
+            if child == first_p:
+                question_html += str(child)
+                collecting = True
+                continue
+            if child == first_details:
+                break
+            if collecting:
+                question_html += str(child)
 
-        question = "\n".join(question_parts).strip()
-
-        # Extract code snippet inside <details> if any
-        code_snippet = ""
-        code_block = article.find("details")
-        if code_block:
-            pre_tag = code_block.find("pre")
-            if pre_tag:
-                lines = pre_tag.find_all("span", class_="line")
-                code_snippet = "\n".join(line.get_text() for line in lines)
-
-        # Extract answer from the <p> after 'Show Answer'
-        answer = "No answer found"
-        answer_summary = article.find("summary", string=lambda text: text and "Show Answer" in text)
-        if answer_summary:
-            details_tag = answer_summary.find_parent("details")
-            if details_tag:
+        # Process all <details> blocks
+        for details_tag in details_tags:
+            summary = details_tag.find("summary")
+            if summary and summary.get_text(strip=True) == "Show Answer":
                 answer_p = details_tag.find("p")
                 if answer_p:
-                    answer = answer_p.get_text(strip=True)
-                else:
-                    pre = details_tag.find("pre")
-                    if pre:
-                        lines = pre.find_all("span", class_="line")
-                        answer = "\n".join(line.get_text() for line in lines)
+                    answer_html = str(answer_p)
+            else:
+                # Non-answer details content goes to question
+                for child in details_tag.contents:
+                    if child.name != "summary":
+                        question_html += str(child)
 
         qna_list.append({
-            "question": question,
-            "code_snippet": code_snippet,
-            "answer": answer
+            "question": question_html.strip(),
+            "answer": answer_html.strip()
         })
 
     return {
