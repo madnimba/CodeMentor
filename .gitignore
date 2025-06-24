@@ -70,3 +70,8 @@ logs
 *.njsproj
 *.sln
 *.sw?
+
+
+# Data collection
+*/venv/*
+

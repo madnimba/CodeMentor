@@ -1,0 +1,51 @@
+id,topic_id,name
+1,1,Array Fundamentals
+2,1,Two Pointers Technique
+3,1,Sliding Window
+4,1,String Manipulation
+5,1,String Matching Algorithms
+6,1,Array Sorting Techniques
+7,1,Prefix Sum Arrays
+8,1,Kadane's Algorithm
+9,1,Boyer-Moore Majority Vote
+10,1,Dutch National Flag Problem
+11,2,Singly Linked Lists
+12,2,Doubly Linked Lists
+13,2,Circular Linked Lists
+14,2,Linked List Reversal
+15,2,Cycle Detection
+16,2,Merging Linked Lists
+17,2,Finding Intersection
+18,2,Palindrome Check
+19,2,Sorting Linked Lists
+20,2,Cloning Complex Lists
+21,3,Binary Tree Fundamentals
+22,3,Tree Traversal Methods
+23,3,Binary Search Trees
+24,3,AVL Trees
+25,3,Tree Construction
+26,3,Lowest Common Ancestor
+27,3,Tree Diameter
+28,3,Tree Serialization
+29,3,Trie Data Structure
+30,3,Segment Trees
+31,4,Graph Representation
+32,4,BFS and DFS
+33,4,Shortest Path Algorithms
+34,4,Topological Sorting
+35,4,Union-Find Data Structure
+36,4,Minimum Spanning Tree
+37,4,Graph Coloring
+38,4,Network Flow
+39,4,Strongly Connected Components
+40,4,Bipartite Graphs
+41,5,DP Fundamentals
+42,5,Fibonacci Sequence
+43,5,Knapsack Problem
+44,5,Longest Common Subsequence
+45,5,Edit Distance
+46,5,Coin Change Problem
+47,5,Matrix Chain Multiplication
+48,5,DP on Trees
+49,5,Digit DP
+50,5,Bitmask DP
