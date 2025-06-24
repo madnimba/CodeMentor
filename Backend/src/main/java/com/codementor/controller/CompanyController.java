@@ -1,0 +1,44 @@
+package com.codementor.controller;
+
+import com.codementor.dto.CompanyDTO;
+import com.codementor.dto.CompanyQuestionDTO;
+import com.codementor.service.CompanyService;
+import com.codementor.service.CompanyQuestionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
+@RestController
+@RequestMapping("/companies")
+@CrossOrigin(origins = "*")
+public class CompanyController {
+    
+    @Autowired
+    private CompanyService companyService;
+    
+    @Autowired
+    private CompanyQuestionService companyQuestionService;
+
+    @GetMapping
+    public ResponseEntity<List<CompanyDTO>> getAllCompanies() {
+        return ResponseEntity.ok(companyService.getAllCompanies());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CompanyDTO> getCompanyById(@PathVariable Integer id) {
+        return ResponseEntity.ok(companyService.getCompanyById(id));
+    }
+
+    @GetMapping("/{companyId}/questions")
+    public ResponseEntity<List<CompanyQuestionDTO>> getCompanyQuestions(@PathVariable Integer companyId) {
+        return ResponseEntity.ok(companyQuestionService.getCompanyQuestions(companyId));
+    }
+
+    @GetMapping("/{companyId}/questions/{questionId}")
+    public ResponseEntity<CompanyQuestionDTO> getCompanyQuestion(
+            @PathVariable Integer companyId,
+            @PathVariable Integer questionId) {
+        return ResponseEntity.ok(companyQuestionService.getCompanyQuestion(companyId, questionId));
+    }
+}

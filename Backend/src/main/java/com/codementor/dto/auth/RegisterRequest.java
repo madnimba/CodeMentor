@@ -19,7 +19,7 @@ public class RegisterRequest {
     @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
 
-    private Long jobRoleId;
+    private Integer jobRoleId;
     private String themePreference;
     private String languagePreference;
 } 

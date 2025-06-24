@@ -1,5 +1,5 @@
 package com.codementor.domain;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 //import org.springframework.data.annotation.CreatedDate;
@@ -23,6 +23,7 @@ public class User {
     @Column(unique = true, nullable = false)
     private String username;
 
+    @JsonIgnore
     @Column(name = "password_hash", nullable = false)
     private String password;
 

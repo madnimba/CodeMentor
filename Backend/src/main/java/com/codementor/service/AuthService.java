@@ -9,6 +9,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthService {
@@ -25,12 +28,13 @@ public class AuthService {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
     
+    @Transactional
     public String signUp(String email, String username, String password) {
         if (userRepository.existsByEmail(email)) {
-            throw new RuntimeException("Email already exists");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exists");
         }
         if (userRepository.existsByUsername(username)) {
-            throw new RuntimeException("Username already exists");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
         }
         
         User user = new User();
@@ -41,10 +45,10 @@ public class AuthService {
         System.out.println("User saved: " + savedUser);
 
         Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(email, password)
+            new UsernamePasswordAuthenticationToken(username, password)
         );
         String token = jwtTokenProvider.generateToken(authentication);
-        System.out.println("Token: " + token);
+        //System.out.println("Token: " + token);
         return token;
     }
     

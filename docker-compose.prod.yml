@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: codementor-postgres-prod
+    environment:
+      POSTGRES_DB: ${DB_NAME:-codementor}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - codementor-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # Backend Service
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    container_name: codementor-backend-prod
+    environment:
+      # Database Configuration
+      DB_URL: jdbc:postgresql://postgres:5432/${DB_NAME:-codementor}
+      DB_USERNAME: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD}
+      
+      # Server Configuration
+      SERVER_PORT: 8080
+      SERVER_CONTEXT_PATH: /api/v1
+      
+      # JWT Configuration
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+      
+      # Spring Configuration
+      SPRING_PROFILES_ACTIVE: production
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SPRING_JPA_SHOW_SQL: false
+      
+      # CORS Configuration
+      SPRING_WEB_CORS_ALLOWED_ORIGINS: ${FRONTEND_URL}
+      SPRING_WEB_CORS_ALLOWED_METHODS: GET,POST,PUT,DELETE,OPTIONS
+      SPRING_WEB_CORS_ALLOWED_HEADERS: "*"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - codementor-network
+    restart: unless-stopped
+
+  # Frontend Service
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    container_name: codementor-frontend-prod
+    environment:
+      - VITE_API_BASE_URL=${BACKEND_URL:-http://backend:8080/api/v1}
+    depends_on:
+      - backend
+    networks:
+      - codementor-network
+    restart: unless-stopped
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: codementor-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - codementor-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  codementor-network:
+    driver: bridge 
