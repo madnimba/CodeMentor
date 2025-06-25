@@ -42,7 +42,8 @@ public class CompanyService {
         dto.setDescription(company.getDescription());
         
         // Get total questions count
-        int totalQuestions = companyQuestionRepository.findByCompanyId(company.getId()).size();
+        int totalQuestions = (int) companyQuestionRepository.countByCompanyId(company.getId());
+
         dto.setTotalQuestions(totalQuestions);
         
         // TODO: Implement solved questions count when user progress tracking is implemented
