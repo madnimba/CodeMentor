@@ -34,6 +34,7 @@ public class CompanyQuestionService {
         List<CompanyQuestionDTO> dtos = questions.stream()
             .map(this::convertToDTO)
             .collect(Collectors.toList());
+        return dtos;
     }
 
     public Page<CompanyQuestionDTO> getCompanyQuestions(Integer companyId, Pageable pageable) {
