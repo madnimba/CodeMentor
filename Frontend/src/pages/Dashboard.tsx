@@ -121,7 +121,7 @@ const Dashboard = () => {
                   </CardHeader>
                   <CardContent>
                     <Button asChild className="w-full bg-purple-600 hover:bg-purple-700">
-                      <Link to="/problems">
+                      <Link to="/companies">
                         Browse Problems <ArrowRight className="ml-2 w-4 h-4" />
                       </Link>
                     </Button>
