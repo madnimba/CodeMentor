@@ -5,6 +5,8 @@ import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.LocalDateTime;
 
 @Data
@@ -43,7 +45,7 @@ public class Question {
     @JoinColumn(name = "subtopic_id")
     private Subtopic subtopic;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     private User createdBy;
 
@@ -57,4 +59,4 @@ public class Question {
     public enum Difficulty {
         Easy, Medium, Hard
     }
-} 
+}

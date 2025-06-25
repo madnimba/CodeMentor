@@ -45,7 +45,9 @@ public class CompanyQuestionService {
         dto.setTags(new String[]{"Array", "Hash Table"}); // Placeholder tags
         
         // TODO: Implement solution when question content is available
-        dto.setSolution("// Solution will be available soon");
+        dto.setSolution("Solution will be available soon");
+
+        // System.out.println("got dto: " + dto.getTitle());
         
         return dto;
     }
