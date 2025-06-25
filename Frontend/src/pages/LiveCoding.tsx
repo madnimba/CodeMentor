@@ -429,77 +429,7 @@ You can return the answer in any order.`,
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Panel - Question Selector */}
-            <div className="space-y-6">
-              <Card className="bg-slate-800/50 border-slate-700">
-                <CardHeader>
-                  <CardTitle className="text-white">Question Selector</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {/* Search Input */}
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-                      <input
-                        type="text"
-                        placeholder="Search questions..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      />
-                    </div>
-
-                    {/* Questions List */}
-                    <div className="h-[400px] overflow-y-auto space-y-2">
-                      {isLoadingQuestions ? (
-                        <div className="flex items-center justify-center h-32">
-                          <Loader2 className="w-6 h-6 animate-spin text-purple-400" />
-                        </div>
-                      ) : filteredQuestions.length === 0 ? (
-                        <div className="text-center text-slate-400 py-8">
-                          {searchTerm ? 'No questions found' : 'No questions available'}
-                        </div>
-                      ) : (
-                        filteredQuestions.map((question) => (
-                          <div
-                            key={question.id}
-                            onClick={() => {
-                              updateQuestionData(question);
-                              navigate(`/companies/${companyId}/questions/${question.id}/live-coding`);
-                            }}
-                            className={`p-4 rounded-lg cursor-pointer transition-colors ${
-                              selectedQuestion?.id === question.id
-                                ? 'bg-purple-600/20 border border-purple-500/30'
-                                : 'bg-slate-700/50 border border-slate-600 hover:bg-slate-700'
-                            }`}
-                          >
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <h3 className="text-white font-medium text-sm mb-1 line-clamp-2">
-                                  {question.title}
-                                </h3>
-                                <p className="text-slate-400 text-xs line-clamp-2">
-                                  {question.description}
-                                </p>
-                              </div>
-                              <Badge className={`ml-2 text-xs ${
-                                question.difficulty === 'Easy' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
-                                question.difficulty === 'Medium' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' :
-                                'bg-red-500/20 text-red-400 border-red-500/30'
-                              }`}>
-                                {question.difficulty}
-                              </Badge>
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Middle Panel - Question Description */}
             <div className="space-y-6">
               <Card className="bg-slate-800/50 border-slate-700">

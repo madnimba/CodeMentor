@@ -14,6 +14,8 @@ import NotFound from "./pages/NotFound";
 import Companies from "./pages/Companies";
 import CompanyQuestions from "./pages/CompanyQuestions";
 import LiveCoding from "./pages/LiveCoding";
+import ProblemSelection from "./pages/ProblemSelection";
+import Chatbot from "./components/Chatbot";
 
 const queryClient = new QueryClient();
 
@@ -93,9 +95,20 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
+            <Route 
+              path="/problem-selection" 
+              element={
+                <ProtectedRoute>
+                  <ProblemSelection />
+                </ProtectedRoute>
+              } 
+            />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          
+          {/* Chatbot - appears on all pages */}
+          <Chatbot apiUrl={import.meta.env.VITE_CHATBOT_API_URL || 'http://localhost:5000/chat'} />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

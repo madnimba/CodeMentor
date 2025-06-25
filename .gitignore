@@ -73,5 +73,6 @@ logs
 
 
 # Data collection
-*/venv/*
+venv/
+Chatbot/venv/
 
