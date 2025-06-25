@@ -5,6 +5,8 @@ import com.codementor.dto.CompanyDTO;
 import com.codementor.repository.CompanyRepository;
 import com.codementor.repository.CompanyQuestionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -27,6 +29,11 @@ public class CompanyService {
             .collect(Collectors.toList());
     }
 
+    public Page<CompanyDTO> getAllCompanies(Pageable pageable) {
+        Page<Company> companies = companyRepository.findAll(pageable);
+        return companies.map(this::convertToDTO);
+    }
+
     public CompanyDTO getCompanyById(Integer id) {
         Company company = companyRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Company not found"));
@@ -42,7 +49,8 @@ public class CompanyService {
         dto.setDescription(company.getDescription());
         
         // Get total questions count
-        int totalQuestions = companyQuestionRepository.findByCompanyId(company.getId()).size();
+        int totalQuestions = (int) companyQuestionRepository.countByCompanyId(company.getId());
+
         dto.setTotalQuestions(totalQuestions);
         
         // TODO: Implement solved questions count when user progress tracking is implemented

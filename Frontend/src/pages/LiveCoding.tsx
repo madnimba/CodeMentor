@@ -392,7 +392,7 @@ You can return the answer in any order.`,
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900">
       <Header />
-      
+
       <div className="pt-24 pb-16 px-4">
         <div className="max-w-7xl mx-auto">
           {/* Back Button and Question Info */}
@@ -403,7 +403,7 @@ You can return the answer in any order.`,
                 Back to Questions
               </Link>
             </Button>
-            
+
             <div className="flex items-center gap-4">
               <Code2 className="w-12 h-12 text-purple-400" />
               <div>
@@ -437,10 +437,12 @@ You can return the answer in any order.`,
                   <CardTitle className="text-white">Description</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="prose prose-invert max-w-none">
-                    <p className="text-slate-300 whitespace-pre-line">
-                      {questionData.description}
-                    </p>
+                  <div className="prose prose-invert max-w-none text-slate-300">
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: questionData.description,
+                      }}
+                    />
                   </div>
                 </CardContent>
               </Card>
@@ -499,7 +501,7 @@ You can return the answer in any order.`,
               </Card>
             </div>
 
-            {/* Right Panel - Code Editor and Test Cases */}
+            {/* Right Panel - Code Editor */}
             <div className="space-y-6">
               <Card className="bg-slate-800/50 border-slate-700">
                 <CardHeader>
@@ -526,7 +528,7 @@ You can return the answer in any order.`,
                       language={judge0Service.getMonacoLanguage(selectedLanguage)}
                       theme="vs-dark"
                       value={code}
-                      onChange={(value) => setCode(value || '')}
+                      onChange={(value) => setCode(value || "")}
                       options={{
                         minimap: { enabled: false },
                         fontSize: 14,
@@ -618,10 +620,10 @@ You can return the answer in any order.`,
           </div>
         </div>
       </div>
-      
+
       <Footer />
     </div>
   );
 };
 
-export default LiveCoding; 
+export default LiveCoding;

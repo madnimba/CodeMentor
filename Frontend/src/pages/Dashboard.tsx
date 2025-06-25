@@ -49,10 +49,10 @@ const Dashboard = () => {
   ];
 
   const featuredCompanies = [
-    { id: 1, name: "Google", solved: 45, total: 60, difficulty: "Hard" },
-    { id: 2, name: "Microsoft", solved: 38, total: 55, difficulty: "Hard" },
-    { id: 3, name: "Amazon", solved: 42, total: 58, difficulty: "Hard" },
-    { id: 4, name: "Meta", solved: 35, total: 50, difficulty: "Medium" }
+    { id: 9, name: "IQVIA​", solved: 45, total: 60, difficulty: "Hard" },
+    { id: 6, name: "Exabyting​", solved: 38, total: 55, difficulty: "Hard" },
+    { id: 2, name: "Chaldal​", solved: 42, total: 58, difficulty: "Hard" },
+    { id: 13, name: "Optimizely Bangladesh​", solved: 35, total: 50, difficulty: "Medium" }
   ];
 
   return (

@@ -15,6 +15,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 // Types
 interface Company {
@@ -27,15 +36,29 @@ interface Company {
   country?: string;
 }
 
+interface PaginatedResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
+}
+
 const Companies = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | null>(null);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
+  const [pageSize] = useState(12); // 12 companies per page
   const { user } = useAuth();
 
-  // Fetch companies from API
+  // Fetch companies from API with pagination
   useEffect(() => {
     if (!user) {
       setError("Please sign in to view companies");
@@ -44,9 +67,12 @@ const Companies = () => {
 
     setLoading(true);
     setError(null);
-    api.get("/companies")
+    api.get(`/companies/paginated?page=${currentPage}&size=${pageSize}`)
       .then(res => {
-        setCompanies(res.data);
+        const paginatedData: PaginatedResponse<Company> = res.data;
+        setCompanies(paginatedData.content);
+        setTotalPages(paginatedData.totalPages);
+        setTotalElements(paginatedData.totalElements);
         setLoading(false);
       })
       .catch((err) => {
@@ -58,7 +84,12 @@ const Companies = () => {
         }
         setLoading(false);
       });
-  }, [user]);
+  }, [user, currentPage, pageSize]);
+
+  // Reset to first page when search query changes
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [searchQuery, sortOrder]);
 
   // Mock data - commented out but kept for reference
   /*
@@ -111,6 +142,87 @@ const Companies = () => {
       !featuredCompanies.some(featured => featured.id === company.id)
     );
   }, [companies, featuredCompanies]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+
+    const pages = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(0, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(0, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return (
+      <Pagination className="mt-8">
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious 
+              onClick={() => handlePageChange(Math.max(0, currentPage - 1))}
+              className={currentPage === 0 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+            />
+          </PaginationItem>
+          
+          {startPage > 0 && (
+            <>
+              <PaginationItem>
+                <PaginationLink onClick={() => handlePageChange(0)}>1</PaginationLink>
+              </PaginationItem>
+              {startPage > 1 && (
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              )}
+            </>
+          )}
+
+          {pages.map((page) => (
+            <PaginationItem key={page}>
+              <PaginationLink 
+                onClick={() => handlePageChange(page)}
+                isActive={page === currentPage}
+                className="cursor-pointer"
+              >
+                {page + 1}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+
+          {endPage < totalPages - 1 && (
+            <>
+              {endPage < totalPages - 2 && (
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              )}
+              <PaginationItem>
+                <PaginationLink onClick={() => handlePageChange(totalPages - 1)}>
+                  {totalPages}
+                </PaginationLink>
+              </PaginationItem>
+            </>
+          )}
+
+          <PaginationItem>
+            <PaginationNext 
+              onClick={() => handlePageChange(Math.min(totalPages - 1, currentPage + 1))}
+              className={currentPage === totalPages - 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
+    );
+  };
 
   if (!user) {
     return (
@@ -224,49 +336,52 @@ const Companies = () => {
 
           {/* All Companies Section */}
           <div>
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-white">All Companies</h2>
-              <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-white mb-2">All Companies</h2>
+                <p className="text-slate-400">
+                  Showing {companies.length} of {totalElements} companies
+                </p>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                {/* Search */}
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
                   <Input
-                    type="text"
                     placeholder="Search companies..."
-                    className="pl-10 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-400"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-400 w-full sm:w-64"
                   />
                 </div>
+
+                {/* Sort */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="border-slate-700 text-slate-400 hover:text-white">
+                    <Button variant="outline" className="border-slate-700 text-slate-400 hover:bg-slate-800/50">
                       <ArrowUpDown className="w-4 h-4 mr-2" />
                       Sort
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="bg-slate-800 border-slate-700">
                     <DropdownMenuItem 
-                      className="text-slate-400 hover:text-white hover:bg-slate-700"
-                      onClick={() => setSortOrder("asc")}
+                      onClick={() => setSortOrder(sortOrder === "asc" ? null : "asc")}
+                      className="text-slate-400 hover:bg-slate-700"
                     >
-                      A to Z
+                      Name A-Z
                     </DropdownMenuItem>
                     <DropdownMenuItem 
-                      className="text-slate-400 hover:text-white hover:bg-slate-700"
-                      onClick={() => setSortOrder("desc")}
+                      onClick={() => setSortOrder(sortOrder === "desc" ? null : "desc")}
+                      className="text-slate-400 hover:bg-slate-700"
                     >
-                      Z to A
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      className="text-slate-400 hover:text-white hover:bg-slate-700"
-                      onClick={() => setSortOrder(null)}
-                    >
-                      Reset
+                      Name Z-A
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
             </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredAndSortedCompanies.map((company) => (
                 <Card key={company.id} className="bg-slate-800/50 border-slate-700 hover:border-purple-500/50 transition-colors flex flex-col h-full">
@@ -298,6 +413,9 @@ const Companies = () => {
                 </Card>
               ))}
             </div>
+
+            {/* Pagination */}
+            {renderPagination()}
           </div>
         </div>
       </div>
