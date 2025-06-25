@@ -5,6 +5,8 @@ import com.codementor.dto.CompanyQuestionDTO;
 import com.codementor.repository.CompanyQuestionRepository;
 import com.codementor.repository.QuestionSolutionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -25,6 +27,11 @@ public class CompanyQuestionService {
         return questions.stream()
             .map(this::convertToDTO)
             .collect(Collectors.toList());
+    }
+
+    public Page<CompanyQuestionDTO> getCompanyQuestions(Integer companyId, Pageable pageable) {
+        Page<CompanyQuestion> questions = companyQuestionRepository.findByCompanyId(companyId, pageable);
+        return questions.map(this::convertToDTO);
     }
 
     public CompanyQuestionDTO getCompanyQuestion(Integer companyId, Integer questionId) {
