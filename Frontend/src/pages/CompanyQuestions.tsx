@@ -159,10 +159,10 @@ const CompanyQuestions = () => {
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <Code2 className="w-5 h-5 text-purple-400" />
-                        <h3
+                        {/* <h3
                           className="text-xl font-semibold text-white"
                           dangerouslySetInnerHTML={{ __html: question.description }}
-                        />
+                        /> */}
                         <Badge
                           className={`${
                             question.difficulty === 'Easy'
