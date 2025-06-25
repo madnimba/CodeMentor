@@ -22,6 +22,6 @@ public class Company {
 
     private String description;
 
-    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<CompanyQuestion> companyQuestions;
 }

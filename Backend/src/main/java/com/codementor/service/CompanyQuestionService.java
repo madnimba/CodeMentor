@@ -3,6 +3,7 @@ package com.codementor.service;
 import com.codementor.domain.CompanyQuestion;
 import com.codementor.dto.CompanyQuestionDTO;
 import com.codementor.repository.CompanyQuestionRepository;
+import com.codementor.repository.QuestionSolutionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,9 @@ public class CompanyQuestionService {
     
     @Autowired
     private CompanyQuestionRepository companyQuestionRepository;
+
+    @Autowired
+    private QuestionSolutionRepository questionSolutionRepository;
 
     public List<CompanyQuestionDTO> getCompanyQuestions(Integer companyId) {
         List<CompanyQuestion> questions = companyQuestionRepository.findByCompanyId(companyId);
@@ -44,8 +48,15 @@ public class CompanyQuestionService {
         dto.setStatus("unsolved");
         dto.setTags(new String[]{"Array", "Hash Table"}); // Placeholder tags
         
-        // TODO: Implement solution when question content is available
-        dto.setSolution("// Solution will be available soon");
+        // Fetch only the first solution code for the question
+        String code = questionSolutionRepository.findFirstCodeByQuestionId(companyQuestion.getQuestion().getId());
+        if (code != null) {
+            dto.setSolution(code);
+        } else {
+            dto.setSolution("Solution will be available soon"); // Or set to "Solution will be available soon" if you prefer
+        }
+
+        // System.out.println("got dto: " + dto.getTitle());
         
         return dto;
     }
