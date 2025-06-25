@@ -2,7 +2,9 @@ package com.codementor.service;
 
 import com.codementor.domain.User;
 import com.codementor.repository.UserRepository;
+import org.springframework.security.core.userdetails.UserDetails;
 import com.codementor.security.JwtTokenProvider;
+import com.codementor.security.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,6 +14,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import java.security.SecureRandom;
+import java.util.Collections;
+import org.springframework.beans.factory.annotation.Value;
 
 @Service
 public class AuthService {
@@ -27,6 +36,14 @@ public class AuthService {
     
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+    
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
+    
+    @Value("${app.google.client-id}")
+    private String googleClientId;
+    
+    private static final SecureRandom random = new SecureRandom();
     
     @Transactional
     public String signUp(String email, String username, String password) {
@@ -67,5 +84,61 @@ public class AuthService {
         // 3. Update user's last logout time
         // For now, we'll just validate the token was valid
         jwtTokenProvider.validateToken(token);
+    }
+
+    public String googleSignIn(String idTokenString) {
+        GoogleIdToken.Payload payload = verifyGoogleIdToken(idTokenString);
+        String email = payload.getEmail();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "No user with this Google account"));
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(user.getEmail());
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        return jwtTokenProvider.generateToken(authentication);
+    }
+
+    @Transactional
+    public String googleSignUp(String idTokenString) {
+        GoogleIdToken.Payload payload = verifyGoogleIdToken(idTokenString);
+        String email = payload.getEmail();
+        if (userRepository.existsByEmail(email)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User already exists");
+        }
+        String username = email;
+        String randomPassword = generateRandomPassword();
+        User user = new User();
+        user.setEmail(email);
+        user.setUsername(username);
+        user.setPassword(passwordEncoder.encode(randomPassword));
+        userRepository.save(user);
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(user.getEmail());
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        return jwtTokenProvider.generateToken(authentication);
+    }
+
+    private GoogleIdToken.Payload verifyGoogleIdToken(String idTokenString) {
+        try {
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
+                    GoogleNetHttpTransport.newTrustedTransport(),
+                    JacksonFactory.getDefaultInstance())
+                    .setAudience(Collections.singletonList(googleClientId))
+                    .build();
+            GoogleIdToken idToken = verifier.verify(idTokenString);
+            if (idToken == null) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid Google ID token");
+            }
+            return idToken.getPayload();
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Google token verification failed", e);
+        }
+    }
+
+    private String generateRandomPassword() {
+        int length = 16;
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            sb.append(chars.charAt(random.nextInt(chars.length())));
+        }
+        return sb.toString();
     }
 } 

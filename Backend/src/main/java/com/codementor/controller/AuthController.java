@@ -7,6 +7,11 @@ import com.codementor.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+
+class GoogleAuthRequest {
+    public String idToken;
+}
 
 @RestController
 @RequestMapping("/auth")
@@ -36,5 +41,17 @@ public class AuthController {
     public ResponseEntity<Void> signOut(@RequestHeader("Authorization") String token) {
         authService.signOut(token.replace("Bearer ", ""));
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/google-signin")
+    public ResponseEntity<JwtResponse> googleSignIn(@RequestBody GoogleAuthRequest request) {
+        String token = authService.googleSignIn(request.idToken);
+        return ResponseEntity.ok(new JwtResponse(token));
+    }
+
+    @PostMapping("/google-signup")
+    public ResponseEntity<JwtResponse> googleSignUp(@RequestBody GoogleAuthRequest request) {
+        String token = authService.googleSignUp(request.idToken);
+        return ResponseEntity.ok(new JwtResponse(token));
     }
 } 
