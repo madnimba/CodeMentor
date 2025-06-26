@@ -392,7 +392,7 @@ You can return the answer in any order.`,
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900">
       <Header />
-      
+
       <div className="pt-24 pb-16 px-4">
         <div className="max-w-7xl mx-auto">
           {/* Back Button and Question Info */}
@@ -403,28 +403,28 @@ You can return the answer in any order.`,
                 Back to Questions
               </Link>
             </Button>
-            
+
             <div className="flex items-center gap-4">
               <Code2 className="w-12 h-12 text-purple-400" />
               <div>
-                <h1 className="text-4xl font-bold text-white mb-2">
-                  {questionData.title}
-                </h1>
-                <div className="flex items-center gap-4">
-                  <Badge className={`${
-                    questionData.difficulty === 'Easy' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
-                    questionData.difficulty === 'Medium' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' :
-                    'bg-red-500/20 text-red-400 border-red-500/30'
-                  }`}>
-                    {questionData.difficulty}
-                  </Badge>
-                  <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                    <span className="text-sm text-slate-400">
-                      {isConnected ? 'Connected' : 'Disconnected'}
-                    </span>
-                  </div>
-                </div>
+                {/* <h1 className="text-4xl font-bold text-white mb-2">
+                  <span
+                    dangerouslySetInnerHTML={{
+                      __html: getFirstParagraphOnly(questionData.title),
+                    }}
+                  />
+                </h1> */}
+                <Badge
+                  className={`${
+                    questionData.difficulty === "Easy"
+                      ? "bg-green-500/20 text-green-400 border-green-500/30"
+                      : questionData.difficulty === "Medium"
+                      ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+                      : "bg-red-500/20 text-red-400 border-red-500/30"
+                  }`}
+                >
+                  {questionData.difficulty}
+                </Badge>
               </div>
             </div>
           </div>
@@ -437,14 +437,17 @@ You can return the answer in any order.`,
                   <CardTitle className="text-white">Description</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="prose prose-invert max-w-none">
-                    <p className="text-slate-300 whitespace-pre-line">
-                      {questionData.description}
-                    </p>
+                  <div className="prose prose-invert max-w-none text-slate-300">
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: questionData.description,
+                      }}
+                    />
                   </div>
                 </CardContent>
               </Card>
 
+              {/* Optional: Add hints/examples/test cases here if your API returns them */}
               <Card className="bg-slate-800/50 border-slate-700">
                 <CardHeader>
                   <CardTitle className="text-white">Examples</CardTitle>
@@ -499,7 +502,7 @@ You can return the answer in any order.`,
               </Card>
             </div>
 
-            {/* Right Panel - Code Editor and Test Cases */}
+            {/* Right Panel - Code Editor */}
             <div className="space-y-6">
               <Card className="bg-slate-800/50 border-slate-700">
                 <CardHeader>
@@ -526,7 +529,7 @@ You can return the answer in any order.`,
                       language={judge0Service.getMonacoLanguage(selectedLanguage)}
                       theme="vs-dark"
                       value={code}
-                      onChange={(value) => setCode(value || '')}
+                      onChange={(value) => setCode(value || "")}
                       options={{
                         minimap: { enabled: false },
                         fontSize: 14,
@@ -618,10 +621,10 @@ You can return the answer in any order.`,
           </div>
         </div>
       </div>
-      
+
       <Footer />
     </div>
   );
 };
 
-export default LiveCoding; 
+export default LiveCoding;
