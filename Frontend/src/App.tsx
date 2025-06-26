@@ -15,7 +15,7 @@ import Companies from "./pages/Companies";
 import CompanyQuestions from "./pages/CompanyQuestions";
 import LiveCoding from "./pages/LiveCoding";
 import ProblemSelection from "./pages/ProblemSelection";
-import Chatbot from "./components/Chatbot";
+import Chatbot from "./pages/Chatbot";
 
 const queryClient = new QueryClient();
 
