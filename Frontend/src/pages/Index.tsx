@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -93,7 +92,7 @@ const Index = () => {
               </CardHeader>
               <CardContent>
                 <Button asChild variant="ghost" className="text-cyan-400 hover:text-cyan-300 p-0">
-                  <Link to="/coding-editor">
+                  <Link to="/problem-selection">
                     Try Editor <ArrowRight className="ml-2 w-4 h-4" />
                   </Link>
                 </Button>

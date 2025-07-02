@@ -4,6 +4,12 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 15           # You can lower this if Supabase limits are stricter
+      minimum-idle: 2
+      idle-timeout: 30000            # 30 seconds
+      max-lifetime: 1800000          # 30 minutes
+      connection-timeout: 20000      # 20 seconds
   jpa:
     hibernate:
       ddl-auto: validate
@@ -12,6 +18,8 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        # connection:
+        #   provider_disables_autocommit: true
   application:
     name: codementor-backend
 
@@ -28,4 +36,8 @@ logging:
   level:
     org.springframework.security: DEBUG
     com.codementor: DEBUG
+    # com.zaxxer.hikari: DEBUG
 
+# supabase:
+#   url: https://otjopoosscoadvryvfaf.supabase.co
+#   api-key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im90am9wb29zc2NvYWR2cnl2ZmFmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0ODE2NzIxOCwiZXhwIjoyMDYzNzQzMjE4fQ.AbIfaA4yrCE8KdDKGBwnATray1XvzFGU7n9yTPeqV-E

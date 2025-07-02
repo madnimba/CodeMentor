@@ -74,4 +74,9 @@ logs
 
 # Data collection
 */venv/*
+Chatbot/venv/*
+
+# pycache
+Chatbot/*/__pycache__/*
+Chatbot/__pycache__/*
 

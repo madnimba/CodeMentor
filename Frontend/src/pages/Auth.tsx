@@ -16,7 +16,7 @@ import { authService } from "@/services/auth";
 const GOOGLE_CLIENT_ID = "333095059228-nc671d09j4et8pdg5lpuvoc1nndj4m2b.apps.googleusercontent.com"; // TODO: Replace with your real client ID
 
 const Auth = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user, signIn, signUp, googleSignIn, googleSignUp } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
@@ -41,21 +41,6 @@ const Auth = () => {
       navigate("/dashboard");
     }
   }, [user, navigate]);
-
-  // Sync tab with URL
-  useEffect(() => {
-    const urlTab = searchParams.get("tab");
-    if (urlTab && urlTab !== activeTab) {
-      setActiveTab(urlTab);
-    }
-    // eslint-disable-next-line
-  }, [searchParams]);
-
-  // Update URL when tab changes
-  const handleTabChange = (tab: string) => {
-    setActiveTab(tab);
-    setSearchParams({ tab });
-  };
 
   // Handle sign in
   const handleSignIn = async (e: React.FormEvent) => {
@@ -86,12 +71,6 @@ const Auth = () => {
         password: signUpPassword
       });
       toast.success("Account created successfully! Please sign in.");
-      setSignUpEmail("");
-      setSignUpUsername("");
-      setSignUpPassword("");
-      setSignUpConfirmPassword("");
-      setSignUpError("");
-      handleTabChange("signin");
     } catch (err) {
       setSignUpError("Signup failed. Try a different email or username.");
       toast.error("Sign up failed. Please try again.");
@@ -143,7 +122,7 @@ const Auth = () => {
             <p className="text-slate-400">Join Bangladesh's premier coding community</p>
           </div>
 
-          <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="grid w-full grid-cols-2 bg-slate-800/50 border border-slate-700">
               <TabsTrigger value="signin" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
                 Sign In
@@ -222,7 +201,7 @@ const Auth = () => {
                   <div className="text-center text-sm text-slate-400">
                     Don't have an account?{" "}
                     <button
-                      onClick={() => handleTabChange("signup")}
+                      onClick={() => setActiveTab("signup")}
                       className="text-purple-400 hover:text-purple-300"
                     >
                       Sign up here
@@ -343,7 +322,7 @@ const Auth = () => {
                   <div className="text-center text-sm text-slate-400">
                     Already have an account?{" "}
                     <button
-                      onClick={() => handleTabChange("signin")}
+                      onClick={() => setActiveTab("signin")}
                       className="text-purple-400 hover:text-purple-300"
                     >
                       Sign in here
