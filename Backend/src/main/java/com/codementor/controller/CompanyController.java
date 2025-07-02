@@ -2,6 +2,7 @@ package com.codementor.controller;
 
 import com.codementor.dto.CompanyDTO;
 import com.codementor.dto.CompanyQuestionDTO;
+import com.codementor.dto.QuestionDetailsDTO;
 import com.codementor.service.CompanyService;
 import com.codementor.service.CompanyQuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,5 +55,12 @@ public class CompanyController {
             @PathVariable Integer companyId,
             @PathVariable Integer questionId) {
         return ResponseEntity.ok(companyQuestionService.getCompanyQuestion(companyId, questionId));
+    }
+
+    @GetMapping("/{companyId}/questions/{questionId}/details")
+    public ResponseEntity<QuestionDetailsDTO> getQuestionDetails(
+            @PathVariable Integer companyId,
+            @PathVariable Integer questionId) {
+        return ResponseEntity.ok(companyQuestionService.getQuestionDetails(companyId, questionId));
     }
 }

@@ -13,6 +13,19 @@ import { useToast } from "@/components/ui/use-toast";
 import { judge0Service, CodeExecutionResponse } from "@/services/judge0";
 import { api } from "@/services/api";
 
+interface QuestionDetails {
+  title: string;
+  description: string;
+  difficulty: 'Easy' | 'Medium' | 'Hard';
+  importanceTag?: string;
+  track?: {
+    id: number;
+    name: string;
+  };
+  upvotes: number;
+  downvotes: number;
+}
+
 const LiveCoding = () => {
   const { companyId, questionId } = useParams();
   const navigate = useNavigate();
@@ -66,50 +79,32 @@ console.log("Output:", solution([3,3], 6));`);
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
+  const [questionDetails, setQuestionDetails] = useState<QuestionDetails | null>(null);
 
   // Fetch questions from the database
   useEffect(() => {
-    const fetchQuestions = async () => {
-      if (!companyId) return;
-      
+    const fetchQuestionDetails = async () => {
+      if (!companyId || !questionId) return;
       setIsLoadingQuestions(true);
       try {
-        console.log('Fetching questions for company:', companyId);
-        console.log('API URL:', `/companies/${companyId}/questions`);
-        
-        const response = await api.get(`/companies/${companyId}/questions`);
-        console.log('API Response:', response);
-        console.log('Questions data:', response.data);
-        
-        setQuestions(response.data);
-        
-        // If questionId is provided, find and set the selected question
-        if (questionId) {
-          const question = response.data.find((q: any) => q.id === parseInt(questionId));
-          if (question) {
-            setSelectedQuestion(question);
-            updateQuestionData(question);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching questions:', error);
-        console.error('Error details:', error.response?.data);
-        console.error('Error status:', error.response?.status);
+        const response = await api.get(`/companies/${companyId}/questions/${questionId}/details`);
+        setQuestionDetails(response.data);
+        updateQuestionData(response.data);
+      } catch (error: any) {
         toast({
-          title: "Error",
-          description: "Failed to load questions",
-          variant: "destructive",
+          title: 'Error',
+          description: 'Failed to load question details',
+          variant: 'destructive',
         });
       } finally {
         setIsLoadingQuestions(false);
       }
     };
-
-    fetchQuestions();
+    fetchQuestionDetails();
   }, [companyId, questionId]);
 
   // Update question data when a question is selected
-  const updateQuestionData = (question: any) => {
+  const updateQuestionData = (question: QuestionDetails) => {
     setSelectedQuestion(question);
     
     // Update code template based on the question
@@ -356,36 +351,27 @@ class Main {
   };
 
   // Mock data - in real app, this would come from an API
-  const questionData = selectedQuestion || {
-    id: questionId,
-    title: "Two Sum",
-    description: `Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.
-
-You may assume that each input would have exactly one solution, and you may not use the same element twice.
-
-You can return the answer in any order.`,
-    difficulty: "Easy",
+  const questionData = questionDetails || {
+    title: 'Two Sum',
+    description: `Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.\n\nYou may assume that each input would have exactly one solution, and you may not use the same element twice.\n\nYou can return the answer in any order.`,
+    difficulty: 'Easy',
+    importanceTag: '',
+    track: undefined,
+    upvotes: 0,
+    downvotes: 0,
     examples: [
-      {
-        input: "nums = [2,7,11,15], target = 9",
-        output: "[0,1]",
-        explanation: "Because nums[0] + nums[1] == 9, we return [0, 1]."
-      },
-      {
-        input: "nums = [3,2,4], target = 6",
-        output: "[1,2]",
-        explanation: "Because nums[1] + nums[2] == 6, we return [1, 2]."
-      }
+      { input: 'nums = [2,7,11,15], target = 9', output: '[0,1]', explanation: 'Because nums[0] + nums[1] == 9, we return [0, 1].' },
+      { input: 'nums = [3,2,4], target = 6', output: '[1,2]', explanation: 'Because nums[1] + nums[2] == 6, we return [1, 2].' }
     ],
     hints: [
-      "Try using a hash map to store the numbers you've seen so far",
-      "For each number, check if its complement (target - number) exists in the hash map",
-      "If the complement exists, you've found your pair"
+      'Try using a hash map to store the numbers you\'ve seen so far',
+      'For each number, check if its complement (target - number) exists in the hash map',
+      'If the complement exists, you\'ve found your pair'
     ],
     testCases: [
-      { input: "[2,7,11,15]", target: 9, expected: "[0,1]" },
-      { input: "[3,2,4]", target: 6, expected: "[1,2]" },
-      { input: "[3,3]", target: 6, expected: "[0,1]" }
+      { input: '[2,7,11,15]', target: 9, expected: '[0,1]' },
+      { input: '[3,2,4]', target: 6, expected: '[1,2]' },
+      { input: '[3,3]', target: 6, expected: '[0,1]' }
     ]
   };
 
