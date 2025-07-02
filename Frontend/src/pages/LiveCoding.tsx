@@ -389,6 +389,21 @@ You can return the answer in any order.`,
     ]
   };
 
+  if (isLoadingQuestions) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900">
+        <Header />
+        <div className="pt-24 pb-16 px-4">
+          <div className="max-w-7xl mx-auto text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto"></div>
+            <p className="text-slate-400 mt-4">Loading question...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900">
       <Header />
