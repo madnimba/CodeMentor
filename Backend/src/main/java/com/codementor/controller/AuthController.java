@@ -1,4 +1,5 @@
 package com.codementor.controller;
+import java.util.Map;
 
 import com.codementor.dto.AuthRequest;
 import com.codementor.dto.JwtResponse;
@@ -6,6 +7,11 @@ import com.codementor.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+
+class GoogleAuthRequest {
+    public String idToken;
+}
 
 @RestController
 @RequestMapping("/auth")
@@ -20,9 +26,9 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<JwtResponse> signUp(@RequestBody AuthRequest request) {
-        String token = authService.signUp(request.getEmail(), request.getUsername(), request.getPassword());
-        return ResponseEntity.ok(new JwtResponse(token));
+    public ResponseEntity<?> signUp(@RequestBody AuthRequest request) {
+        authService.signUp(request.getEmail(), request.getUsername(), request.getPassword());
+        return ResponseEntity.ok().body(Map.of("success", true, "message", "User created successfully"));
     }
 
     @PostMapping("/signin")
@@ -35,5 +41,17 @@ public class AuthController {
     public ResponseEntity<Void> signOut(@RequestHeader("Authorization") String token) {
         authService.signOut(token.replace("Bearer ", ""));
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/google-signin")
+    public ResponseEntity<JwtResponse> googleSignIn(@RequestBody GoogleAuthRequest request) {
+        String token = authService.googleSignIn(request.idToken);
+        return ResponseEntity.ok(new JwtResponse(token));
+    }
+
+    @PostMapping("/google-signup")
+    public ResponseEntity<JwtResponse> googleSignUp(@RequestBody GoogleAuthRequest request) {
+        String token = authService.googleSignUp(request.idToken);
+        return ResponseEntity.ok(new JwtResponse(token));
     }
 } 

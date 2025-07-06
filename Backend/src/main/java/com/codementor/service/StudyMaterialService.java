@@ -11,7 +11,6 @@ import com.codementor.repository.TopicRepository;
 import com.codementor.repository.SubtopicRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,26 +22,18 @@ public class StudyMaterialService {
     private final TopicRepository topicRepository;
     private final SubtopicRepository subtopicRepository;
 
-    @Transactional(readOnly = true)
     public List<TrackResponse> getAllTracks() {
         return trackRepository.findAll().stream()
             .map(this::mapToTrackResponse)
             .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
     public List<TopicResponse> getTopicsByTrackId(Integer trackId) {
-        List<Topic> topics = topicRepository.findByTrackId(trackId);
-        List<Subtopic> allSubtopics = subtopicRepository.findByTopicIdIn(
-            topics.stream().map(Topic::getId).collect(Collectors.toList())
-        );
-        
-        return topics.stream()
-            .map(topic -> mapToTopicResponse(topic, allSubtopics))
+        return topicRepository.findByTrackId(trackId).stream()
+            .map(this::mapToTopicResponse)
             .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
     public List<SubtopicResponse> getSubtopicsByTopicId(Integer topicId) {
         return subtopicRepository.findByTopicId(topicId).stream()
             .map(this::mapToSubtopicResponse)
@@ -58,21 +49,14 @@ public class StudyMaterialService {
         return response;
     }
 
-    private TopicResponse mapToTopicResponse(Topic topic, List<Subtopic> allSubtopics) {
+    private TopicResponse mapToTopicResponse(Topic topic) {
         TopicResponse response = new TopicResponse();
         response.setId(topic.getId());
         response.setName(topic.getName());
         response.setTrackId(topic.getTrack().getId());
         // TODO: Calculate progress based on user's completed subtopics
         response.setProgress(0);
-        
-        // Filter subtopics for this topic
-        List<SubtopicResponse> topicSubtopics = allSubtopics.stream()
-            .filter(subtopic -> subtopic.getTopic().getId().equals(topic.getId()))
-            .map(this::mapToSubtopicResponse)
-            .collect(Collectors.toList());
-        response.setSubtopics(topicSubtopics);
-        
+        response.setSubtopics(getSubtopicsByTopicId(topic.getId()));
         return response;
     }
 
