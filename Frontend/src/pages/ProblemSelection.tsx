@@ -297,8 +297,7 @@ const ProblemSelection = () => {
   }, [problems, searchTerm, selectedDifficulty, selectedCategory, selectedTags, sortBy, showPremiumOnly, showFeaturedOnly]);
 
   const handleProblemSelect = (problem: Problem) => {
-    // Navigate to the editor page with the selected problem
-    navigate(`/coding-editor?problemId=${problem.id}`);
+    navigate(`/coding-editor/problem/${problem.id}`);
   };
 
   const toggleTag = (tag: string) => {

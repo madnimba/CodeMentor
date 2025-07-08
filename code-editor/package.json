@@ -4,7 +4,7 @@
   "description": "Docker-based code execution service for live coding",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "node src/judge-production.js",
     "dev": "nodemon src/index.js"
   },
   "dependencies": {

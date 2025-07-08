@@ -58,15 +58,25 @@ jobs:
           docker build -t ${{ secrets.DOCKER_USERNAME }}/frontend ./Frontend
           docker push ${{ secrets.DOCKER_USERNAME }}/frontend
 
+      - name: Build & push code-editor image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/code-editor ./code-editor
+          docker push ${{ secrets.DOCKER_USERNAME }}/code-editor
+
       - name: SSH & deploy on Azure VM
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.AZURE_HOST }}
           username: ${{ secrets.AZURE_USER }}
           key: ${{ secrets.AZURE_SSH_KEY }}
+          env:
+            JUDGE0_API: ${{ secrets.JUDGE0_API }}
+            RAPIDAPI_HOST: ${{ secrets.RAPIDAPI_HOST }}
+            RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
           script: |
             cd ~/codementor
             docker pull ${{ secrets.DOCKER_USERNAME }}/backend
             docker pull ${{ secrets.DOCKER_USERNAME }}/frontend
-            docker-compose down
-            docker-compose up -d
+            docker pull ${{ secrets.DOCKER_USERNAME }}/code-editor
+            docker-compose -f docker-compose.prod.yml down
+            docker-compose -f docker-compose.prod.yml up -d

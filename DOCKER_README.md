@@ -70,6 +70,12 @@ This document provides instructions for running CodeMentor using Docker containe
 - **Technology:** Spring Boot 3.2.3, Java 17, PostgreSQL
 - **Container:** Multi-stage build with JRE for production
 
+### Code Editor (Node.js)
+- **Port:** 3000 (HTTP API), 8081 (WebSocket)
+- **Technology:** Node.js 18, Express, Docker integration
+- **Container:** Alpine-based with security hardening
+- **Features:** Code execution, rate limiting, queue management
+
 ### Database (PostgreSQL)
 - **Port:** 5432
 - **Version:** PostgreSQL 15
@@ -91,6 +97,9 @@ This document provides instructions for running CodeMentor using Docker containe
 - `DB_NAME`: Database name (default: codementor)
 - `DB_USER`: Database user (default: postgres)
 - `JWT_EXPIRATION`: JWT token expiration in milliseconds
+- `JUDGE0_API`: Judge0 API URL (for code execution)
+- `RAPIDAPI_HOST`: RapidAPI host for Judge0
+- `RAPIDAPI_KEY`: RapidAPI key for Judge0
 
 ## Docker Commands
 

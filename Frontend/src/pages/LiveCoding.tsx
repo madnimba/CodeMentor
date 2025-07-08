@@ -19,7 +19,7 @@ function getFirstParagraphOnly(html: string): string {
 
 
 const LiveCoding = () => {
-  const { companyId, questionId } = useParams();
+  const { companyId, id } = useParams();
   const [activeTab, setActiveTab] = useState("description");
 
   const [questionData, setQuestionData] = useState<any | null>(null);
@@ -28,25 +28,39 @@ const LiveCoding = () => {
   const [code, setCode] = useState<string>("");
 
   useEffect(() => {
-    if (!companyId || !questionId) return;
-
     setLoading(true);
     setError(null);
-
-    api
-      .get(`/companies/${companyId}/questions/${questionId}`)
-      .then((res) => {
-        setQuestionData(res.data);
-        setCode("// Write your solution here\nfunction solution() {\n    // Your code goes here\n}");
-        // setCode(res.data.solution || "// Write your solution here\nfunction solution() {\n    // Your code goes here\n}");
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setError("Failed to load question.");
-        setLoading(false);
-      });
-  }, [companyId, questionId]);
+    if (companyId && id) {
+      api
+        .get(`/companies/${companyId}/questions/${id}`)
+        .then((res) => {
+          setQuestionData(res.data);
+          setCode("// Write your solution here\nfunction solution() {\n    // Your code goes here\n}");
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          setError("Failed to load question.");
+          setLoading(false);
+        });
+    } else if (id) {
+      api
+        .get(`/problems/${id}`)
+        .then((res) => {
+          setQuestionData(res.data);
+          setCode("// Write your solution here\nfunction solution() {\n    // Your code goes here\n}");
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          setError("Failed to load problem.");
+          setLoading(false);
+        });
+    } else {
+      setError("No problem or question specified.");
+      setLoading(false);
+    }
+  }, [companyId, id]);
 
   if (loading) {
     return (

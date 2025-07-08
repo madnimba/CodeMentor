@@ -14,6 +14,7 @@ import NotFound from "./pages/NotFound";
 import Companies from "./pages/Companies";
 import CompanyQuestions from "./pages/CompanyQuestions";
 import LiveCoding from "./pages/LiveCoding";
+import ProblemSelection from "./pages/ProblemSelection";
 
 const queryClient = new QueryClient();
 
@@ -71,6 +72,22 @@ const App = () => (
             />
             <Route 
               path="/companies/:companyId/questions/:questionId" 
+              element={
+                <ProtectedRoute>
+                  <LiveCoding />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/coding-editor" 
+              element={
+                <ProtectedRoute>
+                  <ProblemSelection />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/coding-editor/problem/:id" 
               element={
                 <ProtectedRoute>
                   <LiveCoding />
