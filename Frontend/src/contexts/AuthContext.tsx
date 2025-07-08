@@ -21,12 +21,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check for stored token
-    const token = localStorage.getItem('token');
-    if (token) {
-      setUser({ token });
-    }
-    setLoading(false);
+    const initializeAuth = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (token) {
+          setUser({ token });
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    initializeAuth();
   }, []);
 
   const signIn = async (data: SignInRequest) => {
