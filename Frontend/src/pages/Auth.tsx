@@ -10,15 +10,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Code2, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { GoogleSignInButton } from "@/components/ui/GoogleSignInButton";
-import { authService } from "@/services/auth";
-
-const GOOGLE_CLIENT_ID = "333095059228-nc671d09j4et8pdg5lpuvoc1nndj4m2b.apps.googleusercontent.com"; // TODO: Replace with your real client ID
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user, signIn, signUp, googleSignIn, googleSignUp } = useAuth();
+  const { user, signIn, signUp } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "signin");
@@ -74,37 +70,6 @@ const Auth = () => {
     } catch (err) {
       setSignUpError("Signup failed. Try a different email or username.");
       toast.error("Sign up failed. Please try again.");
-    }
-  };
-
-  const handleGoogleSignIn = async (idToken: string) => {
-    try {
-      await googleSignIn(idToken);
-      toast.success("Successfully signed in with Google!");
-    } catch (err: any) {
-      if (err?.response?.data?.message === "User not found" || err?.response?.status === 404) {
-        toast.error("Not Registered Yet");
-        handleTabChange("signup");
-      } else {
-        toast.error("Google sign in failed");
-      }
-      console.error("Google sign in failed:", err);
-    }
-  };
-
-  const handleGoogleSignUp = async (idToken: string) => {
-    try {
-      await googleSignUp(idToken);
-      toast.success("Successfully signed up with Google!");
-    } catch (err: any) {
-      const errorMsg = err?.response?.data?.error || "";
-      if (errorMsg.includes("User already exists") || err?.response?.status === 409) {
-        toast.error("User already exists");
-        handleTabChange("signin");
-      } else {
-        toast.error("Google sign up failed");
-      }
-      console.error("Google sign up failed:", err);
     }
   };
 
@@ -185,18 +150,6 @@ const Auth = () => {
                     <Button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
                       Sign In
                     </Button>
-                    <div className="flex items-center my-4">
-                    <div className="flex-grow border-t border-slate-600" />
-                    <span className="mx-2 text-slate-400 text-xs">or</span>
-                    <div className="flex-grow border-t border-slate-600" />
-                  </div>
-                  <div className="w-full">
-                    <GoogleSignInButton
-                      clientId={GOOGLE_CLIENT_ID}
-                      onCredential={handleGoogleSignIn}
-                      buttonText="Continue with Google"
-                    />
-                  </div>
                   </form>
                   <div className="text-center text-sm text-slate-400">
                     Don't have an account?{" "}
@@ -220,8 +173,6 @@ const Auth = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  
-                  
                   <form onSubmit={handleSignUp} className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="signup-username" className="text-slate-300">Username</Label>
@@ -305,19 +256,6 @@ const Auth = () => {
                     <Button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
                       Create Account
                     </Button>
-                    <div className="flex items-center my-4">
-                    <div className="flex-grow border-t border-slate-600" />
-                    <span className="mx-2 text-slate-400 text-xs">or</span>
-                    <div className="flex-grow border-t border-slate-600" />
-                  </div>
-                  <div className="w-full">
-                    <GoogleSignInButton
-                      clientId={GOOGLE_CLIENT_ID}
-                      onCredential={handleGoogleSignUp}
-                      buttonText="Continue with Google"
-                    />
-                  </div>
-                  
                   </form>
                   <div className="text-center text-sm text-slate-400">
                     Already have an account?{" "}
