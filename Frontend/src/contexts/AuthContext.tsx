@@ -8,6 +8,8 @@ interface AuthContextType {
   loading: boolean;
   signIn: (data: SignInRequest) => Promise<void>;
   signUp: (data: SignUpRequest) => Promise<void>;
+  googleSignIn: (idToken: string) => Promise<void>;
+  googleSignUp: (idToken: string) => Promise<void>;
   signOut: () => void;
 }
 
@@ -49,6 +51,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const googleSignIn = async (idToken: string) => {
+    try {
+      const response = await authService.googleSignIn(idToken);
+      setUser(response);
+      localStorage.setItem('token', response.token);
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Google sign in error:', error);
+      throw error;
+    }
+  };
+
+  const googleSignUp = async (idToken: string) => {
+    try {
+      const response = await authService.googleSignUp(idToken);
+      setUser(response);
+      localStorage.setItem('token', response.token);
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Google sign up error:', error);
+      throw error;
+    }
+  };
+
   const signOut = () => {
     setUser(null);
     localStorage.removeItem('token');
@@ -56,7 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, loading, signIn, signUp, googleSignIn, googleSignUp, signOut }}>
       {children}
     </AuthContext.Provider>
   );
