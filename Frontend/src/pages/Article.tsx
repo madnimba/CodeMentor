@@ -10,24 +10,18 @@ import { api } from "@/services/api";
 
 const Article = () => {
   const { slug, subtopicId } = useParams();
+  const [upvotes, setUpvotes] = useState(42);
+  const [hasUpvoted, setHasUpvoted] = useState(false);
   const [articles, setArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [upvoteStates, setUpvoteStates] = useState<{[key: number]: {count: number, hasUpvoted: boolean}}>({});
 
   useEffect(() => {
     if (subtopicId) {
       setLoading(true);
       api.get(`/articles/by-subtopic/${subtopicId}`)
         .then(res => {
-          const articlesData = res.data.data;
-          setArticles(articlesData);
-          // Initialize upvote states for each article
-          const initialUpvoteStates: {[key: number]: {count: number, hasUpvoted: boolean}} = {};
-          articlesData.forEach((article: any) => {
-            initialUpvoteStates[article.id] = { count: 42, hasUpvoted: false };
-          });
-          setUpvoteStates(initialUpvoteStates);
+          setArticles(res.data.data);
           setLoading(false);
         })
         .catch(() => {
@@ -40,16 +34,10 @@ const Article = () => {
     }
   }, [subtopicId]);
 
-  const handleUpvote = (articleId: number) => {
-    const currentState = upvoteStates[articleId];
-    if (currentState && !currentState.hasUpvoted) {
-      setUpvoteStates(prev => ({
-        ...prev,
-        [articleId]: {
-          count: currentState.count + 1,
-          hasUpvoted: true
-        }
-      }));
+  const handleUpvote = () => {
+    if (!hasUpvoted) {
+      setUpvotes(prev => prev + 1);
+      setHasUpvoted(true);
     }
   };
 
@@ -130,12 +118,12 @@ const Article = () => {
                 </div>
                 <div className="flex items-center gap-4">
                   <Button
-                    onClick={() => handleUpvote(article.id)}
+                    onClick={handleUpvote}
                     variant="outline"
-                    className={`border-slate-700 bg-slate-800/50 ${upvoteStates[article.id]?.hasUpvoted ? 'bg-purple-600/20 border-purple-500/50 text-purple-300 hover:bg-purple-600/30' : 'text-slate-200 hover:bg-slate-800 hover:text-white'} transition-colors`}
+                    className={`border-slate-700 bg-slate-800/50 ${hasUpvoted ? 'bg-purple-600/20 border-purple-500/50 text-purple-300 hover:bg-purple-600/30' : 'text-slate-200 hover:bg-slate-800 hover:text-white'} transition-colors`}
                   >
                     <ThumbsUp className="w-4 h-4 mr-2" />
-                    {upvoteStates[article.id]?.count || 42} Upvotes
+                    {upvotes} Upvotes
                   </Button>
                 </div>
               </div>

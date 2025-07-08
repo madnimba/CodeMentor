@@ -28,29 +28,4 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: vi.fn(),
     dispatchEvent: vi.fn(),
   })),
-});
-
-// Mock hasPointerCapture for Radix UI components
-if (typeof Element !== 'undefined') {
-  Element.prototype.hasPointerCapture = vi.fn().mockReturnValue(false);
-  Element.prototype.setPointerCapture = vi.fn();
-  Element.prototype.releasePointerCapture = vi.fn();
-  
-  // Mock scrollIntoView for Radix UI components
-  Element.prototype.scrollIntoView = vi.fn();
-}
-
-// Mock getBoundingClientRect for Radix UI components
-if (typeof HTMLElement !== 'undefined') {
-  HTMLElement.prototype.getBoundingClientRect = vi.fn().mockReturnValue({
-    width: 0,
-    height: 0,
-    top: 0,
-    left: 0,
-    bottom: 0,
-    right: 0,
-    x: 0,
-    y: 0,
-    toJSON: vi.fn(),
-  });
-} 
+}); 
