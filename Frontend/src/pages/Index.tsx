@@ -92,7 +92,7 @@ const Index = () => {
               </CardHeader>
               <CardContent>
                 <Button asChild variant="ghost" className="text-cyan-400 hover:text-cyan-300 p-0">
-                  <Link to="/coding-editor">
+                  <Link to="/coding-editorq">
                     Try Editor <ArrowRight className="ml-2 w-4 h-4" />
                   </Link>
                 </Button>

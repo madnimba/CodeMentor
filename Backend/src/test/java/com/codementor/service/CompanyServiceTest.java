@@ -5,7 +5,6 @@ import com.codementor.domain.CompanyQuestion;
 import com.codementor.dto.CompanyDTO;
 import com.codementor.repository.CompanyQuestionRepository;
 import com.codementor.repository.CompanyRepository;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +21,6 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@Disabled("Skipping this temporarily please")
 class CompanyServiceTest {
 
     @Mock
@@ -73,8 +71,8 @@ class CompanyServiceTest {
         // Arrange
         List<Company> companies = Arrays.asList(testCompany1, testCompany2);
         when(companyRepository.findAll()).thenReturn(companies);
-        when(companyQuestionRepository.findByCompanyId(TEST_COMPANY_ID_1)).thenReturn(Arrays.asList());
-        when(companyQuestionRepository.findByCompanyId(TEST_COMPANY_ID_2)).thenReturn(Arrays.asList());
+        when(companyQuestionRepository.countByCompanyId(TEST_COMPANY_ID_1)).thenReturn(0);
+        when(companyQuestionRepository.countByCompanyId(TEST_COMPANY_ID_2)).thenReturn(0);
 
         // Act
         List<CompanyDTO> result = companyService.getAllCompanies();
@@ -102,8 +100,8 @@ class CompanyServiceTest {
         assertEquals(0, dto2.getSolvedQuestions());
 
         verify(companyRepository).findAll();
-        verify(companyQuestionRepository).findByCompanyId(TEST_COMPANY_ID_1);
-        verify(companyQuestionRepository).findByCompanyId(TEST_COMPANY_ID_2);
+        verify(companyQuestionRepository).countByCompanyId(TEST_COMPANY_ID_1);
+        verify(companyQuestionRepository).countByCompanyId(TEST_COMPANY_ID_2);
     }
 
     @Test
@@ -111,7 +109,7 @@ class CompanyServiceTest {
         // Arrange
         List<Company> companies = Arrays.asList(testCompany1);
         when(companyRepository.findAll()).thenReturn(companies);
-        when(companyQuestionRepository.findByCompanyId(TEST_COMPANY_ID_1)).thenReturn(Arrays.asList(testCompanyQuestion1, testCompanyQuestion2));
+        when(companyQuestionRepository.countByCompanyId(TEST_COMPANY_ID_1)).thenReturn(2);
 
         // Act
         List<CompanyDTO> result = companyService.getAllCompanies();
@@ -121,14 +119,14 @@ class CompanyServiceTest {
         assertEquals(1, result.size());
         assertEquals(2, result.get(0).getTotalQuestions());
         verify(companyRepository).findAll();
-        verify(companyQuestionRepository).findByCompanyId(TEST_COMPANY_ID_1);
+        verify(companyQuestionRepository).countByCompanyId(TEST_COMPANY_ID_1);
     }
 
     @Test
     void getCompanyById_Success() {
         // Arrange
         when(companyRepository.findById(TEST_COMPANY_ID_1)).thenReturn(Optional.of(testCompany1));
-        when(companyQuestionRepository.findByCompanyId(TEST_COMPANY_ID_1)).thenReturn(Arrays.asList());
+        when(companyQuestionRepository.countByCompanyId(TEST_COMPANY_ID_1)).thenReturn(0);
 
         // Act
         CompanyDTO result = companyService.getCompanyById(TEST_COMPANY_ID_1);
@@ -144,7 +142,7 @@ class CompanyServiceTest {
         assertEquals(0, result.getSolvedQuestions());
 
         verify(companyRepository).findById(TEST_COMPANY_ID_1);
-        verify(companyQuestionRepository).findByCompanyId(TEST_COMPANY_ID_1);
+        verify(companyQuestionRepository).countByCompanyId(TEST_COMPANY_ID_1);
     }
 
     @Test
@@ -158,14 +156,14 @@ class CompanyServiceTest {
         
         assertEquals("Company not found", exception.getMessage());
         verify(companyRepository).findById(TEST_COMPANY_ID_1);
-        verify(companyQuestionRepository, never()).findByCompanyId(anyInt());
+        verify(companyQuestionRepository, never()).countByCompanyId(anyInt());
     }
 
     @Test
     void getCompanyById_WithQuestions_Success() {
         // Arrange
         when(companyRepository.findById(TEST_COMPANY_ID_1)).thenReturn(Optional.of(testCompany1));
-        when(companyQuestionRepository.findByCompanyId(TEST_COMPANY_ID_1)).thenReturn(Arrays.asList(testCompanyQuestion1, testCompanyQuestion2, testCompanyQuestion3));
+        when(companyQuestionRepository.countByCompanyId(TEST_COMPANY_ID_1)).thenReturn(3);
 
         // Act
         CompanyDTO result = companyService.getCompanyById(TEST_COMPANY_ID_1);
@@ -175,6 +173,6 @@ class CompanyServiceTest {
         assertEquals(3, result.getTotalQuestions());
         assertEquals(0, result.getSolvedQuestions());
         verify(companyRepository).findById(TEST_COMPANY_ID_1);
-        verify(companyQuestionRepository).findByCompanyId(TEST_COMPANY_ID_1);
+        verify(companyQuestionRepository).countByCompanyId(TEST_COMPANY_ID_1);
     }
 } 
