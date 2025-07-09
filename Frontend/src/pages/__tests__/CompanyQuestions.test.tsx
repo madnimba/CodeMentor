@@ -372,30 +372,22 @@ describe('CompanyQuestions Page', () => {
     it('handles API response data mapping correctly', async () => {
       mockUseParams.mockReturnValue({ companyId: '1' });
       
-      const rawQuestionsData = {
-        content: [
-          {
-            id: 1,
-            title: 'Test Question',
-            description: 'Test Description',
-            difficulty: 'Easy',
-            importanceTag: 'Test Tag',
-            solution: 'Test Solution',
-            status: 'solved',
-            tags: ['test'],
-          },
-        ],
-        totalElements: 1,
-        totalPages: 1,
-        size: 10,
-        number: 0,
-        first: true,
-        last: true,
-      };
+      const rawQuestionsData = [
+        {
+          id: 1,
+          title: 'Test Question',
+          description: 'Test Description',
+          difficulty: 'Easy',
+          importanceTag: 'Test Tag',
+          solution: 'Test Solution',
+          status: 'solved',
+          tags: ['test'],
+        },
+      ];
 
       const mockGet = vi.mocked(api.get);
       mockGet.mockImplementation((url: string) => {
-        if (url.includes('/companies/1/questions/paginated')) {
+        if (url.includes('/companies/1/questions')) {
           return Promise.resolve({ data: rawQuestionsData });
         } else if (url.includes('/companies/1')) {
           return Promise.resolve({ data: mockCompanyData });
