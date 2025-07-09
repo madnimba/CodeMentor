@@ -13,15 +13,6 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Editor from "@monaco-editor/react";
 import { api } from "@/services/api";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 // import DOMPurify from "dompurify"; // ✅ Added for sanitization
 
 interface Question {
@@ -43,16 +34,6 @@ interface Company {
   solvedQuestions: number;
 }
 
-interface PaginatedResponse<T> {
-  content: T[];
-  totalElements: number;
-  totalPages: number;
-  size: number;
-  number: number;
-  first: boolean;
-  last: boolean;
-}
-
 const CompanyQuestions = () => {
   const { companyId } = useParams();
   const navigate = useNavigate();
@@ -63,15 +44,12 @@ const CompanyQuestions = () => {
   const [companyData, setCompanyData] = useState<Company | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
-  const [totalElements, setTotalElements] = useState(0);
-  const [pageSize] = useState(10); // 10 questions per page
 
   useEffect(() => {
     if (!companyId) {
       setCompanyData(null);
       setQuestions([]);
+      setLoading(false);
       return;
     }
 
@@ -80,13 +58,12 @@ const CompanyQuestions = () => {
 
     Promise.all([
       api.get(`/companies/${companyId}`),
-      api.get(`/companies/${companyId}/questions/paginated?page=${currentPage}&size=${pageSize}`)
+      api.get(`/companies/${companyId}/questions`)
     ])
       .then(([companyRes, questionsRes]) => {
         setCompanyData(companyRes.data);
 
-        const paginatedData: PaginatedResponse<any> = questionsRes.data;
-        const mappedQuestions: Question[] = paginatedData.content.map((cq: any) => ({
+        const mappedQuestions: Question[] = questionsRes.data.map((cq: any) => ({
           id: cq.id,
           title: cq.title,
           description: cq.description,
@@ -98,8 +75,6 @@ const CompanyQuestions = () => {
         }));
 
         setQuestions(mappedQuestions);
-        setTotalPages(paginatedData.totalPages);
-        setTotalElements(paginatedData.totalElements);
         setLoading(false);
       })
       .catch((err) => {
@@ -107,91 +82,10 @@ const CompanyQuestions = () => {
         setError("Failed to load company or questions");
         setLoading(false);
       });
-  }, [companyId, currentPage, pageSize]);
+  }, [companyId]);
 
   const toggleAnswer = (questionId: number) => {
     setExpandedQuestionId(expandedQuestionId === questionId ? null : questionId);
-  };
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const renderPagination = () => {
-    if (totalPages <= 1) return null;
-
-    const pages = [];
-    const maxVisiblePages = 5;
-    let startPage = Math.max(0, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
-
-    if (endPage - startPage + 1 < maxVisiblePages) {
-      startPage = Math.max(0, endPage - maxVisiblePages + 1);
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
-    }
-
-    return (
-      <Pagination className="mt-8">
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious 
-              onClick={() => handlePageChange(Math.max(0, currentPage - 1))}
-              className={currentPage === 0 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-            />
-          </PaginationItem>
-          
-          {startPage > 0 && (
-            <>
-              <PaginationItem>
-                <PaginationLink onClick={() => handlePageChange(0)}>1</PaginationLink>
-              </PaginationItem>
-              {startPage > 1 && (
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-              )}
-            </>
-          )}
-
-          {pages.map((page) => (
-            <PaginationItem key={page}>
-              <PaginationLink 
-                onClick={() => handlePageChange(page)}
-                isActive={page === currentPage}
-                className="cursor-pointer"
-              >
-                {page + 1}
-              </PaginationLink>
-            </PaginationItem>
-          ))}
-
-          {endPage < totalPages - 1 && (
-            <>
-              {endPage < totalPages - 2 && (
-                <PaginationItem>
-                  <PaginationEllipsis />
-                </PaginationItem>
-              )}
-              <PaginationItem>
-                <PaginationLink onClick={() => handlePageChange(totalPages - 1)}>
-                  {totalPages}
-                </PaginationLink>
-              </PaginationItem>
-            </>
-          )}
-
-          <PaginationItem>
-            <PaginationNext 
-              onClick={() => handlePageChange(Math.min(totalPages - 1, currentPage + 1))}
-              className={currentPage === totalPages - 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
-    );
   };
 
   if (loading) {
@@ -255,99 +149,85 @@ const CompanyQuestions = () => {
             </CardContent>
           </Card>
 
-          {/* Questions Section */}
-          <div>
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-white mb-2">Questions</h2>
-              <p className="text-slate-400">
-                Showing {questions.length} of {totalElements} questions
-              </p>
-            </div>
-
-            <div className="space-y-6">
-              {questions.map((question) => (
-                <Card
-                  key={question.id}
-                  className="bg-slate-800/50 border-slate-700 hover:border-purple-500/50 transition-colors"
-                >
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-start">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <Code2 className="w-5 h-5 text-purple-400" />
-                          {/* <h3
-                            className="text-xl font-semibold text-white"
-                            dangerouslySetInnerHTML={{ __html: question.description }}
-                          /> */}
-                          <Badge
-                            className={`${
-                              question.difficulty === 'Easy'
-                                ? 'bg-green-500/20 text-green-400 border-green-500/30'
-                                : question.difficulty === 'Medium'
-                                ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
-                                : 'bg-red-500/20 text-red-400 border-red-500/30'
-                            }`}
-                          >
-                            {question.difficulty}
-                          </Badge>
-                        </div>
-                        <div
-                          className="text-slate-400"
-                          dangerouslySetInnerHTML={{ __html: question.description }}
-                        />
-                        {question.importanceTag && (
-                          <Badge variant="outline" className="text-slate-400 border-slate-600">
-                            {question.importanceTag}
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="flex gap-2">
-                        {question.solution && (
-                          <Button
-                            variant="outline"
-                            className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
-                            onClick={() => toggleAnswer(question.id)}
-                          >
-                            {expandedQuestionId === question.id ? (
-                              <>
-                                Close <ChevronUp className="ml-2 w-4 h-4" />
-                              </>
-                            ) : (
-                              <>
-                                See Answer <ChevronDown className="ml-2 w-4 h-4" />
-                              </>
-                            )}
-                          </Button>
-                        )}
-                        <Button
-                          className="bg-purple-600 hover:bg-purple-700"
-                          onClick={() =>
-                            navigate(`/companies/${companyId}/questions/${question.id}`)
-                          }
+          <div className="space-y-6">
+            {questions.map((question) => (
+              <Card
+                key={question.id}
+                className="bg-slate-800/50 border-slate-700 hover:border-purple-500/50 transition-colors"
+              >
+                <CardContent className="p-6">
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Code2 className="w-5 h-5 text-purple-400" />
+                        <h3 className="text-xl font-semibold text-white">
+                          {question.title}
+                        </h3>
+                        <Badge
+                          className={`${
+                            question.difficulty === 'Easy'
+                              ? 'bg-green-500/20 text-green-400 border-green-500/30'
+                              : question.difficulty === 'Medium'
+                              ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+                              : 'bg-red-500/20 text-red-400 border-red-500/30'
+                          }`}
                         >
-                          Solve This
+                          {question.difficulty}
+                        </Badge>
+                      </div>
+                      <div
+                        className="text-slate-400"
+                        dangerouslySetInnerHTML={{ __html: question.description }}
+                      />
+                      {question.importanceTag && (
+                        <Badge variant="outline" className="text-slate-400 border-slate-600">
+                          {question.importanceTag}
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      {question.solution && (
+                        <Button
+                          variant="outline"
+                          className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
+                          onClick={() => toggleAnswer(question.id)}
+                        >
+                          {expandedQuestionId === question.id ? (
+                            <>
+                              Close <ChevronUp className="ml-2 w-4 h-4" />
+                            </>
+                          ) : (
+                            <>
+                              See Answer <ChevronDown className="ml-2 w-4 h-4" />
+                            </>
+                          )}
                         </Button>
+                      )}
+                      <Button
+                        className="bg-purple-600 hover:bg-purple-700"
+                        onClick={() =>
+                          navigate(`/companies/${companyId}/questions/${question.id}`)
+                        }
+                      >
+                        Solve This
+                      </Button>
+                    </div>
+                  </div>
+
+                  {expandedQuestionId === question.id && question.solution && (
+                    <div className="mt-6 border-t border-slate-700 pt-6">
+                      <h4 className="text-lg font-semibold text-white mb-4">Solution</h4>
+                      <div className="h-[300px] border border-slate-700 rounded-lg overflow-hidden">
+                      <div
+  className="prose max-w-none text-white"
+  dangerouslySetInnerHTML={{ __html: question.solution }}
+/>
                       </div>
                     </div>
-
-                    {expandedQuestionId === question.id && question.solution && (
-                      <div className="mt-6 border-t border-slate-700 pt-6">
-                        <h4 className="text-lg font-semibold text-white mb-4">Solution</h4>
-                        <div className="h-[300px] border border-slate-700 rounded-lg overflow-hidden">
-                        <div
-    className="prose max-w-none text-white"
-    dangerouslySetInnerHTML={{ __html: question.solution }}
-  />
-                        </div>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            {/* Pagination */}
-            {renderPagination()}
+                  )}
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </div>

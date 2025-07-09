@@ -37,46 +37,38 @@ const mockCompanyData = {
   solvedQuestions: 45,
 };
 
-const mockPaginatedQuestionsData = {
-  content: [
-    {
-      id: 1,
-      title: 'Two Sum',
-      description: 'Given an array of integers, return indices of the two numbers such that they add up to a specific target.',
-      difficulty: 'Easy',
-      importanceTag: 'Must Know',
-      solution: 'Use a hash map to store the complement of each number...',
-      status: 'solved',
-      tags: ['Array', 'Hash Table'],
-    },
-    {
-      id: 2,
-      title: 'Add Two Numbers',
-      description: 'You are given two non-empty linked lists representing two non-negative integers.',
-      difficulty: 'Medium',
-      importanceTag: 'Important',
-      solution: 'Traverse both linked lists simultaneously...',
-      status: 'attempted',
-      tags: ['Linked List', 'Math'],
-    },
-    {
-      id: 3,
-      title: 'Longest Substring Without Repeating Characters',
-      description: 'Given a string, find the length of the longest substring without repeating characters.',
-      difficulty: 'Hard',
-      importanceTag: 'Good to Know',
-      solution: null,
-      status: 'unsolved',
-      tags: ['String', 'Sliding Window'],
-    },
-  ],
-  totalElements: 3,
-  totalPages: 1,
-  size: 10,
-  number: 0,
-  first: true,
-  last: true,
-};
+const mockQuestionsData = [
+  {
+    id: 1,
+    title: 'Two Sum',
+    description: 'Given an array of integers, return indices of the two numbers such that they add up to a specific target.',
+    difficulty: 'Easy' as const,
+    importanceTag: 'Must Know',
+    solution: 'Use a hash map to store the complement of each number...',
+    status: 'solved' as const,
+    tags: ['Array', 'Hash Table'],
+  },
+  {
+    id: 2,
+    title: 'Add Two Numbers',
+    description: 'You are given two non-empty linked lists representing two non-negative integers.',
+    difficulty: 'Medium' as const,
+    importanceTag: 'Important',
+    solution: 'Traverse both linked lists simultaneously...',
+    status: 'attempted' as const,
+    tags: ['Linked List', 'Math'],
+  },
+  {
+    id: 3,
+    title: 'Longest Substring Without Repeating Characters',
+    description: 'Given a string, find the length of the longest substring without repeating characters.',
+    difficulty: 'Hard' as const,
+    importanceTag: 'Good to Know',
+    solution: null,
+    status: 'unsolved' as const,
+    tags: ['String', 'Sliding Window'],
+  },
+];
 
 describe('CompanyQuestions Page', () => {
   beforeEach(() => {
@@ -87,9 +79,12 @@ describe('CompanyQuestions Page', () => {
   describe('Loading State', () => {
     it('shows loading message while fetching data', async () => {
       mockUseParams.mockReturnValue({ companyId: '1' });
+      
       const mockGet = vi.mocked(api.get);
       mockGet.mockImplementation(() => new Promise(() => {})); // Never resolves
+
       render(<CompanyQuestions />);
+
       expect(screen.getByText('Loading questions...')).toBeInTheDocument();
     });
   });
@@ -97,9 +92,12 @@ describe('CompanyQuestions Page', () => {
   describe('Error State', () => {
     it('shows error message when API calls fail', async () => {
       mockUseParams.mockReturnValue({ companyId: '1' });
+      
       const mockGet = vi.mocked(api.get);
       mockGet.mockRejectedValue(new Error('Failed to fetch'));
+
       render(<CompanyQuestions />);
+
       await waitFor(() => {
         expect(screen.getByText('Failed to load company or questions')).toBeInTheDocument();
       });
@@ -109,7 +107,9 @@ describe('CompanyQuestions Page', () => {
   describe('No Company ID', () => {
     it('handles missing companyId parameter', async () => {
       mockUseParams.mockReturnValue({});
+      
       render(<CompanyQuestions />);
+
       // Component should return null when no companyId, so nothing should be rendered
       await waitFor(() => {
         expect(screen.queryByText('Loading questions...')).not.toBeInTheDocument();
@@ -121,11 +121,12 @@ describe('CompanyQuestions Page', () => {
   describe('Successful Data Load', () => {
     beforeEach(() => {
       mockUseParams.mockReturnValue({ companyId: '1' });
+      
       const mockGet = vi.mocked(api.get);
       mockGet.mockImplementation((url: string) => {
-        if (url.includes('/questions/paginated')) {
-          return Promise.resolve({ data: mockPaginatedQuestionsData });
-        } else if (url.endsWith('/companies/1')) {
+        if (url.includes('/companies/1/questions')) {
+          return Promise.resolve({ data: mockQuestionsData });
+        } else if (url.includes('/companies/1')) {
           return Promise.resolve({ data: mockCompanyData });
         }
         return Promise.reject(new Error('Unknown endpoint'));
@@ -134,6 +135,7 @@ describe('CompanyQuestions Page', () => {
 
     it('renders company information', async () => {
       render(<CompanyQuestions />);
+
       await waitFor(() => {
         expect(screen.getByText('Google Questions')).toBeInTheDocument();
         expect(screen.getByText('Top tech company focusing on search and AI')).toBeInTheDocument();
@@ -142,6 +144,7 @@ describe('CompanyQuestions Page', () => {
 
     it('displays progress summary', async () => {
       render(<CompanyQuestions />);
+
       await waitFor(() => {
         expect(screen.getByText('45 of 60 questions solved')).toBeInTheDocument();
         expect(screen.getByText('75% Complete')).toBeInTheDocument();
@@ -150,15 +153,18 @@ describe('CompanyQuestions Page', () => {
 
     it('renders all questions with correct information', async () => {
       render(<CompanyQuestions />);
+
       await waitFor(() => {
         expect(screen.getByText('Two Sum')).toBeInTheDocument();
         expect(screen.getByText('Add Two Numbers')).toBeInTheDocument();
         expect(screen.getByText('Longest Substring Without Repeating Characters')).toBeInTheDocument();
       });
+
       // Check difficulty badges
       expect(screen.getByText('Easy')).toBeInTheDocument();
       expect(screen.getByText('Medium')).toBeInTheDocument();
       expect(screen.getByText('Hard')).toBeInTheDocument();
+
       // Check importance tags
       expect(screen.getByText('Must Know')).toBeInTheDocument();
       expect(screen.getByText('Important')).toBeInTheDocument();
@@ -167,6 +173,7 @@ describe('CompanyQuestions Page', () => {
 
     it('has back navigation to companies page', async () => {
       render(<CompanyQuestions />);
+
       await waitFor(() => {
         const backLink = screen.getByRole('link', { name: /back to companies/i });
         expect(backLink).toHaveAttribute('href', '/companies');
@@ -177,11 +184,12 @@ describe('CompanyQuestions Page', () => {
   describe('Question Interactions', () => {
     beforeEach(() => {
       mockUseParams.mockReturnValue({ companyId: '1' });
+      
       const mockGet = vi.mocked(api.get);
       mockGet.mockImplementation((url: string) => {
-        if (url.includes('/questions/paginated')) {
-          return Promise.resolve({ data: mockPaginatedQuestionsData });
-        } else if (url.endsWith('/companies/1')) {
+        if (url.includes('/companies/1/questions')) {
+          return Promise.resolve({ data: mockQuestionsData });
+        } else if (url.includes('/companies/1')) {
           return Promise.resolve({ data: mockCompanyData });
         }
         return Promise.reject(new Error('Unknown endpoint'));
@@ -190,6 +198,7 @@ describe('CompanyQuestions Page', () => {
 
     it('shows "See Answer" button for questions with solutions', async () => {
       render(<CompanyQuestions />);
+
       await waitFor(() => {
         const seeAnswerButtons = screen.getAllByText('See Answer');
         expect(seeAnswerButtons).toHaveLength(2); // Two questions have solutions
@@ -198,28 +207,35 @@ describe('CompanyQuestions Page', () => {
 
     it('does not show "See Answer" for questions without solutions', async () => {
       render(<CompanyQuestions />);
+
       await waitFor(() => {
         expect(screen.getByText('Longest Substring Without Repeating Characters')).toBeInTheDocument();
       });
+
       // The third question should not have a "See Answer" button
-      const questionCard = screen.getByText('Longest Substring Without Repeating Characters').closest('.bg-slate-800/50');
+      const questionCard = screen.getByText('Longest Substring Without Repeating Characters').closest('.bg-slate-800\\/50');
       expect(questionCard?.querySelector('button[aria-label*="See Answer"]')).not.toBeInTheDocument();
     });
 
     it('expands answer when "See Answer" is clicked', async () => {
       const user = userEvent.setup();
       render(<CompanyQuestions />);
+
       await waitFor(() => {
         expect(screen.getByText('Two Sum')).toBeInTheDocument();
       });
+
       // Initially solution should not be visible
       expect(screen.queryByText('Use a hash map to store the complement of each number...')).not.toBeInTheDocument();
+
       // Click "See Answer" button for the first question
       const seeAnswerButtons = screen.getAllByText('See Answer');
       await user.click(seeAnswerButtons[0]);
+
       // Solution should now be visible
       expect(screen.getByText('Solution')).toBeInTheDocument();
       expect(screen.getByText('Use a hash map to store the complement of each number...')).toBeInTheDocument();
+
       // Button text should change to "Close"
       expect(screen.getByText('Close')).toBeInTheDocument();
     });
@@ -227,20 +243,26 @@ describe('CompanyQuestions Page', () => {
     it('collapses answer when "Close" is clicked', async () => {
       const user = userEvent.setup();
       render(<CompanyQuestions />);
+
       await waitFor(() => {
         expect(screen.getByText('Two Sum')).toBeInTheDocument();
       });
+
       // Expand answer first
       const seeAnswerButtons = screen.getAllByText('See Answer');
       await user.click(seeAnswerButtons[0]);
+
       await waitFor(() => {
         expect(screen.getByText('Solution')).toBeInTheDocument();
       });
+
       // Click "Close" button
       const closeButton = screen.getByText('Close');
       await user.click(closeButton);
+
       // Solution should be hidden again
       expect(screen.queryByText('Use a hash map to store the complement of each number...')).not.toBeInTheDocument();
+      
       // Check that "See Answer" button is visible again (there are multiple)
       const seeAnswerButtonsAfterClose = screen.getAllByText('See Answer');
       expect(seeAnswerButtonsAfterClose.length).toBeGreaterThan(0);
@@ -249,20 +271,27 @@ describe('CompanyQuestions Page', () => {
     it('allows only one answer to be expanded at a time', async () => {
       const user = userEvent.setup();
       render(<CompanyQuestions />);
+
       await waitFor(() => {
         expect(screen.getByText('Two Sum')).toBeInTheDocument();
       });
+
       const seeAnswerButtons = screen.getAllByText('See Answer');
+      
       // Expand first question's answer
       await user.click(seeAnswerButtons[0]);
+      
       await waitFor(() => {
         expect(screen.getByText('Use a hash map to store the complement of each number...')).toBeInTheDocument();
       });
+
       // Expand second question's answer
       await user.click(seeAnswerButtons[1]);
+
       await waitFor(() => {
         expect(screen.getByText('Traverse both linked lists simultaneously...')).toBeInTheDocument();
       });
+
       // First question's answer should now be hidden
       expect(screen.queryByText('Use a hash map to store the complement of each number...')).not.toBeInTheDocument();
     });
@@ -270,11 +299,14 @@ describe('CompanyQuestions Page', () => {
     it('navigates to question detail when "Solve This" is clicked', async () => {
       const user = userEvent.setup();
       render(<CompanyQuestions />);
+
       await waitFor(() => {
         expect(screen.getByText('Two Sum')).toBeInTheDocument();
       });
+
       const solveButtons = screen.getAllByText('Solve This');
       await user.click(solveButtons[0]);
+
       expect(mockNavigate).toHaveBeenCalledWith('/companies/1/questions/1');
     });
   });
@@ -285,9 +317,9 @@ describe('CompanyQuestions Page', () => {
       
       const mockGet = vi.mocked(api.get);
       mockGet.mockImplementation((url: string) => {
-        if (url.includes('/questions/paginated')) {
-          return Promise.resolve({ data: mockPaginatedQuestionsData });
-        } else if (url.endsWith('/companies/1')) {
+        if (url.includes('/companies/1/questions')) {
+          return Promise.resolve({ data: mockQuestionsData });
+        } else if (url.includes('/companies/1')) {
           return Promise.resolve({ data: mockCompanyData });
         }
         return Promise.reject(new Error('Unknown endpoint'));
@@ -316,9 +348,9 @@ describe('CompanyQuestions Page', () => {
       
       const mockGet = vi.mocked(api.get);
       mockGet.mockImplementation((url: string) => {
-        if (url.includes('/questions/paginated')) {
-          return Promise.resolve({ data: mockPaginatedQuestionsData });
-        } else if (url.endsWith('/companies/1')) {
+        if (url.includes('/companies/1/questions')) {
+          return Promise.resolve({ data: mockQuestionsData });
+        } else if (url.includes('/companies/1')) {
           return Promise.resolve({ data: mockCompanyData });
         }
         return Promise.reject(new Error('Unknown endpoint'));
@@ -411,9 +443,9 @@ describe('CompanyQuestions Page', () => {
       
       const mockGet = vi.mocked(api.get);
       mockGet.mockImplementation((url: string) => {
-        if (url.includes('/questions/paginated')) {
-          return Promise.resolve({ data: mockPaginatedQuestionsData });
-        } else if (url.endsWith('/companies/1')) {
+        if (url.includes('/companies/1/questions')) {
+          return Promise.resolve({ data: mockQuestionsData });
+        } else if (url.includes('/companies/1')) {
           return Promise.resolve({ data: mockCompanyData });
         }
         return Promise.reject(new Error('Unknown endpoint'));
@@ -438,9 +470,9 @@ describe('CompanyQuestions Page', () => {
       
       const mockGet = vi.mocked(api.get);
       mockGet.mockImplementation((url: string) => {
-        if (url.includes('/questions/paginated')) {
-          return Promise.resolve({ data: mockPaginatedQuestionsData });
-        } else if (url.endsWith('/companies/1')) {
+        if (url.includes('/companies/1/questions')) {
+          return Promise.resolve({ data: mockQuestionsData });
+        } else if (url.includes('/companies/1')) {
           return Promise.resolve({ data: mockCompanyData });
         }
         return Promise.reject(new Error('Unknown endpoint'));

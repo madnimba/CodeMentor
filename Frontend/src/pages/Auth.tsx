@@ -10,11 +10,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Code2, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { GoogleSignInButton } from "@/components/ui/GoogleSignInButton";
+import { authService } from "@/services/auth";
+
+const GOOGLE_CLIENT_ID = "333095059228-nc671d09j4et8pdg5lpuvoc1nndj4m2b.apps.googleusercontent.com"; // TODO: Replace with your real client ID
 
 const Auth = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user, signIn, signUp } = useAuth();
+  const { user, signIn, signUp, googleSignIn, googleSignUp } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "signin");
@@ -37,6 +41,21 @@ const Auth = () => {
       navigate("/dashboard");
     }
   }, [user, navigate]);
+
+  // Sync tab with URL
+  useEffect(() => {
+    const urlTab = searchParams.get("tab");
+    if (urlTab && urlTab !== activeTab) {
+      setActiveTab(urlTab);
+    }
+    // eslint-disable-next-line
+  }, [searchParams]);
+
+  // Update URL when tab changes
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    setSearchParams({ tab });
+  };
 
   // Handle sign in
   const handleSignIn = async (e: React.FormEvent) => {
@@ -67,9 +86,46 @@ const Auth = () => {
         password: signUpPassword
       });
       toast.success("Account created successfully! Please sign in.");
+      setSignUpEmail("");
+      setSignUpUsername("");
+      setSignUpPassword("");
+      setSignUpConfirmPassword("");
+      setSignUpError("");
+      handleTabChange("signin");
     } catch (err) {
       setSignUpError("Signup failed. Try a different email or username.");
       toast.error("Sign up failed. Please try again.");
+    }
+  };
+
+  const handleGoogleSignIn = async (idToken: string) => {
+    try {
+      await googleSignIn(idToken);
+      toast.success("Successfully signed in with Google!");
+    } catch (err: any) {
+      if (err?.response?.data?.message === "User not found" || err?.response?.status === 404) {
+        toast.error("Not Registered Yet");
+        handleTabChange("signup");
+      } else {
+        toast.error("Google sign in failed");
+      }
+      console.error("Google sign in failed:", err);
+    }
+  };
+
+  const handleGoogleSignUp = async (idToken: string) => {
+    try {
+      await googleSignUp(idToken);
+      toast.success("Successfully signed up with Google!");
+    } catch (err: any) {
+      const errorMsg = err?.response?.data?.error || "";
+      if (errorMsg.includes("User already exists") || err?.response?.status === 409) {
+        toast.error("User already exists");
+        handleTabChange("signin");
+      } else {
+        toast.error("Google sign up failed");
+      }
+      console.error("Google sign up failed:", err);
     }
   };
 
@@ -87,7 +143,7 @@ const Auth = () => {
             <p className="text-slate-400">Join Bangladesh's premier coding community</p>
           </div>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
             <TabsList className="grid w-full grid-cols-2 bg-slate-800/50 border border-slate-700">
               <TabsTrigger value="signin" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">
                 Sign In
@@ -150,11 +206,23 @@ const Auth = () => {
                     <Button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
                       Sign In
                     </Button>
+                    <div className="flex items-center my-4">
+                    <div className="flex-grow border-t border-slate-600" />
+                    <span className="mx-2 text-slate-400 text-xs">or</span>
+                    <div className="flex-grow border-t border-slate-600" />
+                  </div>
+                  <div className="w-full">
+                    <GoogleSignInButton
+                      clientId={GOOGLE_CLIENT_ID}
+                      onCredential={handleGoogleSignIn}
+                      buttonText="Continue with Google"
+                    />
+                  </div>
                   </form>
                   <div className="text-center text-sm text-slate-400">
                     Don't have an account?{" "}
                     <button
-                      onClick={() => setActiveTab("signup")}
+                      onClick={() => handleTabChange("signup")}
                       className="text-purple-400 hover:text-purple-300"
                     >
                       Sign up here
@@ -173,6 +241,8 @@ const Auth = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  
+                  
                   <form onSubmit={handleSignUp} className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="signup-username" className="text-slate-300">Username</Label>
@@ -256,11 +326,24 @@ const Auth = () => {
                     <Button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
                       Create Account
                     </Button>
+                    <div className="flex items-center my-4">
+                    <div className="flex-grow border-t border-slate-600" />
+                    <span className="mx-2 text-slate-400 text-xs">or</span>
+                    <div className="flex-grow border-t border-slate-600" />
+                  </div>
+                  <div className="w-full">
+                    <GoogleSignInButton
+                      clientId={GOOGLE_CLIENT_ID}
+                      onCredential={handleGoogleSignUp}
+                      buttonText="Continue with Google"
+                    />
+                  </div>
+                  
                   </form>
                   <div className="text-center text-sm text-slate-400">
                     Already have an account?{" "}
                     <button
-                      onClick={() => setActiveTab("signin")}
+                      onClick={() => handleTabChange("signin")}
                       className="text-purple-400 hover:text-purple-300"
                     >
                       Sign in here
