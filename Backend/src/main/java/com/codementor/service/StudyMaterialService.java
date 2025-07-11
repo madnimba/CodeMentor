@@ -32,8 +32,13 @@ public class StudyMaterialService {
 
     @Transactional(readOnly = true)
     public List<TopicResponse> getTopicsByTrackId(Integer trackId) {
-        return topicRepository.findByTrackId(trackId).stream()
-            .map(this::mapToTopicResponse)
+        List<Topic> topics = topicRepository.findByTrackId(trackId);
+        List<Subtopic> allSubtopics = subtopicRepository.findByTopicIdIn(
+            topics.stream().map(Topic::getId).collect(Collectors.toList())
+        );
+        
+        return topics.stream()
+            .map(topic -> mapToTopicResponse(topic, allSubtopics))
             .collect(Collectors.toList());
     }
 
@@ -53,14 +58,21 @@ public class StudyMaterialService {
         return response;
     }
 
-    private TopicResponse mapToTopicResponse(Topic topic) {
+    private TopicResponse mapToTopicResponse(Topic topic, List<Subtopic> allSubtopics) {
         TopicResponse response = new TopicResponse();
         response.setId(topic.getId());
         response.setName(topic.getName());
         response.setTrackId(topic.getTrack().getId());
         // TODO: Calculate progress based on user's completed subtopics
         response.setProgress(0);
-        response.setSubtopics(getSubtopicsByTopicId(topic.getId()));
+        
+        // Filter subtopics for this topic
+        List<SubtopicResponse> topicSubtopics = allSubtopics.stream()
+            .filter(subtopic -> subtopic.getTopic().getId().equals(topic.getId()))
+            .map(this::mapToSubtopicResponse)
+            .collect(Collectors.toList());
+        response.setSubtopics(topicSubtopics);
+        
         return response;
     }
 
@@ -75,6 +87,4 @@ public class StudyMaterialService {
         response.setArticleSlug(subtopic.getName().toLowerCase().replace(" ", "-"));
         return response;
     }
-
-    
 } 

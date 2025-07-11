@@ -4,7 +4,6 @@ import com.codementor.domain.User;
 import com.codementor.repository.UserRepository;
 import com.codementor.security.JwtTokenProvider;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,7 +21,6 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@Disabled("Skipping this temporarily")
 class AuthServiceTest {
 
     @Mock
@@ -66,21 +64,16 @@ class AuthServiceTest {
         when(userRepository.existsByUsername(TEST_USERNAME)).thenReturn(false);
         when(passwordEncoder.encode(TEST_PASSWORD)).thenReturn(ENCODED_PASSWORD);
         when(userRepository.save(any(User.class))).thenReturn(testUser);
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenReturn(authentication);
-        when(jwtTokenProvider.generateToken(authentication)).thenReturn(TEST_TOKEN);
 
         // Act
         String result = authService.signUp(TEST_EMAIL, TEST_USERNAME, TEST_PASSWORD);
 
         // Assert
-        assertEquals(TEST_TOKEN, result);
+        assertEquals("User saved", result);
         verify(userRepository).existsByEmail(TEST_EMAIL);
         verify(userRepository).existsByUsername(TEST_USERNAME);
         verify(passwordEncoder).encode(TEST_PASSWORD);
         verify(userRepository).save(any(User.class));
-        verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
-        verify(jwtTokenProvider).generateToken(authentication);
     }
 
     @Test

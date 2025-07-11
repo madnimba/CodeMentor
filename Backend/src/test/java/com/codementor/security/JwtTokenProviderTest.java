@@ -2,6 +2,7 @@ package com.codementor.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.security.Key;
 import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -29,7 +31,7 @@ class JwtTokenProviderTest {
     @InjectMocks
     private JwtTokenProvider jwtTokenProvider;
 
-    private static final String TEST_SECRET = "testSecretKeyForJwtTokenProviderTestingPurposesOnly";
+    private static final String TEST_SECRET = "testSecretKeyForJwtTokenProviderTestingPurposesOnlyMakeItLongEnough";
     private static final long TEST_EXPIRATION = 86400000L; // 24 hours in milliseconds
     private static final String TEST_USERNAME = "testuser";
 
@@ -57,8 +59,9 @@ class JwtTokenProviderTest {
         assertFalse(token.isEmpty());
         
         // Verify the token can be parsed and contains the correct username
+        Key key = Keys.hmacShaKeyFor(TEST_SECRET.getBytes());
         Claims claims = Jwts.parserBuilder()
-                .setSigningKey(TEST_SECRET.getBytes())
+                .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -71,6 +74,9 @@ class JwtTokenProviderTest {
         long expectedExpiration = new Date().getTime() + TEST_EXPIRATION;
         long actualExpiration = claims.getExpiration().getTime();
         assertTrue(Math.abs(expectedExpiration - actualExpiration) < 1000); // Allow 1 second difference
+        
+        // Verify the token is valid using the provider's validate method
+        assertTrue(jwtTokenProvider.validateToken(token));
     }
 
     @Test

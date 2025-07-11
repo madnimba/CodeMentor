@@ -19,7 +19,7 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singleton(
-            () -> user.getIsAdmin() ? "ROLE_ADMIN" : "ROLE_USER"
+            () -> Boolean.TRUE.equals(user.getIsAdmin()) ? "ROLE_ADMIN" : "ROLE_USER"
         );
     }
 
