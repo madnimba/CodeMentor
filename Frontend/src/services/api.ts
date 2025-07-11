@@ -10,7 +10,7 @@ export const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // Don't send Authorization header for public endpoints
-    const publicEndpoints = ['/auth', '/companies', '/articles'];
+    const publicEndpoints = ['/auth', '/articles'];
     const isPublicEndpoint = publicEndpoints.some(endpoint => 
       config.url?.startsWith(endpoint)
     );
