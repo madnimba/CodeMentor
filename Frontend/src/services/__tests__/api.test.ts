@@ -165,7 +165,9 @@ describe('API Service', () => {
     });
 
     it('returns response unchanged for successful requests', () => {
-      const response = { data: { message: 'success' }, status: 200 };
+      const response = { data: { message: 'success' }, status: 200, config: {
+    url: '/api/v1/example-endpoint',
+  },};
       const result = responseInterceptor.success(response);
 
       expect(result).toEqual(response);
