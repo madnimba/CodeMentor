@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @Transactional
@@ -25,6 +27,11 @@ public class CompanyService {
         return companies.stream()
             .map(this::convertToDTO)
             .collect(Collectors.toList());
+    }
+
+        public Page<CompanyDTO> getAllCompanies(Pageable pageable) {
+        Page<Company> companies = companyRepository.findAll(pageable);
+        return companies.map(this::convertToDTO);
     }
 
     public CompanyDTO getCompanyById(Integer id) {

@@ -11,6 +11,7 @@ import com.codementor.repository.TopicRepository;
 import com.codementor.repository.SubtopicRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,18 +23,21 @@ public class StudyMaterialService {
     private final TopicRepository topicRepository;
     private final SubtopicRepository subtopicRepository;
 
+    @Transactional(readOnly = true)
     public List<TrackResponse> getAllTracks() {
         return trackRepository.findAll().stream()
             .map(this::mapToTrackResponse)
             .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<TopicResponse> getTopicsByTrackId(Integer trackId) {
         return topicRepository.findByTrackId(trackId).stream()
             .map(this::mapToTopicResponse)
             .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<SubtopicResponse> getSubtopicsByTopicId(Integer topicId) {
         return subtopicRepository.findByTopicId(topicId).stream()
             .map(this::mapToSubtopicResponse)
@@ -71,4 +75,6 @@ public class StudyMaterialService {
         response.setArticleSlug(subtopic.getName().toLowerCase().replace(" ", "-"));
         return response;
     }
+
+    
 } 

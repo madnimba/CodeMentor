@@ -1,5 +1,4 @@
 package com.codementor.controller;
-import java.util.Map;
 
 import com.codementor.dto.AuthRequest;
 import com.codementor.dto.JwtResponse;
@@ -7,7 +6,6 @@ import com.codementor.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.http.HttpStatus;
 
 class GoogleAuthRequest {
     public String idToken;
@@ -26,9 +24,9 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signUp(@RequestBody AuthRequest request) {
-        authService.signUp(request.getEmail(), request.getUsername(), request.getPassword());
-        return ResponseEntity.ok().body(Map.of("success", true, "message", "User created successfully"));
+    public ResponseEntity<JwtResponse> signUp(@RequestBody AuthRequest request) {
+        String token = authService.signUp(request.getEmail(), request.getUsername(), request.getPassword());
+        return ResponseEntity.ok(new JwtResponse(token));
     }
 
     @PostMapping("/signin")
