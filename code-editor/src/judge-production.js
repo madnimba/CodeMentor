@@ -9,7 +9,7 @@ const app = express();
 
 // CORS configuration for production
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:3000'],
+  origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost', 'http://frontend'],
   credentials: true
 }));
 
@@ -25,6 +25,8 @@ const limiter = rateLimit({
 });
 
 app.use('/run', limiter);
+
+
 
 const JUDGE0_API = process.env.JUDGE0_API;
 const RAPIDAPI_HOST = process.env.RAPIDAPI_HOST;

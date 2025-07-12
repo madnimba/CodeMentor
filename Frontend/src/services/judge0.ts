@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const JUDGE0_API_URL = "http://localhost:3000"; // Your Judge0 proxy server
+const JUDGE0_API_URL = "/code-editor"; // Proxied through nginx
 
 export interface CodeExecutionRequest {
   code: string;

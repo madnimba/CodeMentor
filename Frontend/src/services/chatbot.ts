@@ -16,7 +16,7 @@ export interface ChatResponse {
 class ChatbotService {
   private apiUrl: string;
 
-  constructor(apiUrl: string = 'http://localhost:5000/chat') {
+  constructor(apiUrl: string = '/chatbot/chat') {
     this.apiUrl = apiUrl;
   }
 

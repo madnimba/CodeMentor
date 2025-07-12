@@ -43,6 +43,54 @@ services:
       - codementor-network
     restart: unless-stopped
 
+  code-editor:
+    build:
+      context: ./code-editor
+      dockerfile: Dockerfile
+    container_name: codementor-code-editor
+    environment:
+      - PORT=3000
+      - WS_PORT=8081
+      - NODE_ENV=development
+      - ALLOWED_ORIGINS=http://localhost,http://frontend
+      - JUDGE0_API=${JUDGE0_API}
+      - RAPIDAPI_HOST=${RAPIDAPI_HOST}
+      - RAPIDAPI_KEY=${RAPIDAPI_KEY}
+    expose:
+      - "3000"
+      - "8081"
+
+    depends_on:
+      - backend
+    networks:
+      - codementor-network
+    restart: unless-stopped
+
+  chatbot:
+    build:
+      context: ./Chatbot
+      dockerfile: Dockerfile
+    container_name: codementor-chatbot
+    environment:
+      - FLASK_ENV=development
+      - SECRET_KEY=${CHATBOT_SECRET_KEY}
+      - ALLOWED_ORIGINS=http://localhost,http://frontend
+      - DEFAULT_AI_MODEL=${DEFAULT_AI_MODEL:-gpt-3.5-turbo}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - MAX_MESSAGE_LENGTH=${MAX_MESSAGE_LENGTH:-4000}
+      - MAX_HISTORY_LENGTH=${MAX_HISTORY_LENGTH:-50}
+      - DEFAULT_TEMPERATURE=${DEFAULT_TEMPERATURE:-0.7}
+      - DEFAULT_MAX_TOKENS=${DEFAULT_MAX_TOKENS:-1000}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    expose:
+      - "5000"
+    depends_on:
+      - backend
+    networks:
+      - codementor-network
+    restart: unless-stopped
+
   # nginx:
   #   image: nginx:alpine
   #   container_name: codementor-nginx

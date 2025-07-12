@@ -108,7 +108,7 @@ const App = () => (
           </Routes>
           
           {/* Chatbot - appears on all pages */}
-          <Chatbot apiUrl={import.meta.env.VITE_CHATBOT_API_URL || 'http://localhost:5000/chat'} />
+          <Chatbot apiUrl={import.meta.env.VITE_CHATBOT_API_URL || '/chatbot/chat'} />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
