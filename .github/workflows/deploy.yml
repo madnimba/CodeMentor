@@ -58,6 +58,16 @@ jobs:
           docker build -t ${{ secrets.DOCKER_USERNAME }}/frontend ./Frontend
           docker push ${{ secrets.DOCKER_USERNAME }}/frontend
 
+      - name: Build & push code-editor image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/code-editor ./code-editor
+          docker push ${{ secrets.DOCKER_USERNAME }}/code-editor
+
+      - name: Build & push chatbot image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/chatbot ./Chatbot
+          docker push ${{ secrets.DOCKER_USERNAME }}/chatbot
+
       - name: SSH & deploy on Azure VM
         uses: appleboy/ssh-action@master
         with:
@@ -68,5 +78,7 @@ jobs:
             cd ~/codementor
             docker pull ${{ secrets.DOCKER_USERNAME }}/backend
             docker pull ${{ secrets.DOCKER_USERNAME }}/frontend
+            docker pull ${{ secrets.DOCKER_USERNAME }}/code-editor
+            docker pull ${{ secrets.DOCKER_USERNAME }}/chatbot
             docker-compose down
             docker-compose up -d
