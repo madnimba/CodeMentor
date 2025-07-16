@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -28,6 +29,7 @@ public class ArticleService {
     private final JobRoleRepository jobRoleRepository;
     private final QuestionRepository questionRepository;
     private final UserRepository userRepository;
+    private final UserArticleReadRepository userArticleReadRepository;
 
     @Transactional
     public ArticleResponse createArticle(CreateArticleRequest request) {
@@ -82,12 +84,34 @@ public class ArticleService {
     public ArticleResponse getArticleById(Integer id) {
         Article article = articleRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Article not found"));
+        User currentUser = getCurrentUser();
+        return mapToArticleResponse(article, currentUser);
+    }
+
+    @Transactional
+    public ArticleResponse markArticleAsRead(Integer articleId) {
+        User currentUser = getCurrentUser();
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new ResourceNotFoundException("Article not found"));
+        
+        // Check if already read
+        Optional<UserArticleRead> existingRead = userArticleReadRepository.findByUserIdAndArticleId(
+            currentUser.getId(), articleId);
+        
+        if (existingRead.isEmpty()) {
+            UserArticleRead userArticleRead = new UserArticleRead();
+            userArticleRead.setUser(currentUser);
+            userArticleRead.setArticle(article);
+            userArticleReadRepository.save(userArticleRead);
+        }
+        
         return mapToArticleResponse(article);
     }
 
     public Page<ArticleResponse> getArticlesByFilters(Integer trackId, Integer topicId, Integer subtopicId, 
     Integer jobRoleId, Pageable pageable) {
         Page<Article> articles;
+        User currentUser = getCurrentUser();
         
         // if (trackId != null) {
         //     articles = articleRepository.findByTrackId(trackId, pageable);
@@ -102,7 +126,7 @@ public class ArticleService {
             articles = articleRepository.findAllApproved(pageable);
         }
         
-        return articles.map(this::mapToArticleResponse);
+        return articles.map(article -> mapToArticleResponse(article, currentUser));
     }
 
     @Transactional
@@ -184,6 +208,10 @@ public class ArticleService {
     }
 
     private ArticleResponse mapToArticleResponse(Article article) {
+        return mapToArticleResponse(article, null);
+    }
+
+    private ArticleResponse mapToArticleResponse(Article article, User currentUser) {
         ArticleResponse response = new ArticleResponse();
         response.setId(article.getId());
         response.setTitle(article.getTitle());
@@ -210,11 +238,26 @@ public class ArticleService {
         article.getQuestions().forEach(question -> questionIds.add(question.getId()));
         response.setQuestionIds(questionIds);
         
+        // Check if article is read by current user
+        if (currentUser != null) {
+            Optional<UserArticleRead> userArticleRead = userArticleReadRepository.findByUserIdAndArticleId(
+                currentUser.getId(), article.getId());
+            if (userArticleRead.isPresent()) {
+                response.setIsRead(true);
+                response.setReadAt(userArticleRead.get().getReadAt());
+            } else {
+                response.setIsRead(false);
+            }
+        } else {
+            response.setIsRead(false);
+        }
+        
         return response;
     }
 
     public List<ArticleResponse> getArticlesBySubtopicId(Integer subtopicId) {
         List<Article> articles = articleRepository.findBySubtopicId(subtopicId);
-        return articles.stream().map(this::mapToArticleResponse).collect(Collectors.toList());
+        User currentUser = getCurrentUser();
+        return articles.stream().map(article -> mapToArticleResponse(article, currentUser)).collect(Collectors.toList());
     }
 } 

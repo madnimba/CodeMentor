@@ -4,13 +4,15 @@ import { Footer } from "@/components/layout/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ThumbsUp, Clock, User, BookOpen, Code2, ExternalLink } from "lucide-react";
+import { ArrowLeft, ThumbsUp, Clock, User, BookOpen, Code2, ExternalLink, CheckCircle } from "lucide-react";
 import { useState, useEffect } from "react";
-import { api } from "@/services/api";
+import { articleService, Article } from "@/services/articles";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Article = () => {
   const { slug, subtopicId } = useParams();
-  const [articles, setArticles] = useState<any[]>([]);
+  const { user } = useAuth();
+  const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [upvoteStates, setUpvoteStates] = useState<{[key: number]: {count: number, hasUpvoted: boolean}}>({});
@@ -18,13 +20,12 @@ const Article = () => {
   useEffect(() => {
     if (subtopicId) {
       setLoading(true);
-      api.get(`/articles/by-subtopic/${subtopicId}`)
-        .then(res => {
-          const articlesData = res.data.data;
+      articleService.getArticlesBySubtopicId(parseInt(subtopicId))
+        .then(articlesData => {
           setArticles(articlesData);
           // Initialize upvote states for each article
           const initialUpvoteStates: {[key: number]: {count: number, hasUpvoted: boolean}} = {};
-          articlesData.forEach((article: any) => {
+          articlesData.forEach((article: Article) => {
             initialUpvoteStates[article.id] = { count: 42, hasUpvoted: false };
           });
           setUpvoteStates(initialUpvoteStates);
@@ -40,6 +41,17 @@ const Article = () => {
     }
   }, [subtopicId]);
 
+  // Mark articles as read when they are viewed
+  useEffect(() => {
+    if (articles.length > 0 && user) {
+      articles.forEach(article => {
+        if (!article.isRead) {
+          markArticleAsRead(article.id);
+        }
+      });
+    }
+  }, [articles, user]);
+
   const handleUpvote = (articleId: number) => {
     const currentState = upvoteStates[articleId];
     if (currentState && !currentState.hasUpvoted) {
@@ -50,6 +62,19 @@ const Article = () => {
           hasUpvoted: true
         }
       }));
+    }
+  };
+
+  const markArticleAsRead = async (articleId: number) => {
+    if (!user) return; // Only mark as read if user is authenticated
+    
+    try {
+      const updatedArticle = await articleService.markArticleAsRead(articleId);
+      setArticles(prev => prev.map(article => 
+        article.id === articleId ? updatedArticle : article
+      ));
+    } catch (error) {
+      console.error('Failed to mark article as read:', error);
     }
   };
 
@@ -113,6 +138,12 @@ const Article = () => {
                   )}
                   {article.isApproved && (
                     <Badge className="bg-green-500/20 text-green-400 border-green-500/30">Approved</Badge>
+                  )}
+                  {article.isRead && (
+                    <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 flex items-center gap-1">
+                      <CheckCircle className="w-3 h-3" />
+                      Read
+                    </Badge>
                   )}
                 </div>
                 <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white leading-tight">

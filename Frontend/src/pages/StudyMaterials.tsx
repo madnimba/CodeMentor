@@ -41,6 +41,16 @@ const StudyMaterials = () => {
     fetchData();
   }, []);
 
+  // Refresh data when user returns to the page
+  useEffect(() => {
+    const handleFocus = () => {
+      refreshData();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
+
   const toggleSubject = (subjectId: string) => {
     setExpandedSubjects(prev => 
       prev.includes(subjectId) 
@@ -55,6 +65,23 @@ const StudyMaterials = () => {
         ? prev.filter(id => id !== topicId)
         : [...prev, topicId]
     );
+  };
+
+  const refreshData = async () => {
+    try {
+      const tracksData = await studyMaterialService.getAllTracks();
+      setTracks(tracksData);
+      
+      // Fetch topics for each track
+      const topicsData: { [key: number]: Topic[] } = {};
+      for (const track of tracksData) {
+        const trackTopics = await studyMaterialService.getTopicsByTrackId(track.id);
+        topicsData[track.id] = trackTopics;
+      }
+      setTopics(topicsData);
+    } catch (err) {
+      console.error('Failed to refresh study materials:', err);
+    }
   };
 
   if (loading) {

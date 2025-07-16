@@ -23,4 +23,6 @@ public class ArticleResponse {
     private LocalDateTime createdAt;
     private Set<Integer> jobRoleIds;
     private Set<Integer> questionIds;
+    private Boolean isRead;
+    private LocalDateTime readAt;
 } 

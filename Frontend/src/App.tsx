@@ -15,7 +15,6 @@ import Companies from "./pages/Companies";
 import CompanyQuestions from "./pages/CompanyQuestions";
 import LiveCoding from "./pages/LiveCoding";
 import ProblemSelection from "./pages/ProblemSelection";
-import Note from "./pages/Note";
 import Chatbot from "./pages/Chatbot";
 
 const queryClient = new QueryClient();
@@ -101,14 +100,6 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <ProblemSelection />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/notes" 
-              element={
-                <ProtectedRoute>
-                  <Note />
                 </ProtectedRoute>
               } 
             />

@@ -20,6 +20,9 @@ public interface ArticleRepository extends JpaRepository<Article, Integer> {
     @Query("SELECT a FROM Article a WHERE a.track.id = ?1 AND a.isApproved = true")
     Page<Article> findByTrackId(Integer trackId, Pageable pageable);
     
+    @Query("SELECT a FROM Article a WHERE a.track.id = ?1 AND a.isApproved = true")
+    List<Article> findByTrackId(Integer trackId);
+    
     @Query("SELECT a FROM Article a WHERE a.topic.id = ?1 AND a.isApproved = true")
     Page<Article> findByTopicId(Integer topicId, Pageable pageable);
     

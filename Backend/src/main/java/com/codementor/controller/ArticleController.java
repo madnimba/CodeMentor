@@ -32,6 +32,12 @@ public class ArticleController {
         return ResponseEntity.ok(ApiResponse.success(articleService.getArticleById(id)));
     }
 
+    @PostMapping("/{id}/mark-read")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<ArticleResponse>> markArticleAsRead(@PathVariable Integer id) {
+        return ResponseEntity.ok(ApiResponse.success(articleService.markArticleAsRead(id)));
+    }
+
     @GetMapping
     public ResponseEntity<ApiResponse<Page<ArticleResponse>>> getArticles(
             @RequestParam(required = false) Integer trackId,
