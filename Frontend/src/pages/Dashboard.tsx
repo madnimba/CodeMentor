@@ -143,6 +143,13 @@ const Dashboard = () => {
                       </Link>
                     </Button>
                   </CardContent>
+                  <CardContent>
+                    <Button asChild variant="outline" className="w-full border-cyan-700 text-cyan-600 hover:bg-cyan-500/10">
+                      <Link to="/notes">
+                        Create Note <ArrowRight className="ml-2 w-4 h-4" />
+                      </Link>
+                    </Button>
+                  </CardContent>
                 </Card>
               </div>
 
