@@ -24,6 +24,17 @@ interface QuestionDetails {
   };
   upvotes: number;
   downvotes: number;
+  examples?: {
+    input: string;
+    output: string;
+    explanation: string;
+  }[];
+  hints?: string[];
+  testCases?: {
+    input: string;
+    target: number;
+    expected: string;
+  }[];
 }
 
 const LiveCoding = () => {
@@ -84,12 +95,19 @@ console.log("Output:", solution([3,3], 6));`);
   // Fetch questions from the database
   useEffect(() => {
     const fetchQuestionDetails = async () => {
-      if (!companyId || !questionId) return;
+      if (!questionId) return;
       setIsLoadingQuestions(true);
       try {
-        const response = await api.get(`/companies/${companyId}/questions/${questionId}/details`);
-        setQuestionDetails(response.data);
-        updateQuestionData(response.data);
+        let response;
+        if (companyId) {
+          // Fetch company question details
+          response = await api.get(`/companies/${companyId}/questions/${questionId}/details`);
+        } else {
+          // Fetch standalone question details
+          response = await api.get(`/questions/${questionId}`);
+        }
+        setQuestionDetails(response.data.data);
+        updateQuestionData(response.data.data);
       } catch (error: any) {
         toast({
           title: 'Error',
@@ -399,9 +417,9 @@ class Main {
           {/* Back Button and Question Info */}
           <div className="mb-8">
             <Button asChild variant="ghost" className="text-slate-400 hover:text-white mb-4">
-              <Link to={`/companies/${companyId}`}>
+              <Link to={companyId ? `/companies/${companyId}` : "/questions"}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Questions
+                Back to {companyId ? "Company Questions" : "Questions"}
               </Link>
             </Button>
 
