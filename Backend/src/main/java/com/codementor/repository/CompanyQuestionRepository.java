@@ -17,5 +17,5 @@ public interface CompanyQuestionRepository extends JpaRepository<CompanyQuestion
     Page<CompanyQuestion> findByCompanyId(Integer companyId, Pageable pageable);
 
     CompanyQuestion findByCompanyIdAndQuestionId(Integer companyId, Integer questionId);
-    int countByCompanyId(Integer companyId);
+    long countByCompanyId(Integer companyId);
 }   

@@ -38,11 +38,13 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/**").permitAll()
-                .requestMatchers("/articles/**").permitAll()
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .anyRequest().authenticated()
-            )
+    .requestMatchers("/auth/**").permitAll()
+    .requestMatchers("/admin/auth/**").permitAll()
+    .requestMatchers("/articles/**").permitAll()
+    .requestMatchers("/admin/**").hasRole("ADMIN")
+    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+    .anyRequest().authenticated()
+)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

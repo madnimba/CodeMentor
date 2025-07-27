@@ -13,4 +13,6 @@ public interface QuestionSolutionRepository extends JpaRepository<QuestionSoluti
 
     @Query("SELECT qs.code FROM QuestionSolution qs WHERE qs.question.id = :questionId ORDER BY qs.submittedAt ASC LIMIT 1")
     String findFirstCodeByQuestionId(Integer questionId);
+    
+    long countByQuestionId(Integer questionId);
 } 

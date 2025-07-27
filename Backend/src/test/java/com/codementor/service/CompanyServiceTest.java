@@ -71,8 +71,8 @@ class CompanyServiceTest {
         // Arrange
         List<Company> companies = Arrays.asList(testCompany1, testCompany2);
         when(companyRepository.findAll()).thenReturn(companies);
-        when(companyQuestionRepository.countByCompanyId(TEST_COMPANY_ID_1)).thenReturn(0);
-        when(companyQuestionRepository.countByCompanyId(TEST_COMPANY_ID_2)).thenReturn(0);
+        when(companyQuestionRepository.countByCompanyId(TEST_COMPANY_ID_1)).thenReturn(0L);
+        when(companyQuestionRepository.countByCompanyId(TEST_COMPANY_ID_2)).thenReturn(0L);
 
         // Act
         List<CompanyDTO> result = companyService.getAllCompanies();
@@ -109,7 +109,7 @@ class CompanyServiceTest {
         // Arrange
         List<Company> companies = Arrays.asList(testCompany1);
         when(companyRepository.findAll()).thenReturn(companies);
-        when(companyQuestionRepository.countByCompanyId(TEST_COMPANY_ID_1)).thenReturn(2);
+        when(companyQuestionRepository.countByCompanyId(TEST_COMPANY_ID_1)).thenReturn(2L);
 
         // Act
         List<CompanyDTO> result = companyService.getAllCompanies();
@@ -126,7 +126,7 @@ class CompanyServiceTest {
     void getCompanyById_Success() {
         // Arrange
         when(companyRepository.findById(TEST_COMPANY_ID_1)).thenReturn(Optional.of(testCompany1));
-        when(companyQuestionRepository.countByCompanyId(TEST_COMPANY_ID_1)).thenReturn(0);
+        when(companyQuestionRepository.countByCompanyId(TEST_COMPANY_ID_1)).thenReturn(0L);
 
         // Act
         CompanyDTO result = companyService.getCompanyById(TEST_COMPANY_ID_1);
@@ -163,7 +163,7 @@ class CompanyServiceTest {
     void getCompanyById_WithQuestions_Success() {
         // Arrange
         when(companyRepository.findById(TEST_COMPANY_ID_1)).thenReturn(Optional.of(testCompany1));
-        when(companyQuestionRepository.countByCompanyId(TEST_COMPANY_ID_1)).thenReturn(3);
+        when(companyQuestionRepository.countByCompanyId(TEST_COMPANY_ID_1)).thenReturn(3L);
 
         // Act
         CompanyDTO result = companyService.getCompanyById(TEST_COMPANY_ID_1);

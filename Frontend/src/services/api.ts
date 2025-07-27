@@ -18,14 +18,25 @@ api.interceptors.request.use(
     const isPublicGetEndpoint = config.method?.toLowerCase() === 'get' && 
       publicGetEndpoints.some(endpoint => config.url?.startsWith(endpoint));
     
+    // Check if it's an admin endpoint
+    const isAdminEndpoint = config.url?.startsWith('/admin');
+    
+    let token = null;
     if (!isPublicEndpoint && !isPublicGetEndpoint) {
-      const token = localStorage.getItem('token');
+      // For admin endpoints, use admin token, otherwise use regular token
+      token = isAdminEndpoint 
+        ? localStorage.getItem('adminToken') 
+        : localStorage.getItem('token');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
     
-    console.log('API Request:', config.method?.toUpperCase(), config.url);
+    console.log('API Request:', config.method?.toUpperCase(), config.url, {
+      isAdminEndpoint,
+      hasToken: !!token,
+      headers: config.headers
+    });
     return config;
   },
   (error) => {
@@ -42,9 +53,17 @@ api.interceptors.response.use(
   (error) => {
     console.error('API Error:', error.response?.status, error.config?.url, error.message);
     if (error.response?.status === 401) {
-      // Token is invalid or expired, redirect to login
-      localStorage.removeItem('token');
-      window.location.href = '/auth';
+      // Check if it's an admin endpoint
+      const isAdminEndpoint = error.config?.url?.startsWith('/admin');
+      if (isAdminEndpoint) {
+        // Admin token is invalid or expired, redirect to admin login
+        localStorage.removeItem('adminToken');
+        window.location.href = '/admin/auth';
+      } else {
+        // Regular token is invalid or expired, redirect to login
+        localStorage.removeItem('token');
+        window.location.href = '/auth';
+      }
     }
     return Promise.reject(error);
   }

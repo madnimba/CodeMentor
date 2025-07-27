@@ -203,10 +203,10 @@ class CompanyQuestionRepositoryTest {
     @Test
     void countByCompanyId_CompanyHasQuestions_ReturnsCorrectCount() {
         // Act
-        int count = companyQuestionRepository.countByCompanyId(testCompany1.getId());
+        long count = companyQuestionRepository.countByCompanyId(testCompany1.getId());
 
         // Assert
-        assertEquals(2, count);
+        assertEquals(2L, count);
     }
 
     @Test
@@ -220,19 +220,19 @@ class CompanyQuestionRepositoryTest {
         emptyCompany = entityManager.persistAndFlush(emptyCompany);
 
         // Act
-        int count = companyQuestionRepository.countByCompanyId(emptyCompany.getId());
+        long count = companyQuestionRepository.countByCompanyId(emptyCompany.getId());
 
         // Assert
-        assertEquals(0, count);
+        assertEquals(0L, count);
     }
 
     @Test
     void countByCompanyId_NonExistentCompany_ReturnsZero() {
         // Act
-        int count = companyQuestionRepository.countByCompanyId(999);
+        long count = companyQuestionRepository.countByCompanyId(999);
 
         // Assert
-        assertEquals(0, count);
+        assertEquals(0L, count);
     }
 
     @Test
@@ -270,7 +270,7 @@ class CompanyQuestionRepositoryTest {
         companyQuestionRepository.delete(testCompanyQuestion1);
 
         // Assert
-        int count = companyQuestionRepository.countByCompanyId(testCompany1.getId());
-        assertEquals(1, count); // Should be 1 remaining question for company1
+        long count = companyQuestionRepository.countByCompanyId(testCompany1.getId());
+        assertEquals(1L, count); // Should be 1 remaining question for company1
     }
 } 
