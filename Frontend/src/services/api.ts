@@ -9,13 +9,16 @@ export const api = axios.create({
 // Add a request interceptor to include the authorization header
 api.interceptors.request.use(
   (config) => {
-    // Don't send Authorization header for public endpoints
-    const publicEndpoints = ['/auth', '/articles'];
+    // Don't send Authorization header for public endpoints (GET requests only)
+    const publicEndpoints = ['/auth'];
+    const publicGetEndpoints = ['/articles'];
     const isPublicEndpoint = publicEndpoints.some(endpoint => 
       config.url?.startsWith(endpoint)
     );
+    const isPublicGetEndpoint = config.method?.toLowerCase() === 'get' && 
+      publicGetEndpoints.some(endpoint => config.url?.startsWith(endpoint));
     
-    if (!isPublicEndpoint) {
+    if (!isPublicEndpoint && !isPublicGetEndpoint) {
       const token = localStorage.getItem('token');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;

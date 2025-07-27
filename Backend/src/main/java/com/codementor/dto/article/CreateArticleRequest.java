@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
@@ -23,4 +24,8 @@ public class CreateArticleRequest {
     private Integer subtopicId;
     private Set<Integer> jobRoleIds;
     private Set<Integer> questionIds;
+    
+    // These fields will be set server-side, but included as per request
+    private LocalDateTime createdAt;
+    private Integer createdBy;
 } 

@@ -5,14 +5,25 @@ import {
   Card, CardContent, CardHeader, CardTitle, CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Building2, ArrowLeft, CheckCircle, Code2,
-  ChevronDown, ChevronUp
+  ChevronDown, ChevronUp, Plus, X, Trash2
 } from "lucide-react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
 import Editor from "@monaco-editor/react";
 import { api } from "@/services/api";
+import { studyMaterialService, Track, Subtopic } from "@/services/studyMaterials";
+import { questionService, CreateQuestionRequest, TestcaseRequest } from "@/services/questions";
+import { companiesService, Company as CompanyType } from "@/services/companies";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 import {
   Pagination,
   PaginationContent,
@@ -68,6 +79,72 @@ const CompanyQuestions = () => {
   const [totalElements, setTotalElements] = useState(0);
   const [pageSize] = useState(10); // 10 questions per page
 
+  // Question creation state
+  const [isQuestionDialogOpen, setIsQuestionDialogOpen] = useState(false);
+  const [tracks, setTracks] = useState<Track[]>([]);
+  const [subtopics, setSubtopics] = useState<{ [key: number]: Subtopic[] }>({});
+  const [companies, setCompanies] = useState<CompanyType[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { user } = useAuth();
+
+  const form = useForm<CreateQuestionRequest>({
+    defaultValues: {
+      title: "",
+      description: "",
+      difficulty: "Medium",
+      importanceTag: "",
+      trackId: 0,
+      subtopicId: undefined,
+      companyId: companyId ? Number(companyId) : undefined,
+      testcases: [{ input: "", expectedOutput: "", timeLimitMs: 1000, isPublic: false }],
+    },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "testcases",
+  });
+
+  const selectedTrackId = form.watch("trackId");
+
+  // Fetch tracks and companies for question creation
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [tracksData, companiesData] = await Promise.all([
+          studyMaterialService.getAllTracks(),
+          companiesService.getAllCompanies()
+        ]);
+        setTracks(tracksData);
+        setCompanies(companiesData);
+      } catch (err) {
+        console.error("Failed to fetch data:", err);
+      }
+    };
+    fetchData();
+  }, []);
+
+  // Fetch subtopics when track is selected
+  useEffect(() => {
+    if (selectedTrackId && selectedTrackId > 0) {
+      const fetchSubtopics = async () => {
+        try {
+          const topics = await studyMaterialService.getTopicsByTrackId(selectedTrackId);
+          const allSubtopics: Subtopic[] = [];
+          for (const topic of topics) {
+            const topicSubtopics = await studyMaterialService.getSubtopicsByTopicId(topic.id);
+            allSubtopics.push(...topicSubtopics);
+          }
+          setSubtopics(prev => ({ ...prev, [selectedTrackId]: allSubtopics }));
+        } catch (err) {
+          console.error("Failed to fetch subtopics:", err);
+        }
+      };
+      fetchSubtopics();
+    }
+  }, [selectedTrackId]);
+
   useEffect(() => {
     if (!companyId) {
       setCompanyData(null);
@@ -115,6 +192,38 @@ const CompanyQuestions = () => {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+  };
+
+  const onSubmitQuestion = async (data: CreateQuestionRequest) => {
+    if (!user) {
+      toast.error("You must be logged in to create a question");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await questionService.createQuestion(data);
+      toast.success("Question created successfully! It will be reviewed before publication.");
+      setIsQuestionDialogOpen(false);
+      form.reset();
+      // Refresh questions list
+      window.location.reload();
+    } catch (err) {
+      toast.error("Failed to create question. Please try again.");
+      console.error("Failed to create question:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const addTestcase = () => {
+    append({ input: "", expectedOutput: "", timeLimitMs: 1000, isPublic: false });
+  };
+
+  const removeTestcase = (index: number) => {
+    if (fields.length > 1) {
+      remove(index);
+    }
   };
 
   const renderPagination = () => {
@@ -226,6 +335,25 @@ const CompanyQuestions = () => {
                   Back to Companies
                 </Link>
               </Button>
+              
+              {/* Create Question Button */}
+              <Dialog open={isQuestionDialogOpen} onOpenChange={setIsQuestionDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button
+                    className="bg-purple-600 hover:bg-purple-700 text-white"
+                    onClick={() => {
+                      if (!user) {
+                        toast.error("Please log in to create a question");
+                        return;
+                      }
+                      setIsQuestionDialogOpen(true);
+                    }}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Question
+                  </Button>
+                </DialogTrigger>
+              </Dialog>
             </div>
 
             <div className="flex items-center gap-4 mt-4">
@@ -351,6 +479,325 @@ const CompanyQuestions = () => {
           </div>
         </div>
       </div>
+
+      {/* Create Question Dialog */}
+      <Dialog open={isQuestionDialogOpen} onOpenChange={setIsQuestionDialogOpen}>
+        
+        {user && (
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-slate-800 border-slate-700">
+            <DialogHeader>
+              <DialogTitle className="text-white">Create New Question</DialogTitle>
+            </DialogHeader>
+            
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmitQuestion)} className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="title"
+                  rules={{ required: "Title is required" }}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-slate-200">Title</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Enter question title"
+                          className="bg-slate-700 border-slate-600 text-white"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="description"
+                  rules={{ required: "Description is required" }}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-slate-200">Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Describe the problem statement..."
+                          className="bg-slate-700 border-slate-600 text-white min-h-[150px]"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="difficulty"
+                    rules={{ required: "Difficulty is required" }}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-slate-200">Difficulty</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                              <SelectValue placeholder="Select difficulty" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-slate-700 border-slate-600">
+                            <SelectItem value="Easy">Easy</SelectItem>
+                            <SelectItem value="Medium">Medium</SelectItem>
+                            <SelectItem value="Hard">Hard</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="importanceTag"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-slate-200">Importance Tag</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g., High, Medium, Low"
+                            className="bg-slate-700 border-slate-600 text-white"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="companyId"
+                    rules={{ required: "Company is required" }}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-slate-200">Company</FormLabel>
+                        <Select onValueChange={(value) => field.onChange(Number(value))} value={field.value?.toString()}>
+                          <FormControl>
+                            <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                              <SelectValue placeholder="Select a company" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-slate-700 border-slate-600">
+                            {companies.map((company) => (
+                              <SelectItem key={company.id} value={company.id.toString()}>
+                                {company.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="trackId"
+                    rules={{ required: "Track is required" }}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-slate-200">Track</FormLabel>
+                        <Select onValueChange={(value) => field.onChange(Number(value))} value={field.value?.toString()}>
+                          <FormControl>
+                            <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                              <SelectValue placeholder="Select a track" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-slate-700 border-slate-600">
+                            {tracks.map((track) => (
+                              <SelectItem key={track.id} value={track.id.toString()}>
+                                {track.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="subtopicId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-slate-200">Subtopic (Optional)</FormLabel>
+                        <Select 
+                          onValueChange={(value) => field.onChange(value ? Number(value) : undefined)} 
+                          value={field.value?.toString()}
+                          disabled={!selectedTrackId || selectedTrackId === 0}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                              <SelectValue placeholder="Select a subtopic (optional)" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-slate-700 border-slate-600">
+                            {subtopics[selectedTrackId]?.map((subtopic) => (
+                              <SelectItem key={subtopic.id} value={subtopic.id.toString()}>
+                                {subtopic.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Testcases Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <FormLabel className="text-slate-200">Test Cases</FormLabel>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addTestcase}
+                      className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Test Case
+                    </Button>
+                  </div>
+                  
+                  {fields.map((field, index) => (
+                    <Card key={field.id} className="bg-slate-700/50 border-slate-600">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-white font-medium">Test Case {index + 1}</h4>
+                          {fields.length > 1 && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeTestcase(index)}
+                              className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name={`testcases.${index}.input`}
+                            rules={{ required: "Input is required" }}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-slate-200">Input</FormLabel>
+                                <FormControl>
+                                  <Textarea
+                                    placeholder="Test case input"
+                                    className="bg-slate-600 border-slate-500 text-white"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name={`testcases.${index}.expectedOutput`}
+                            rules={{ required: "Expected output is required" }}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-slate-200">Expected Output</FormLabel>
+                                <FormControl>
+                                  <Textarea
+                                    placeholder="Expected output"
+                                    className="bg-slate-600 border-slate-500 text-white"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4 mt-4">
+                          <FormField
+                            control={form.control}
+                            name={`testcases.${index}.timeLimitMs`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-slate-200">Time Limit (ms)</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="number"
+                                    placeholder="1000"
+                                    className="bg-slate-600 border-slate-500 text-white"
+                                    {...field}
+                                    onChange={(e) => field.onChange(Number(e.target.value))}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name={`testcases.${index}.isPublic`}
+                            render={({ field }) => (
+                              <FormItem className="flex items-center space-x-2 mt-8">
+                                <FormControl>
+                                  <input
+                                    type="checkbox"
+                                    checked={field.value}
+                                    onChange={field.onChange}
+                                    className="w-4 h-4"
+                                  />
+                                </FormControl>
+                                <FormLabel className="text-slate-200">Public Test Case</FormLabel>
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+
+                <div className="flex justify-end space-x-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsQuestionDialogOpen(false)}
+                    className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="bg-purple-600 hover:bg-purple-700"
+                  >
+                    {isSubmitting ? "Creating..." : "Create Question"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </DialogContent>
+        )}
+      </Dialog>
 
       <Footer />
     </div>

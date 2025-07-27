@@ -52,6 +52,9 @@ public class Question {
     private Integer upvotes = 0;
     private Integer downvotes = 0;
 
+    @Column(name = "is_approved", nullable = false)
+    private Boolean isApproved = false;
+
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

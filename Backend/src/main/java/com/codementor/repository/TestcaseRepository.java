@@ -8,4 +8,5 @@ import java.util.List;
 @Repository
 public interface TestcaseRepository extends JpaRepository<Testcase, Integer> {
     List<Testcase> findByQuestionIdAndIsPublicTrueOrderByIdAsc(Integer questionId);
+    List<Testcase> findByQuestionId(Integer questionId);
 } 
