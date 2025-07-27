@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Markdown } from "@/components/ui/markdown";
 import { 
   FileText, Search, Edit, Trash2, ArrowLeft, 
   CheckCircle, XCircle, Eye, Calendar, User, Tag
@@ -358,9 +359,7 @@ const AdminArticles = () => {
                   <div>
                     <Label className="text-slate-400">Content</Label>
                     <div className="mt-2 p-4 bg-slate-900 rounded-lg border border-slate-600">
-                      <div className="prose prose-invert max-w-none">
-                        <div dangerouslySetInnerHTML={{ __html: selectedArticle.content }} />
-                      </div>
+                      <Markdown content={selectedArticle.content} />
                     </div>
                   </div>
                 </div>

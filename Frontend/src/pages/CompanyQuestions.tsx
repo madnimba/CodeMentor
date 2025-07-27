@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Markdown } from "@/components/ui/markdown";
 import {
   Building2, ArrowLeft, CheckCircle, Code2,
   ChevronDown, ChevronUp, Plus, X, Trash2
@@ -44,6 +45,7 @@ interface Question {
   solution?: string;
   status?: "solved" | "attempted" | "unsolved";
   tags?: string[];
+  isCoding: boolean;
 }
 
 interface Company {
@@ -97,6 +99,7 @@ const CompanyQuestions = () => {
       trackId: 0,
       subtopicId: undefined,
       companyId: companyId ? Number(companyId) : undefined,
+      isCoding: false,
       testcases: [{ input: "", expectedOutput: "", timeLimitMs: 1000, isPublic: false }],
     },
   });
@@ -172,6 +175,7 @@ const CompanyQuestions = () => {
           solution: cq.solution ?? "",
           status: cq.status ?? "unsolved",
           tags: cq.tags ?? [],
+          isCoding: cq.isCoding ?? false,
         }));
 
         setQuestions(mappedQuestions);
@@ -403,10 +407,6 @@ const CompanyQuestions = () => {
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
                           <Code2 className="w-5 h-5 text-purple-400" />
-                          {/* <h3
-                            className="text-xl font-semibold text-white"
-                            dangerouslySetInnerHTML={{ __html: question.description }}
-                          /> */}
                           <Badge
                             className={`${
                               question.difficulty === 'Easy'
@@ -418,11 +418,17 @@ const CompanyQuestions = () => {
                           >
                             {question.difficulty}
                           </Badge>
+                          <Badge className={
+                            question.isCoding 
+                              ? "bg-purple-500/20 text-purple-400 border-purple-500/30" 
+                              : "bg-gray-500/20 text-gray-400 border-gray-500/30"
+                          }>
+                            {question.isCoding ? "Coding" : "Theory"}
+                          </Badge>
                         </div>
-                        <div
-                          className="text-slate-400"
-                          dangerouslySetInnerHTML={{ __html: question.description }}
-                        />
+                        <div className="text-slate-400">
+                          <Markdown content={question.description} />
+                        </div>
                         {question.importanceTag && (
                           <Badge variant="outline" className="text-slate-400 border-slate-600">
                             {question.importanceTag}
@@ -447,25 +453,24 @@ const CompanyQuestions = () => {
                             )}
                           </Button>
                         )}
-                        <Button
-                          className="bg-purple-600 hover:bg-purple-700"
-                          onClick={() =>
-                            navigate(`/companies/${companyId}/questions/${question.id}`)
-                          }
-                        >
-                          Solve This
-                        </Button>
+                        {question.isCoding && (
+                          <Button
+                            className="bg-purple-600 hover:bg-purple-700"
+                            onClick={() =>
+                              navigate(`/companies/${companyId}/questions/${question.id}`)
+                            }
+                          >
+                            Solve This
+                          </Button>
+                        )}
                       </div>
                     </div>
 
                     {expandedQuestionId === question.id && question.solution && (
                       <div className="mt-6 border-t border-slate-700 pt-6">
                         <h4 className="text-lg font-semibold text-white mb-4">Solution</h4>
-                        <div className="h-[300px] border border-slate-700 rounded-lg overflow-hidden">
-                        <div
-    className="prose max-w-none text-white"
-    dangerouslySetInnerHTML={{ __html: question.solution }}
-  />
+                        <div className="h-[300px] border border-slate-700 rounded-lg overflow-hidden p-4">
+                          <Markdown content={question.solution} />
                         </div>
                       </div>
                     )}
@@ -657,6 +662,24 @@ const CompanyQuestions = () => {
                     )}
                   />
                 </div>
+
+                <FormField
+                  control={form.control}
+                  name="isCoding"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center space-x-2">
+                      <FormControl>
+                        <input
+                          type="checkbox"
+                          checked={field.value}
+                          onChange={field.onChange}
+                          className="w-4 h-4"
+                        />
+                      </FormControl>
+                      <FormLabel className="text-slate-200">Coding Question</FormLabel>
+                    </FormItem>
+                  )}
+                />
 
                 {/* Testcases Section */}
                 <div className="space-y-4">

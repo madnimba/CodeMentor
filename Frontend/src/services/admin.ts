@@ -50,9 +50,11 @@ export interface AdminQuestion {
   subtopic: string | null;
   createdBy: string | null;
   isApproved: boolean;
+  isCoding: boolean;
   createdAt: string;
   testcaseCount: number;
   solutionCount: number;
+  companies: string[];
 }
 
 export interface AdminCompany {
@@ -92,6 +94,7 @@ export interface UpdateQuestionRequest {
   trackId: number;
   subtopicId?: number;
   isApproved?: boolean;
+  isCoding?: boolean;
   testcases?: Array<{
     input: string;
     expectedOutput: string;

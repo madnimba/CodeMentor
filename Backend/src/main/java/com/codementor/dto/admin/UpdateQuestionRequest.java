@@ -23,6 +23,7 @@ public class UpdateQuestionRequest {
     
     private Integer subtopicId;
     private Boolean isApproved;
+    private Boolean isCoding;
     private List<TestcaseRequest> testcases;
     
     @Data

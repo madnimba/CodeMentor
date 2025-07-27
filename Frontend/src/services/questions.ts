@@ -8,6 +8,7 @@ export interface CreateQuestionRequest {
   trackId: number;
   subtopicId?: number;
   companyId?: number;
+  isCoding?: boolean;
   testcases: TestcaseRequest[];
 }
 
@@ -34,6 +35,7 @@ export interface Question {
   upvotes: number;
   downvotes: number;
   isApproved: boolean;
+  isCoding: boolean;
   createdAt: string;
   testcases: TestcaseResponse[];
 }

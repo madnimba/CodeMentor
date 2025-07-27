@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Markdown } from "@/components/ui/markdown";
 import { ArrowLeft, Code2, Play, CheckCircle, AlertCircle, ChevronDown, Loader2, Search } from "lucide-react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -24,6 +25,17 @@ interface QuestionDetails {
   };
   upvotes: number;
   downvotes: number;
+  examples?: Array<{
+    input: string;
+    output: string;
+    explanation: string;
+  }>;
+  hints?: string[];
+  testCases?: Array<{
+    input: string;
+    target: number;
+    expected: string;
+  }>;
 }
 
 const LiveCoding = () => {
@@ -351,7 +363,7 @@ class Main {
   };
 
   // Mock data - in real app, this would come from an API
-  const questionData = questionDetails || {
+  const questionData: QuestionDetails = questionDetails || {
     title: 'Two Sum',
     description: `Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.\n\nYou may assume that each input would have exactly one solution, and you may not use the same element twice.\n\nYou can return the answer in any order.`,
     difficulty: 'Easy',
@@ -438,13 +450,7 @@ class Main {
                   <CardTitle className="text-white">Description</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="prose prose-invert max-w-none text-slate-300">
-                    <div
-                      dangerouslySetInnerHTML={{
-                        __html: questionData.description,
-                      }}
-                    />
-                  </div>
+                  <Markdown content={questionData.description} />
                 </CardContent>
               </Card>
 

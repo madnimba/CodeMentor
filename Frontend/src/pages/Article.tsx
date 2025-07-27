@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, ThumbsUp, Clock, User, BookOpen, Code2, ExternalLink } from "lucide-react";
 import { useState, useEffect } from "react";
 import { api } from "@/services/api";
+import { Markdown } from "@/components/ui/markdown";
 
 const Article = () => {
   const { slug, subtopicId } = useParams();
@@ -142,28 +143,7 @@ const Article = () => {
               {/* Article Content */}
               <Card className="bg-slate-800/50 border-slate-700 mb-8">
                 <CardContent className="p-8">
-                  <div className="prose prose-invert prose-purple max-w-none">
-                    <div className="text-slate-200 leading-relaxed space-y-6">
-                      {article.content?.split('\n').map((paragraph: string, index: number) => {
-                        if (paragraph.startsWith('# ')) {
-                          return <h1 key={index} className="text-3xl font-bold text-white mt-8 mb-4">{paragraph.slice(2)}</h1>;
-                        }
-                        if (paragraph.startsWith('## ')) {
-                          return <h2 key={index} className="text-2xl font-semibold text-purple-300 mt-6 mb-3">{paragraph.slice(3)}</h2>;
-                        }
-                        if (paragraph.startsWith('### ')) {
-                          return <h3 key={index} className="text-xl font-medium text-slate-200 mt-4 mb-2">{paragraph.slice(4)}</h3>;
-                        }
-                        if (paragraph.startsWith('```')) {
-                          return <pre key={index} className="bg-slate-900 p-4 rounded-lg overflow-x-auto"><code className="text-cyan-300">{paragraph.slice(3)}</code></pre>;
-                        }
-                        if (paragraph.trim() === '') {
-                          return <br key={index} />;
-                        }
-                        return <p key={index} className="mb-4">{paragraph}</p>;
-                      })}
-                    </div>
-                  </div>
+                  <Markdown content={article.content || ''} />
                 </CardContent>
               </Card>
             </div>

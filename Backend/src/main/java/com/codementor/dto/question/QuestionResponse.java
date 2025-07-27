@@ -22,6 +22,7 @@ public class QuestionResponse {
     private Integer upvotes;
     private Integer downvotes;
     private Boolean isApproved;
+    private Boolean isCoding;
     private LocalDateTime createdAt;
     private List<TestcaseResponse> testcases;
 

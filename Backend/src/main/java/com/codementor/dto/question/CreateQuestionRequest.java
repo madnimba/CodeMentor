@@ -26,6 +26,8 @@ public class CreateQuestionRequest {
 
     private Integer companyId;
 
+    private Boolean isCoding = false;
+
     private List<TestcaseRequest> testcases;
 
     @Data

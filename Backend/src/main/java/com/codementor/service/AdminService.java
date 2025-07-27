@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -195,6 +196,9 @@ public class AdminService {
         question.setDifficulty(Question.Difficulty.valueOf(request.getDifficulty()));
         question.setImportanceTag(request.getImportanceTag());
         question.setIsApproved(request.getIsApproved());
+        if (request.getIsCoding() != null) {
+            question.setIsCoding(request.getIsCoding());
+        }
         
         Track track = trackRepository.findById(request.getTrackId())
                 .orElseThrow(() -> new ResourceNotFoundException("Track not found"));
@@ -301,6 +305,12 @@ public class AdminService {
     }
 
     private AdminQuestionResponse mapToAdminQuestionResponse(Question question) {
+        // Get companies associated with this question
+        List<String> companies = companyQuestionRepository.findByQuestionId(question.getId())
+                .stream()
+                .map(cq -> cq.getCompany().getName())
+                .collect(Collectors.toList());
+        
         return AdminQuestionResponse.builder()
                 .id(question.getId())
                 .title(question.getTitle())
@@ -311,9 +321,11 @@ public class AdminService {
                 .subtopic(question.getSubtopic() != null ? question.getSubtopic().getName() : null)
                 .createdBy(question.getCreatedBy() != null ? question.getCreatedBy().getUsername() : null)
                 .isApproved(question.getIsApproved())
+                .isCoding(question.getIsCoding())
                 .createdAt(question.getCreatedAt())
                 .testcaseCount((int) testcaseRepository.countByQuestionId(question.getId()))
                 .solutionCount((int) questionSolutionRepository.countByQuestionId(question.getId()))
+                .companies(companies)
                 .build();
     }
 

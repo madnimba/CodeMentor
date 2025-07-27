@@ -3,6 +3,7 @@ package com.codementor.dto.admin;
 import lombok.Data;
 import lombok.Builder;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -16,7 +17,9 @@ public class AdminQuestionResponse {
     private String subtopic;
     private String createdBy;
     private Boolean isApproved;
+    private Boolean isCoding;
     private LocalDateTime createdAt;
     private Integer testcaseCount;
     private Integer solutionCount;
+    private List<String> companies;
 } 

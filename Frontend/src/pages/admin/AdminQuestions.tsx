@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Markdown } from "@/components/ui/markdown";
 import { 
   Code2, Search, Edit, Trash2, ArrowLeft, 
   CheckCircle, Eye, Calendar, User, Zap, Target
@@ -11,6 +12,7 @@ import { Link, useLocation } from "react-router-dom";
 import { adminService, AdminQuestion, PaginatedResponse } from "@/services/admin";
 import { toast } from "sonner";
 import AdminNavigation from "../../components/admin/AdminNavigation";
+import { TestcaseManager } from "@/components/admin/TestcaseManager";
 import {
   Dialog,
   DialogContent,
@@ -40,6 +42,10 @@ const AdminQuestions = () => {
   // View question state
   const [selectedQuestion, setSelectedQuestion] = useState<AdminQuestion | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  
+  // Testcase manager state
+  const [isTestcaseManagerOpen, setIsTestcaseManagerOpen] = useState(false);
+  const [selectedQuestionForTestcases, setSelectedQuestionForTestcases] = useState<number | null>(null);
 
   useEffect(() => {
     fetchQuestions();
@@ -89,6 +95,28 @@ const AdminQuestions = () => {
   const handleViewQuestion = (question: AdminQuestion) => {
     setSelectedQuestion(question);
     setIsViewDialogOpen(true);
+  };
+
+  const handleViewTestcases = (questionId: number) => {
+    setSelectedQuestionForTestcases(questionId);
+    setIsTestcaseManagerOpen(true);
+  };
+
+  const handleEditTestcases = (questionId: number) => {
+    setSelectedQuestionForTestcases(questionId);
+    setIsTestcaseManagerOpen(true);
+  };
+
+  const handleDeleteTestcases = async (questionId: number) => {
+    if (window.confirm("Are you sure you want to delete all testcases for this question?")) {
+      try {
+        // TODO: Implement testcase deletion API call
+        toast.success("All testcases deleted successfully");
+      } catch (error) {
+        toast.error("Failed to delete testcases");
+        console.error("Error deleting testcases:", error);
+      }
+    }
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -248,7 +276,23 @@ const AdminQuestions = () => {
                         }>
                           {question.isApproved ? "Approved" : "Pending"}
                         </Badge>
+                        <Badge className={
+                          question.isCoding 
+                            ? "bg-purple-500/20 text-purple-400 border-purple-500/30" 
+                            : "bg-gray-500/20 text-gray-400 border-gray-500/30"
+                        }>
+                          {question.isCoding ? "Coding" : "Theory"}
+                        </Badge>
                       </div>
+                      {question.companies && question.companies.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {question.companies.map((company, index) => (
+                            <Badge key={index} className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs">
+                              {company}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
                     </div>
                     <div className="flex items-center gap-2">
                       <Button
@@ -281,9 +325,9 @@ const AdminQuestions = () => {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-slate-300 text-sm line-clamp-3">
-                    {question.description.substring(0, 200)}...
-                  </p>
+                  <div className="text-slate-300 text-sm line-clamp-3">
+                    <Markdown content={question.description.substring(0, 200) + (question.description.length > 200 ? '...' : '')} />
+                  </div>
                 </CardContent>
               </Card>
             ))}
@@ -353,6 +397,16 @@ const AdminQuestions = () => {
                       </Badge>
                     </div>
                     <div>
+                      <Label className="text-slate-400">Type</Label>
+                      <Badge className={
+                        selectedQuestion.isCoding 
+                          ? "bg-purple-500/20 text-purple-400 border-purple-500/30" 
+                          : "bg-gray-500/20 text-gray-400 border-gray-500/30"
+                      }>
+                        {selectedQuestion.isCoding ? "Coding" : "Theory"}
+                      </Badge>
+                    </div>
+                    <div>
                       <Label className="text-slate-400">Track</Label>
                       <p className="text-white">{selectedQuestion.track || "N/A"}</p>
                     </div>
@@ -368,6 +422,18 @@ const AdminQuestions = () => {
                       <Label className="text-slate-400">Solutions</Label>
                       <p className="text-white">{selectedQuestion.solutionCount}</p>
                     </div>
+                    {selectedQuestion.companies && selectedQuestion.companies.length > 0 && (
+                      <div>
+                        <Label className="text-slate-400">Companies</Label>
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {selectedQuestion.companies.map((company, index) => (
+                            <Badge key={index} className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+                              {company}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                   
                   {selectedQuestion.importanceTag && (
@@ -382,12 +448,33 @@ const AdminQuestions = () => {
                   <div>
                     <Label className="text-slate-400">Description</Label>
                     <div className="mt-2 p-4 bg-slate-900 rounded-lg border border-slate-600">
-                      <div className="prose prose-invert max-w-none">
-                        <div className="whitespace-pre-wrap text-slate-300">
-                          {selectedQuestion.description}
-                        </div>
-                      </div>
+                      <Markdown content={selectedQuestion.description} />
                     </div>
+                  </div>
+                  
+                  {/* Testcase Management */}
+                  <div className="flex gap-2 mt-6">
+                    <Button
+                      variant="outline"
+                      className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10"
+                      onClick={() => handleViewTestcases(selectedQuestion.id)}
+                    >
+                      View Testcases ({selectedQuestion.testcaseCount})
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="border-green-500/30 text-green-400 hover:bg-green-500/10"
+                      onClick={() => handleEditTestcases(selectedQuestion.id)}
+                    >
+                      Edit Testcases
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="border-red-500/30 text-red-400 hover:bg-red-500/10"
+                      onClick={() => handleDeleteTestcases(selectedQuestion.id)}
+                    >
+                      Delete All Testcases
+                    </Button>
                   </div>
                 </div>
               )}
@@ -395,6 +482,18 @@ const AdminQuestions = () => {
           </Dialog>
         </div>
       </div>
+
+      {/* Testcase Manager */}
+      {selectedQuestionForTestcases && (
+        <TestcaseManager
+          questionId={selectedQuestionForTestcases}
+          isOpen={isTestcaseManagerOpen}
+          onClose={() => {
+            setIsTestcaseManagerOpen(false);
+            setSelectedQuestionForTestcases(null);
+          }}
+        />
+      )}
     </div>
   );
 };

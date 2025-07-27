@@ -18,4 +18,7 @@ public interface CompanyQuestionRepository extends JpaRepository<CompanyQuestion
 
     CompanyQuestion findByCompanyIdAndQuestionId(Integer companyId, Integer questionId);
     long countByCompanyId(Integer companyId);
+    
+    @Query("SELECT cq FROM CompanyQuestion cq JOIN FETCH cq.company WHERE cq.question.id = :questionId")
+    List<CompanyQuestion> findByQuestionId(Integer questionId);
 }   

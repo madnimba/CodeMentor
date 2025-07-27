@@ -18,24 +18,24 @@ public class Question {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String title;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 255)
     private String slug;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "content_fingerprint", nullable = false)
+    @Column(name = "content_fingerprint", nullable = false, columnDefinition = "TEXT")
     private String contentFingerprint;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Difficulty difficulty;
+    @Column(nullable = false, length = 20)
+    private Difficulty difficulty = Difficulty.Medium;
 
-    @Column(name = "importance_tag")
-    private String importanceTag;
+    @Column(name = "importance_tag", length = 100)
+    private String importanceTag = "Medium";
 
     @ManyToOne
     @JoinColumn(name = "track_id")
@@ -49,15 +49,21 @@ public class Question {
     @JoinColumn(name = "created_by")
     private User createdBy;
 
+    @Column(nullable = false)
     private Integer upvotes = 0;
-    private Integer downvotes = 0;
 
-    @Column(name = "is_approved", nullable = false)
-    private Boolean isApproved = false;
+    @Column(nullable = false)
+    private Integer downvotes = 0;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "is_approved", nullable = false)
+    private Boolean isApproved = false;
+
+    @Column(name = "is_coding", nullable = false)
+    private Boolean isCoding = false;
 
     public enum Difficulty {
         Easy, Medium, Hard

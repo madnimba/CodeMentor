@@ -52,6 +52,7 @@ public class QuestionService {
         question.setUpvotes(0);
         question.setDownvotes(0);
         question.setIsApproved(false);
+        question.setIsCoding(request.getIsCoding() != null ? request.getIsCoding() : false);
 
         Question savedQuestion = questionRepository.save(question);
 
@@ -127,6 +128,7 @@ public class QuestionService {
         response.setUpvotes(question.getUpvotes());
         response.setDownvotes(question.getDownvotes());
         response.setIsApproved(question.getIsApproved());
+        response.setIsCoding(question.getIsCoding());
         response.setCreatedAt(question.getCreatedAt());
 
         // Get testcases for this question
