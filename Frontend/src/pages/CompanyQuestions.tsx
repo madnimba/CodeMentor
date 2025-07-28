@@ -259,11 +259,16 @@ const CompanyQuestions = () => {
           {startPage > 0 && (
             <>
               <PaginationItem>
-                <PaginationLink onClick={() => handlePageChange(0)}>1</PaginationLink>
+                <PaginationLink 
+                  onClick={() => handlePageChange(0)}
+                  className="bg-slate-700/50 text-slate-300 border-slate-600 hover:bg-slate-600/50 hover:text-white"
+                >
+                  1
+                </PaginationLink>
               </PaginationItem>
               {startPage > 1 && (
                 <PaginationItem>
-                  <PaginationEllipsis />
+                  <PaginationEllipsis className="text-slate-400" />
                 </PaginationItem>
               )}
             </>
@@ -274,7 +279,11 @@ const CompanyQuestions = () => {
               <PaginationLink 
                 onClick={() => handlePageChange(page)}
                 isActive={page === currentPage}
-                className="cursor-pointer"
+                className={`cursor-pointer ${
+                  page === currentPage 
+                    ? "bg-white text-black border-white" 
+                    : "bg-slate-700/50 text-slate-300 border-slate-600 hover:bg-slate-600/50 hover:text-white"
+                }`}
               >
                 {page + 1}
               </PaginationLink>
@@ -285,11 +294,14 @@ const CompanyQuestions = () => {
             <>
               {endPage < totalPages - 2 && (
                 <PaginationItem>
-                  <PaginationEllipsis />
+                  <PaginationEllipsis className="text-slate-400" />
                 </PaginationItem>
               )}
               <PaginationItem>
-                <PaginationLink onClick={() => handlePageChange(totalPages - 1)}>
+                <PaginationLink 
+                  onClick={() => handlePageChange(totalPages - 1)}
+                  className="bg-slate-700/50 text-slate-300 border-slate-600 hover:bg-slate-600/50 hover:text-white"
+                >
                   {totalPages}
                 </PaginationLink>
               </PaginationItem>
@@ -439,7 +451,7 @@ const CompanyQuestions = () => {
                         {question.solution && (
                           <Button
                             variant="outline"
-                            className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
+                            className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10 hover:text-purple-300"
                             onClick={() => toggleAnswer(question.id)}
                           >
                             {expandedQuestionId === question.id ? (
@@ -469,8 +481,10 @@ const CompanyQuestions = () => {
                     {expandedQuestionId === question.id && question.solution && (
                       <div className="mt-6 border-t border-slate-700 pt-6">
                         <h4 className="text-lg font-semibold text-white mb-4">Solution</h4>
-                        <div className="h-[300px] border border-slate-700 rounded-lg overflow-hidden p-4">
-                          <Markdown content={question.solution} />
+                        <div className="h-[300px] border border-slate-700 rounded-lg overflow-hidden p-4 bg-slate-700/50">
+                          <div className="text-slate-200">
+                            <Markdown content={question.solution} />
+                          </div>
                         </div>
                       </div>
                     )}

@@ -37,4 +37,7 @@ public interface ArticleRepository extends JpaRepository<Article, Integer> {
     
     @Query("SELECT COUNT(a) FROM Article a WHERE a.isApproved = false")
     long countByIsApprovedFalse();
+    
+    @Query("SELECT a FROM Article a WHERE a.isApproved = false")
+    List<Article> findByIsApprovedFalse();
 } 

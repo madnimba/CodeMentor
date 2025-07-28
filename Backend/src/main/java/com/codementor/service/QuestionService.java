@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -85,6 +86,11 @@ public class QuestionService {
         return mapToQuestionResponse(savedQuestion);
     }
 
+    public org.springframework.data.domain.Page<QuestionResponse> getCodingQuestions(Pageable pageable) {
+        return questionRepository.findByIsCodingTrue(pageable)
+                .map(this::mapToQuestionResponse);
+    }
+
     private User getCurrentUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByEmail(email)
@@ -117,21 +123,38 @@ public class QuestionService {
         response.setTitle(question.getTitle());
         response.setSlug(question.getSlug());
         response.setDescription(question.getDescription());
-        response.setDifficulty(question.getDifficulty().name());
-        response.setImportanceTag(question.getImportanceTag());
-        response.setTrackId(question.getTrack().getId());
-        response.setTrackName(question.getTrack().getName());
+        response.setDifficulty(question.getDifficulty() != null ? question.getDifficulty().name() : null);
+        response.setImportanceTag(question.getImportanceTag() != null ? question.getImportanceTag() : null);
+        
+        // Add null checks for Track
+        if (question.getTrack() != null) {
+            response.setTrackId(question.getTrack().getId());
+            response.setTrackName(question.getTrack().getName());
+        }
+        
         if (question.getSubtopic() != null) {
             response.setSubtopicId(question.getSubtopic().getId());
             response.setSubtopicName(question.getSubtopic().getName());
         }
-        response.setCreatedById(question.getCreatedBy().getId());
-        response.setCreatedByUsername(question.getCreatedBy().getUsername());
+        
+        // Add null checks for CreatedBy
+        if (question.getCreatedBy() != null) {
+            response.setCreatedById(question.getCreatedBy().getId());
+            response.setCreatedByUsername(question.getCreatedBy().getUsername());
+        }
+        
         response.setUpvotes(question.getUpvotes());
         response.setDownvotes(question.getDownvotes());
         response.setIsApproved(question.getIsApproved());
         response.setIsCoding(question.getIsCoding());
-        response.setCreatedAt(question.getCreatedAt());
+        response.setCreatedAt(question.getCreatedAt() != null ? question.getCreatedAt() : null);
+
+        // Get companies associated with this question
+        List<CompanyQuestion> companyQuestions = companyQuestionRepository.findByQuestionId(question.getId());
+        if (!companyQuestions.isEmpty()) {
+            // Use the first company name (you might want to show all companies in the future)
+            response.setCompanyName(companyQuestions.get(0).getCompany().getName());
+        }
 
         // Get testcases for this question
         List<Testcase> testcases = testcaseRepository.findByQuestionId(question.getId());

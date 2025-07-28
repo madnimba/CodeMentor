@@ -6,6 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Markdown } from "@/components/ui/markdown";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { 
   ArrowLeft, 
   Code2, 
@@ -22,6 +32,7 @@ import { useToast } from "@/components/ui/use-toast";
 interface Problem {
   id: number;
   title: string;
+  description: string;
   difficulty: "Easy" | "Medium" | "Hard";
   company?: string;
   isCoding: boolean;
@@ -35,6 +46,12 @@ const ProblemSelection = () => {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize] = useState(10); // 10 problems per page
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
 
   // Fetch coding problems from all companies
   useEffect(() => {
@@ -43,35 +60,23 @@ const ProblemSelection = () => {
       setError(null);
       
       try {
-        // First, get all companies
-        const companiesResponse = await api.get('/companies');
-        const companies = companiesResponse.data;
+        // Use the global coding questions endpoint with pagination
+        const response = await api.get(`/questions/coding/paginated?page=${currentPage}&size=${pageSize}`);
+        const pageData = response.data.data;
         
-        // Then, get coding questions from each company
-        const allCodingProblems: Problem[] = [];
-        
-        for (const company of companies) {
-          try {
-            const codingQuestionsResponse = await api.get(`/companies/${company.id}/questions/coding`);
-            console.log(`Coding questions for ${company.name}:`, codingQuestionsResponse.data);
-            
-            if (codingQuestionsResponse.data && codingQuestionsResponse.data.length > 0) {
-              const companyQuestions = codingQuestionsResponse.data.map((q: any) => ({
-                id: q.id,
-                title: q.title,
-                difficulty: q.difficulty as "Easy" | "Medium" | "Hard",
-                company: company.name,
-                isCoding: q.isCoding || true
-              }));
-              allCodingProblems.push(...companyQuestions);
-            }
-          } catch (err) {
-            console.warn(`Failed to fetch coding questions for company ${company.name}:`, err);
-          }
-        }
+        const allCodingProblems: Problem[] = pageData.content.map((q: any) => ({
+          id: q.id,
+          title: q.title,
+          description: q.description || "",
+          difficulty: q.difficulty as "Easy" | "Medium" | "Hard",
+          company: q.companyName || "Unknown", // Use company name from response
+          isCoding: q.isCoding || true
+        }));
         
         console.log('Total coding problems found:', allCodingProblems.length);
         setProblems(allCodingProblems);
+        setTotalPages(pageData.totalPages);
+        setTotalElements(pageData.totalElements);
         setLoading(false);
         
         if (allCodingProblems.length === 0) {
@@ -88,8 +93,8 @@ const ProblemSelection = () => {
       }
     };
 
-        fetchCodingProblems();
-  }, [toast]);
+    fetchCodingProblems();
+  }, [toast, currentPage, pageSize]);
 
   // Filter problems
   const filteredProblems = useMemo(() => {
@@ -103,6 +108,99 @@ const ProblemSelection = () => {
       return matchesSearch && matchesDifficulty;
     });
   }, [problems, searchTerm, selectedDifficulty]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+
+    const pages = [];
+    const maxVisiblePages = 5;
+    let startPage = Math.max(0, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 1);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(0, endPage - maxVisiblePages + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return (
+      <Pagination className="mt-8">
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious 
+              onClick={() => handlePageChange(Math.max(0, currentPage - 1))}
+              className={currentPage === 0 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+            />
+          </PaginationItem>
+          
+          {startPage > 0 && (
+            <>
+              <PaginationItem>
+                <PaginationLink 
+                  onClick={() => handlePageChange(0)}
+                  className="bg-slate-700/50 text-slate-300 border-slate-600 hover:bg-slate-600/50 hover:text-white"
+                >
+                  1
+                </PaginationLink>
+              </PaginationItem>
+              {startPage > 1 && (
+                <PaginationItem>
+                  <PaginationEllipsis className="text-slate-400" />
+                </PaginationItem>
+              )}
+            </>
+          )}
+
+          {pages.map((page) => (
+            <PaginationItem key={page}>
+              <PaginationLink 
+                onClick={() => handlePageChange(page)}
+                isActive={page === currentPage}
+                className={`cursor-pointer ${
+                  page === currentPage 
+                    ? "bg-white text-black border-white" 
+                    : "bg-slate-700/50 text-slate-300 border-slate-600 hover:bg-slate-600/50 hover:text-white"
+                }`}
+              >
+                {page + 1}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+
+          {endPage < totalPages - 1 && (
+            <>
+              {endPage < totalPages - 2 && (
+                <PaginationItem>
+                  <PaginationEllipsis className="text-slate-400" />
+                </PaginationItem>
+              )}
+              <PaginationItem>
+                <PaginationLink 
+                  onClick={() => handlePageChange(totalPages - 1)}
+                  className="bg-slate-700/50 text-slate-300 border-slate-600 hover:bg-slate-600/50 hover:text-white"
+                >
+                  {totalPages}
+                </PaginationLink>
+              </PaginationItem>
+            </>
+          )}
+
+          <PaginationItem>
+            <PaginationNext 
+              onClick={() => handlePageChange(Math.min(totalPages - 1, currentPage + 1))}
+              className={currentPage === totalPages - 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
+    );
+  };
 
   const handleProblemSelect = (problem: Problem) => {
     // Navigate to the live coding page with the selected problem
@@ -237,8 +335,8 @@ const ProblemSelection = () => {
                     onClick={() => handleProblemSelect(problem)}
                   >
                     <CardContent className="p-6">
-                      <div className="flex justify-between items-center">
-                        <div className="flex-1 space-y-2">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1 space-y-3">
                           <div className="flex items-center gap-3">
                             <h3 className="text-xl font-semibold text-white">{problem.title}</h3>
                             <Badge className={`${
@@ -250,6 +348,12 @@ const ProblemSelection = () => {
                             </Badge>
                           </div>
                           
+                          {problem.description && (
+                            <div className="text-slate-300 text-sm">
+                              <Markdown content={problem.description} />
+                            </div>
+                          )}
+                          
                           {problem.company && (
                             <div className="flex items-center gap-1 text-sm text-slate-400">
                               <Building2 className="w-4 h-4" />
@@ -258,7 +362,7 @@ const ProblemSelection = () => {
                           )}
                         </div>
                         
-                        <Button className="bg-purple-600 hover:bg-purple-700">
+                        <Button className="bg-purple-600 hover:bg-purple-700 ml-4">
                           Solve
                         </Button>
                       </div>
@@ -274,6 +378,7 @@ const ProblemSelection = () => {
                   </div>
                 )}
               </div>
+              {renderPagination()}
             </div>
           </div>
         </div>

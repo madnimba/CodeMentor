@@ -15,20 +15,20 @@ public class Testcase {
     @JoinColumn(name = "question_id")
     private Question question;
 
-    @Column(name = "test1", columnDefinition = "TEXT")
+    @Column(name = "test1", columnDefinition = "TEXT", nullable = false)
     private String test1;
 
-    @Column(name = "output1", columnDefinition = "TEXT")
+    @Column(name = "output1", columnDefinition = "TEXT", nullable = false)
     private String output1;
 
     @Column(name = "test2", columnDefinition = "TEXT")
     private String test2;
 
-    @Column(name = "output2", columnDefinition = "TEXT")
-    private String output2;
-
     @Column(name = "test3", columnDefinition = "TEXT")
     private String test3;
+
+    @Column(name = "output2", columnDefinition = "TEXT")
+    private String output2;
 
     @Column(name = "output3", columnDefinition = "TEXT")
     private String output3;

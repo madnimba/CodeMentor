@@ -24,6 +24,7 @@ public class QuestionResponse {
     private Boolean isApproved;
     private Boolean isCoding;
     private LocalDateTime createdAt;
+    private String companyName;
     private List<TestcaseResponse> testcases;
 
     @Data

@@ -13,6 +13,7 @@ import Editor from "@monaco-editor/react";
 import { useToast } from "@/components/ui/use-toast";
 import { judge0Service, CodeExecutionResponse } from "@/services/judge0";
 import { api } from "@/services/api";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from "@/components/ui/pagination";
 
 interface QuestionDetails {
   title: string;
@@ -52,6 +53,9 @@ const LiveCoding = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [serverHealth, setServerHealth] = useState<any>(null);
   const [questions, setQuestions] = useState<any[]>([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
   const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -108,6 +112,28 @@ const LiveCoding = () => {
     };
     fetchQuestionDetails();
   }, [companyId, questionId]);
+
+  // Fetch paginated coding questions
+  useEffect(() => {
+    const fetchCodingQuestions = async () => {
+      setIsLoadingQuestions(true);
+      try {
+        const response = await api.get(`/questions/coding/paginated?page=${currentPage}&size=${pageSize}`);
+        const pageData = response.data.data;
+        setQuestions(pageData.content);
+        setTotalPages(pageData.totalPages);
+      } catch (error: any) {
+        toast({
+          title: 'Error',
+          description: 'Failed to load coding questions',
+          variant: 'destructive',
+        });
+      } finally {
+        setIsLoadingQuestions(false);
+      }
+    };
+    fetchCodingQuestions();
+  }, [currentPage, pageSize]);
 
   // Update question data when a question is selected
   const updateQuestionData = (question: QuestionDetails) => {
@@ -433,6 +459,67 @@ const LiveCoding = () => {
 
       <div className="pt-24 pb-16 px-4">
         <div className="max-w-7xl mx-auto">
+          {/* Questions List Sidebar */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-white mb-4">Coding Questions</h2>
+            <div className="space-y-4 mb-4">
+              {questions.length === 0 ? (
+                <div className="text-slate-400">No coding questions found.</div>
+              ) : (
+                questions.map((q: any) => (
+                  <Card key={q.id} className={`bg-slate-800/50 border-slate-700 cursor-pointer hover:border-purple-500/50 transition-colors ${selectedQuestion?.id === q.id ? 'border-purple-500' : ''}`}
+                    onClick={() => setSelectedQuestion(q)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex flex-col gap-2">
+                        <div className="text-lg font-semibold text-white">
+                          <Markdown content={q.title} />
+                        </div>
+                        <div className="text-slate-300 text-sm">
+                          <Markdown content={q.description} />
+                        </div>
+                        <Badge className={`w-fit mt-1 ${
+                          q.difficulty === 'Easy' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
+                          q.difficulty === 'Medium' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' :
+                          'bg-red-500/20 text-red-400 border-red-500/30'
+                        }`}>
+                          {q.difficulty}
+                        </Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <Pagination className="mt-4">
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious onClick={() => setCurrentPage(Math.max(0, currentPage - 1))} className={currentPage === 0 ? "pointer-events-none opacity-50" : "cursor-pointer"} />
+                  </PaginationItem>
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <PaginationItem key={i}>
+                      <PaginationLink
+                        onClick={() => setCurrentPage(i)}
+                        isActive={i === currentPage}
+                        className={`cursor-pointer ${
+                          i === currentPage
+                            ? "bg-white text-black border-white"
+                            : "bg-slate-700/50 text-slate-300 border-slate-600 hover:bg-slate-600/50 hover:text-white"
+                        }`}
+                      >
+                        {i + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  <PaginationItem>
+                    <PaginationNext onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))} className={currentPage === totalPages - 1 ? "pointer-events-none opacity-50" : "cursor-pointer"} />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            )}
+          </div>
           {/* Back Button and Question Info */}
           <div className="mb-8">
             <Button asChild variant="ghost" className="text-slate-400 hover:text-white mb-4">
