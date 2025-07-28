@@ -72,10 +72,12 @@ public class QuestionService {
             for (CreateQuestionRequest.TestcaseRequest testcaseRequest : request.getTestcases()) {
                 Testcase testcase = new Testcase();
                 testcase.setQuestion(savedQuestion);
-                testcase.setInput(testcaseRequest.getInput());
-                testcase.setExpectedOutput(testcaseRequest.getExpectedOutput());
-                testcase.setTimeLimitMs(testcaseRequest.getTimeLimitMs());
-                testcase.setIsPublic(testcaseRequest.getIsPublic());
+                testcase.setTest1(testcaseRequest.getTest1());
+                testcase.setOutput1(testcaseRequest.getOutput1());
+                testcase.setTest2(testcaseRequest.getTest2());
+                testcase.setOutput2(testcaseRequest.getOutput2());
+                testcase.setTest3(testcaseRequest.getTest3());
+                testcase.setOutput3(testcaseRequest.getOutput3());
                 testcaseRepository.save(testcase);
             }
         }
@@ -144,10 +146,12 @@ public class QuestionService {
     private QuestionResponse.TestcaseResponse mapToTestcaseResponse(Testcase testcase) {
         QuestionResponse.TestcaseResponse response = new QuestionResponse.TestcaseResponse();
         response.setId(testcase.getId());
-        response.setInput(testcase.getInput());
-        response.setExpectedOutput(testcase.getExpectedOutput());
-        response.setTimeLimitMs(testcase.getTimeLimitMs());
-        response.setIsPublic(testcase.getIsPublic());
+        response.setTest1(testcase.getTest1());
+        response.setOutput1(testcase.getOutput1());
+        response.setTest2(testcase.getTest2());
+        response.setOutput2(testcase.getOutput2());
+        response.setTest3(testcase.getTest3());
+        response.setOutput3(testcase.getOutput3());
         return response;
     }
 } 

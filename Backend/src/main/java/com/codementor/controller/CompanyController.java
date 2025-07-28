@@ -50,6 +50,18 @@ public class CompanyController {
         return ResponseEntity.ok(companyQuestionService.getCompanyQuestions(companyId, pageable));
     }
 
+    @GetMapping("/{companyId}/questions/coding")
+    public ResponseEntity<List<CompanyQuestionDTO>> getCompanyCodingQuestions(@PathVariable Integer companyId) {
+        return ResponseEntity.ok(companyQuestionService.getCompanyCodingQuestions(companyId));
+    }
+
+    @GetMapping("/{companyId}/questions/coding/paginated")
+    public ResponseEntity<Page<CompanyQuestionDTO>> getCompanyCodingQuestionsPaginated(
+            @PathVariable Integer companyId,
+            Pageable pageable) {
+        return ResponseEntity.ok(companyQuestionService.getCompanyCodingQuestions(companyId, pageable));
+    }
+
     @GetMapping("/{companyId}/questions/{questionId}")
     public ResponseEntity<CompanyQuestionDTO> getCompanyQuestion(
             @PathVariable Integer companyId,

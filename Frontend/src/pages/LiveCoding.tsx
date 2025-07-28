@@ -25,17 +25,16 @@ interface QuestionDetails {
   };
   upvotes: number;
   downvotes: number;
-  examples?: Array<{
-    input: string;
-    output: string;
-    explanation: string;
+  testcases?: Array<{
+    id: number;
+    test1: string;
+    output1: string;
+    test2: string;
+    output2: string;
+    test3: string;
+    output3: string;
   }>;
   hints?: string[];
-  testCases?: Array<{
-    input: string;
-    target: number;
-    expected: string;
-  }>;
 }
 
 const LiveCoding = () => {
@@ -46,41 +45,7 @@ const LiveCoding = () => {
   
   const [activeTab, setActiveTab] = useState("description");
   const [selectedLanguage, setSelectedLanguage] = useState("javascript");
-  const [code, setCode] = useState(`// Write your solution here
-function solution(nums, target) {
-    // Create a map to store numbers and their indices
-    const numMap = new Map();
-    
-    // Iterate through the array
-    for (let i = 0; i < nums.length; i++) {
-        // Calculate the complement needed
-        const complement = target - nums[i];
-        
-        // If complement exists in map, we found our pair
-        if (numMap.has(complement)) {
-            return [numMap.get(complement), i];
-        }
-        
-        // Store current number and its index
-        numMap.set(nums[i], i);
-    }
-    
-    // No solution found
-    return [];
-}
-
-// Test cases
-console.log("Test Case 1:");
-console.log("Input: nums = [2,7,11,15], target = 9");
-console.log("Output:", solution([2,7,11,15], 9));
-
-console.log("\\nTest Case 2:");
-console.log("Input: nums = [3,2,4], target = 6");
-console.log("Output:", solution([3,2,4], 6));
-
-console.log("\\nTest Case 3:");
-console.log("Input: nums = [3,3], target = 6");
-console.log("Output:", solution([3,3], 6));`);
+  const [code, setCode] = useState("");
   
   const [output, setOutput] = useState<string[]>([]);
   const [isRunning, setIsRunning] = useState(false);
@@ -90,16 +55,45 @@ console.log("Output:", solution([3,3], 6));`);
   const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [submissionResult, setSubmissionResult] = useState<'success' | 'failure' | null>(null);
+  const [testInput, setTestInput] = useState(""); // New state for test input
   const { toast } = useToast();
   const [questionDetails, setQuestionDetails] = useState<QuestionDetails | null>(null);
 
   // Fetch questions from the database
   useEffect(() => {
     const fetchQuestionDetails = async () => {
-      if (!companyId || !questionId) return;
+      if (!questionId) return;
       setIsLoadingQuestions(true);
       try {
-        const response = await api.get(`/companies/${companyId}/questions/${questionId}/details`);
+        let response;
+        if (companyId) {
+          // If we have companyId, use the company-specific endpoint
+          response = await api.get(`/companies/${companyId}/questions/${questionId}/details`);
+        } else {
+          // If no companyId, we need to find the question from all companies
+          // For now, let's use a fallback approach
+          const companiesResponse = await api.get('/companies');
+          const companies = companiesResponse.data;
+          
+          let foundQuestion = null;
+          for (const company of companies) {
+            try {
+              const questionResponse = await api.get(`/companies/${company.id}/questions/${questionId}/details`);
+              foundQuestion = questionResponse.data;
+              break;
+            } catch (err) {
+              // Continue to next company
+            }
+          }
+          
+          if (!foundQuestion) {
+            throw new Error('Question not found');
+          }
+          
+          response = { data: foundQuestion };
+        }
+        
         setQuestionDetails(response.data);
         updateQuestionData(response.data);
       } catch (error: any) {
@@ -119,62 +113,8 @@ console.log("Output:", solution([3,3], 6));`);
   const updateQuestionData = (question: QuestionDetails) => {
     setSelectedQuestion(question);
     
-    // Update code template based on the question
-    const templates = {
-      javascript: `// ${question.title}
-// ${question.description}
-
-function solution() {
-    // Your solution here
-    return null;
-}
-
-// Test your solution here
-console.log("Testing solution...");`,
-      python: `# ${question.title}
-# ${question.description}
-
-def solution():
-    # Your solution here
-    return None
-
-# Test your solution here
-print("Testing solution...")`,
-      cpp: `#include <iostream>
-#include <vector>
-using namespace std;
-
-// ${question.title}
-// ${question.description}
-
-// Your solution here
-void solution() {
-    // Implementation
-}
-
-int main() {
-    cout << "Testing solution..." << endl;
-    return 0;
-}`,
-      java: `import java.util.*;
-
-// ${question.title}
-// ${question.description}
-
-class Solution {
-    public void solution() {
-        // Your solution here
-    }
-}
-
-class Main {
-    public static void main(String[] args) {
-        System.out.println("Testing solution...");
-    }
-}`
-    };
-    
-    setCode(templates[selectedLanguage as keyof typeof templates] || templates.javascript);
+    // Don't set any default code template - let users start with empty editor
+    // setCode(templates[selectedLanguage as keyof typeof templates] || templates.javascript);
   };
 
   // Filter questions based on search term
@@ -224,11 +164,13 @@ class Main {
 
     setIsRunning(true);
     setOutput([]);
+    setSubmissionResult(null); // Reset submission result for normal run
 
     try {
       const result: CodeExecutionResponse = await judge0Service.executeCode({
         code: code,
-        language: selectedLanguage
+        language: selectedLanguage,
+        input: testInput // Pass the test input
       });
 
       // Process the result
@@ -283,83 +225,164 @@ class Main {
     }
   };
 
+  const handleSubmit = async () => {
+    if (!isConnected) {
+      toast({
+        title: "Error",
+        description: "Not connected to code execution service. Please wait...",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!questionDetails?.testcases || questionDetails.testcases.length === 0) {
+      toast({
+        title: "Error",
+        description: "No test cases available for this question",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsRunning(true);
+    setOutput([]);
+
+    try {
+      const testCase = questionDetails.testcases[0]; // Use the first test case
+      const testCases = [
+        { input: testCase.test1, expected: testCase.output1, name: "Test Case 1" },
+        { input: testCase.test2, expected: testCase.output2, name: "Test Case 2" },
+        { input: testCase.test3, expected: testCase.output3, name: "Test Case 3" }
+      ];
+
+      // Filter out test cases that don't have input or expected output
+      const validTestCases = testCases.filter(tc => tc.input && tc.expected);
+
+      if (validTestCases.length === 0) {
+        toast({
+          title: "Error",
+          description: "No valid test cases available",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const results = [];
+      const outputLines = [];
+
+      // Execute each test case
+      for (let i = 0; i < validTestCases.length; i++) {
+        const testCase = validTestCases[i];
+        
+        outputLines.push(`\n--- ${testCase.name} ---`);
+        outputLines.push(`Input: ${testCase.input}`);
+        outputLines.push(`Expected: ${testCase.expected}`);
+
+        try {
+          const result: CodeExecutionResponse = await judge0Service.executeCode({
+            code: code,
+            language: selectedLanguage,
+            input: testCase.input
+          });
+
+          // Process the result
+          if (result.stdout) {
+            outputLines.push(`Output: ${result.stdout.trim()}`);
+          }
+          
+          if (result.stderr) {
+            outputLines.push(`Error: ${result.stderr}`);
+          }
+          
+          if (result.compile_output) {
+            outputLines.push(`Compilation: ${result.compile_output}`);
+          }
+
+          // Extract the actual result from the output
+          let actualResult = '';
+          const actualOutput = result.stdout?.trim() || '';
+          const outputLinesArray = actualOutput.split('\n');
+          for (let j = outputLinesArray.length - 1; j >= 0; j--) {
+            const line = outputLinesArray[j].trim();
+            if (line && !line.includes('Input:') && !line.includes('Expected:') && !line.includes('Output:')) {
+              actualResult = line;
+              break;
+            }
+          }
+
+          // Clean up the actual result
+          actualResult = actualResult.replace(/^\[|\]$/g, '');
+          const expectedClean = testCase.expected.trim().replace(/^\[|\]$/g, '');
+
+          // Compare the actual result with expected output
+          const isCorrect = actualResult === expectedClean || 
+                           actualResult === testCase.expected.trim() ||
+                           actualResult === `[${testCase.expected.trim()}]` ||
+                           actualResult === testCase.expected.trim().replace(/[\[\]]/g, '');
+
+          results.push({
+            testCase: testCase.name,
+            input: testCase.input,
+            expected: testCase.expected,
+            actual: actualResult,
+            passed: isCorrect
+          });
+
+          outputLines.push(`Status: ${isCorrect ? '✅ PASSED' : '❌ FAILED'}`);
+
+        } catch (error: any) {
+          outputLines.push(`Error: ${error.message}`);
+          results.push({
+            testCase: testCase.name,
+            input: testCase.input,
+            expected: testCase.expected,
+            actual: 'ERROR',
+            passed: false
+          });
+        }
+      }
+
+      setOutput(outputLines);
+
+      // Check if all test cases passed
+      const allPassed = results.every(result => result.passed);
+      const passedCount = results.filter(result => result.passed).length;
+      const totalCount = results.length;
+
+      if (allPassed) {
+        setSubmissionResult('success');
+        toast({
+          title: "🎉 All Tests Passed!",
+          description: `${passedCount}/${totalCount} test cases passed`,
+          variant: "default",
+        });
+      } else {
+        setSubmissionResult('failure');
+        toast({
+          title: "❌ Some Tests Failed",
+          description: `${passedCount}/${totalCount} test cases passed`,
+          variant: "destructive",
+        });
+      }
+
+    } catch (error: any) {
+      console.error('Error submitting code:', error);
+      setOutput([`Error: ${error.message}`]);
+      toast({
+        title: "Submission Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsRunning(false);
+    }
+  };
+
   const handleLanguageChange = (language: string) => {
     setSelectedLanguage(language);
-    // Update code template based on language
-    const templates = {
-      javascript: `// Write your solution here
-function solution(nums, target) {
-    // Your code here
-    return [];
-}
-
-// Test cases
-console.log("Test Case 1:");
-console.log("Input: nums = [2,7,11,15], target = 9");
-console.log("Output:", solution([2,7,11,15], 9));`,
-      python: `# Write your solution here
-def solution(nums, target):
-    # Your code here
-    return []
-
-# Test cases
-print("Test Case 1:")
-print("Input: nums = [2,7,11,15], target = 9")
-print("Output:", solution([2,7,11,15], 9))`,
-      cpp: `#include <iostream>
-#include <vector>
-using namespace std;
-
-// Write your solution here
-vector<int> solution(vector<int>& nums, int target) {
-    // Your code here
-    return {};
-}
-
-int main() {
-    // Test cases
-    vector<int> nums1 = {2,7,11,15};
-    int target1 = 9;
     
-    cout << "Test Case 1:" << endl;
-    cout << "Input: nums = [2,7,11,15], target = 9" << endl;
-    vector<int> result1 = solution(nums1, target1);
-    cout << "Output: [";
-    for(int i = 0; i < result1.size(); i++) {
-        cout << result1[i];
-        if(i < result1.size() - 1) cout << ",";
-    }
-    cout << "]" << endl;
-    
-    return 0;
-}`,
-      java: `import java.util.*;
-
-// Write your solution here
-class Solution {
-    public int[] solution(int[] nums, int target) {
-        // Your code here
-        return new int[]{};
-    }
-}
-
-class Main {
-    public static void main(String[] args) {
-        Solution sol = new Solution();
-        
-        // Test cases
-        int[] nums1 = {2,7,11,15};
-        int target1 = 9;
-        
-        System.out.println("Test Case 1:");
-        System.out.println("Input: nums = [2,7,11,15], target = 9");
-        int[] result1 = sol.solution(nums1, target1);
-        System.out.println("Output: " + Arrays.toString(result1));
-    }
-}`
-    };
-    
-    setCode(templates[language as keyof typeof templates] || templates.javascript);
+    // Don't set any default code template - let users write their own code
+    // setCode(templates[language as keyof typeof templates] || templates.javascript);
   };
 
   // Mock data - in real app, this would come from an API
@@ -371,19 +394,21 @@ class Main {
     track: undefined,
     upvotes: 0,
     downvotes: 0,
-    examples: [
-      { input: 'nums = [2,7,11,15], target = 9', output: '[0,1]', explanation: 'Because nums[0] + nums[1] == 9, we return [0, 1].' },
-      { input: 'nums = [3,2,4], target = 6', output: '[1,2]', explanation: 'Because nums[1] + nums[2] == 6, we return [1, 2].' }
+    testcases: [
+      {
+        id: 1,
+        test1: "nums = [2,7,11,15], target = 9",
+        output1: "[0,1]",
+        test2: "nums = [3,2,4], target = 6",
+        output2: "[1,2]",
+        test3: "nums = [3,3], target = 6",
+        output3: "[0,1]"
+      }
     ],
     hints: [
       'Try using a hash map to store the numbers you\'ve seen so far',
       'For each number, check if its complement (target - number) exists in the hash map',
       'If the complement exists, you\'ve found your pair'
-    ],
-    testCases: [
-      { input: '[2,7,11,15]', target: 9, expected: '[0,1]' },
-      { input: '[3,2,4]', target: 6, expected: '[1,2]' },
-      { input: '[3,3]', target: 6, expected: '[0,1]' }
     ]
   };
 
@@ -411,9 +436,9 @@ class Main {
           {/* Back Button and Question Info */}
           <div className="mb-8">
             <Button asChild variant="ghost" className="text-slate-400 hover:text-white mb-4">
-              <Link to={`/companies/${companyId}`}>
+              <Link to={companyId ? `/companies/${companyId}` : "/problem-selection"}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Questions
+                {companyId ? "Back to Questions" : "Back to Problem Selection"}
               </Link>
             </Button>
 
@@ -442,9 +467,9 @@ class Main {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Middle Panel - Question Description */}
-            <div className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Panel - Problem Description and Hints */}
+            <div className="lg:col-span-1 space-y-6">
               <Card className="bg-slate-800/50 border-slate-700">
                 <CardHeader>
                   <CardTitle className="text-white">Description</CardTitle>
@@ -454,40 +479,7 @@ class Main {
                 </CardContent>
               </Card>
 
-              {/* Optional: Add hints/examples/test cases here if your API returns them */}
-              <Card className="bg-slate-800/50 border-slate-700">
-                <CardHeader>
-                  <CardTitle className="text-white">Examples</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {questionData.examples?.map((example: any, index: number) => (
-                      <div key={index} className="bg-slate-900/50 p-4 rounded-lg">
-                        <div className="text-slate-400 mb-2">Example {index + 1}:</div>
-                        <div className="space-y-2">
-                          <div>
-                            <span className="text-slate-400">Input: </span>
-                            <code className="text-purple-400">{example.input}</code>
-                          </div>
-                          <div>
-                            <span className="text-slate-400">Output: </span>
-                            <code className="text-green-400">{example.output}</code>
-                          </div>
-                          <div>
-                            <span className="text-slate-400">Explanation: </span>
-                            <span className="text-slate-300">{example.explanation}</span>
-                          </div>
-                        </div>
-                      </div>
-                    )) || (
-                      <div className="text-slate-400 text-center py-4">
-                        No examples available for this question
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-
+              {/* Hints */}
               <Card className="bg-slate-800/50 border-slate-700">
                 <CardHeader>
                   <CardTitle className="text-white">Hints</CardTitle>
@@ -507,10 +499,34 @@ class Main {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Expected Input/Output Format */}
+              <Card className="bg-slate-800/50 border-slate-700">
+                <CardHeader>
+                  <CardTitle className="text-white">Expected Input/Output Format</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-2 text-slate-300">
+                      <span className="text-blue-400 font-medium">Input Format:</span>
+                      <span className="text-slate-200">
+                        {questionData.testcases?.[0]?.test1 || "No test case available"}
+                      </span>
+                    </div>
+                    <div className="flex items-start gap-2 text-slate-300">
+                      <span className="text-green-400 font-medium">Output Format:</span>
+                      <span className="text-slate-200">
+                        {questionData.testcases?.[0]?.output1 || "No output format available"}
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
-            {/* Right Panel - Code Editor */}
-            <div className="space-y-6">
+            {/* Right Panel - Code Editor and Output */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Code Editor */}
               <Card className="bg-slate-800/50 border-slate-700">
                 <CardHeader>
                   <div className="flex items-center justify-between">
@@ -530,32 +546,59 @@ class Main {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-[400px] border border-slate-700 rounded-lg overflow-hidden">
-                    <Editor
-                      height="100%"
-                      language={judge0Service.getMonacoLanguage(selectedLanguage)}
-                      theme="vs-dark"
-                      value={code}
-                      onChange={(value) => setCode(value || "")}
-                      options={{
-                        minimap: { enabled: false },
-                        fontSize: 14,
-                        lineNumbers: "on",
-                        roundedSelection: false,
-                        scrollBeyondLastLine: false,
-                        automaticLayout: true,
-                      }}
-                    />
+                  <div className="space-y-4">
+                    {/* Test Input Field */}
+                    <div>
+                      <label className="block text-sm font-medium text-slate-300 mb-2">
+                        Test Input (optional)
+                      </label>
+                      <textarea
+                        value={testInput}
+                        onChange={(e) => setTestInput(e.target.value)}
+                        placeholder="Enter test input here (e.g., [1,2,3,4] 9)"
+                        className="w-full p-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 resize-none"
+                        rows={2}
+                      />
+                    </div>
+                    
+                    {/* Code Editor */}
+                    <div className="h-[500px] border border-slate-700 rounded-lg overflow-hidden">
+                      <Editor
+                        height="100%"
+                        language={judge0Service.getMonacoLanguage(selectedLanguage)}
+                        theme="vs-dark"
+                        value={code}
+                        onChange={(value) => setCode(value || "")}
+                        options={{
+                          minimap: { enabled: false },
+                          fontSize: 14,
+                          lineNumbers: "on",
+                          roundedSelection: false,
+                          scrollBeyondLastLine: false,
+                          automaticLayout: true,
+                        }}
+                      />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
 
+              {/* Output */}
               <Card className="bg-slate-800/50 border-slate-700">
                 <CardHeader>
                   <CardTitle className="text-white">Output</CardTitle>
+                  {submissionResult && (
+                    <div className={`text-sm font-medium ${
+                      submissionResult === 'success' 
+                        ? 'text-green-400' 
+                        : 'text-red-400'
+                    }`}>
+                      {submissionResult === 'success' ? '✅ Test Passed' : '❌ Test Failed'}
+                    </div>
+                  )}
                 </CardHeader>
                 <CardContent>
-                  <div className="h-[200px] bg-slate-900/50 p-4 rounded-lg overflow-auto font-mono text-sm">
+                  <div className="h-[250px] bg-slate-900/50 p-4 rounded-lg overflow-auto font-mono text-sm">
                     {output.length === 0 ? (
                       <div className="text-slate-500">No output yet. Run your code to see the results.</div>
                     ) : (
@@ -567,40 +610,7 @@ class Main {
                 </CardContent>
               </Card>
 
-              <Card className="bg-slate-800/50 border-slate-700">
-                <CardHeader>
-                  <CardTitle className="text-white">Test Cases</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {questionData.testCases?.map((testCase: any, index: number) => (
-                      <div key={index} className="bg-slate-900/50 p-4 rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-slate-400">Test Case {index + 1}</span>
-                          <Badge variant="outline" className="text-slate-400 border-slate-600">
-                            Pending
-                          </Badge>
-                        </div>
-                        <div className="space-y-2">
-                          <div>
-                            <span className="text-slate-400">Input: </span>
-                            <code className="text-purple-400">nums = {testCase.input}, target = {testCase.target}</code>
-                          </div>
-                          <div>
-                            <span className="text-slate-400">Expected: </span>
-                            <code className="text-green-400">{testCase.expected}</code>
-                          </div>
-                        </div>
-                      </div>
-                    )) || (
-                      <div className="text-slate-400 text-center py-4">
-                        No test cases available for this question
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-
+              {/* Action Buttons */}
               <div className="flex gap-4">
                 <Button 
                   className="flex-1 bg-purple-600 hover:bg-purple-700"
@@ -619,9 +629,22 @@ class Main {
                     </>
                   )}
                 </Button>
-                <Button className="flex-1 bg-green-600 hover:bg-green-700">
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  Submit
+                <Button 
+                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  onClick={handleSubmit}
+                  disabled={isRunning || !isConnected}
+                >
+                  {isRunning ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Testing...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Submit
+                    </>
+                  )}
                 </Button>
               </div>
             </div>

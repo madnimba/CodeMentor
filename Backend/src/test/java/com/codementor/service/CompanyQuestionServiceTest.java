@@ -101,7 +101,7 @@ public class CompanyQuestionServiceTest {
         q.setDownvotes(0);
         when(cq.getQuestion()).thenReturn(q);
         when(companyQuestionRepository.findByCompanyIdAndQuestionId(1, 2)).thenReturn(cq);
-        when(testcaseRepository.findByQuestionIdAndIsPublicTrueOrderByIdAsc(1)).thenReturn(Collections.emptyList());
+        when(testcaseRepository.findByQuestionId(1)).thenReturn(Collections.emptyList());
         when(hintRepository.findByQuestionIdOrderByHintOrderAsc(1)).thenReturn(Collections.emptyList());
         QuestionDetailsDTO dto = companyQuestionService.getQuestionDetails(1, 2);
         assertEquals("title", dto.getTitle());

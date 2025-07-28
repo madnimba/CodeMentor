@@ -98,13 +98,13 @@ const App = () => (
                   </ProtectedRoute>
                 } 
               />
-              <Route 
+                            <Route 
                 path="/companies/:companyId/questions/:questionId" 
                 element={
                   <ProtectedRoute>
                     <LiveCoding />
                   </ProtectedRoute>
-                } 
+                }
               />
               <Route 
                 path="/companies/:companyId/questions/:questionId/live-coding" 
@@ -112,23 +112,32 @@ const App = () => (
                   <ProtectedRoute>
                     <LiveCoding />
                   </ProtectedRoute>
-                } 
+                }
               />
               <Route 
+                path="/live-coding/:questionId" 
+                element={
+                  <ProtectedRoute>
+                    <LiveCoding />
+                  </ProtectedRoute>
+                }
+              />
+                            <Route 
                 path="/coding-editor" 
                 element={
                   <ProtectedRoute>
                     <LiveCoding />
                   </ProtectedRoute>
-                } 
+                }
               />
+
               <Route 
                 path="/problem-selection" 
                 element={
                   <ProtectedRoute>
                     <ProblemSelection />
                   </ProtectedRoute>
-                } 
+                }
               />
 
               {/* Admin Routes */}

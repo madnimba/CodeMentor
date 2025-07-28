@@ -15,15 +15,21 @@ public class Testcase {
     @JoinColumn(name = "question_id")
     private Question question;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    private String input;
+    @Column(name = "test1", columnDefinition = "TEXT")
+    private String test1;
 
-    @Column(name = "expected_output", nullable = false, columnDefinition = "TEXT")
-    private String expectedOutput;
+    @Column(name = "output1", columnDefinition = "TEXT")
+    private String output1;
 
-    @Column(name = "time_limit_ms")
-    private Integer timeLimitMs = 1000;
+    @Column(name = "test2", columnDefinition = "TEXT")
+    private String test2;
 
-    @Column(name = "is_public")
-    private Boolean isPublic = false;
+    @Column(name = "output2", columnDefinition = "TEXT")
+    private String output2;
+
+    @Column(name = "test3", columnDefinition = "TEXT")
+    private String test3;
+
+    @Column(name = "output3", columnDefinition = "TEXT")
+    private String output3;
 } 

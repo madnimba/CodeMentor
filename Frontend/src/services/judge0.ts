@@ -5,6 +5,7 @@ const JUDGE0_API_URL = "/code-editor"; // Proxied through nginx
 export interface CodeExecutionRequest {
   code: string;
   language: string;
+  input?: string; // Optional input parameter
 }
 
 export interface CodeExecutionResponse {
@@ -63,15 +64,6 @@ class Judge0Service {
       { id: "javascript", name: "JavaScript", extension: "js" },
       { id: "python", name: "Python", extension: "py" },
       { id: "cpp", name: "C++", extension: "cpp" },
-      { id: "java", name: "Java", extension: "java" },
-      { id: "c", name: "C", extension: "c" },
-      { id: "csharp", name: "C#", extension: "cs" },
-      { id: "php", name: "PHP", extension: "php" },
-      { id: "ruby", name: "Ruby", extension: "rb" },
-      { id: "swift", name: "Swift", extension: "swift" },
-      { id: "go", name: "Go", extension: "go" },
-      { id: "rust", name: "Rust", extension: "rs" },
-      { id: "kotlin", name: "Kotlin", extension: "kt" },
     ];
   }
 
@@ -86,15 +78,6 @@ class Judge0Service {
       javascript: "javascript",
       python: "python",
       cpp: "cpp",
-      java: "java",
-      c: "c",
-      csharp: "csharp",
-      php: "php",
-      ruby: "ruby",
-      swift: "swift",
-      go: "go",
-      rust: "rust",
-      kotlin: "kotlin",
     };
     return languageMap[languageId] || "javascript";
   }

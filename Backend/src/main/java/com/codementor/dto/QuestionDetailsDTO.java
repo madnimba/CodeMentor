@@ -24,9 +24,12 @@ public class QuestionDetailsDTO {
     @Data
     public static class TestcaseDTO {
         private Integer id;
-        private String input;
-        private String expectedOutput;
-        private Integer timeLimitMs;
+        private String test1;
+        private String output1;
+        private String test2;
+        private String output2;
+        private String test3;
+        private String output3;
     }
 
     @Data

@@ -16,6 +16,12 @@ public interface CompanyQuestionRepository extends JpaRepository<CompanyQuestion
     @Query("SELECT cq FROM CompanyQuestion cq JOIN FETCH cq.question WHERE cq.company.id = :companyId")
     Page<CompanyQuestion> findByCompanyId(Integer companyId, Pageable pageable);
 
+    @Query("SELECT cq FROM CompanyQuestion cq JOIN FETCH cq.question WHERE cq.company.id = :companyId AND cq.question.isCoding = true")
+    List<CompanyQuestion> findByCompanyIdAndQuestionIsCodingTrue(Integer companyId);
+    
+    @Query("SELECT cq FROM CompanyQuestion cq JOIN FETCH cq.question WHERE cq.company.id = :companyId AND cq.question.isCoding = true")
+    Page<CompanyQuestion> findByCompanyIdAndQuestionIsCodingTrue(Integer companyId, Pageable pageable);
+
     CompanyQuestion findByCompanyIdAndQuestionId(Integer companyId, Integer questionId);
     long countByCompanyId(Integer companyId);
     

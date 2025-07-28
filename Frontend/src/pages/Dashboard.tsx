@@ -114,15 +114,15 @@ const Dashboard = () => {
                 <Card className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 border-purple-500/30 hover:border-purple-400/50 transition-colors">
                   <CardHeader>
                     <Code2 className="w-8 h-8 text-purple-800 mb-2" />
-                    <CardTitle className="text-purple-800">Start Solving</CardTitle>
+                    <CardTitle className="text-purple-800">Live Coding</CardTitle>
                     <CardDescription className="text-purple-600">
-                      Continue your coding journey with curated problems
+                      Practice coding problems with our live editor
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <Button asChild className="w-full bg-purple-600 hover:bg-purple-700">
-                      <Link to="/companies">
-                        Browse Problems <ArrowRight className="ml-2 w-4 h-4" />
+                      <Link to="/problem-selection">
+                        Start Coding <ArrowRight className="ml-2 w-4 h-4" />
                       </Link>
                     </Button>
                   </CardContent>

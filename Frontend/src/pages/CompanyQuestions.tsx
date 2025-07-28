@@ -100,7 +100,7 @@ const CompanyQuestions = () => {
       subtopicId: undefined,
       companyId: companyId ? Number(companyId) : undefined,
       isCoding: false,
-      testcases: [{ input: "", expectedOutput: "", timeLimitMs: 1000, isPublic: false }],
+      testcases: [{ test1: "", output1: "", test2: "", output2: "", test3: "", output3: "" }],
     },
   });
 
@@ -221,7 +221,7 @@ const CompanyQuestions = () => {
   };
 
   const addTestcase = () => {
-    append({ input: "", expectedOutput: "", timeLimitMs: 1000, isPublic: false });
+    append({ test1: "", output1: "", test2: "", output2: "", test3: "", output3: "" });
   };
 
   const removeTestcase = (index: number) => {
@@ -718,7 +718,7 @@ const CompanyQuestions = () => {
                         <div className="grid grid-cols-2 gap-4">
                           <FormField
                             control={form.control}
-                            name={`testcases.${index}.input`}
+                            name={`testcases.${index}.test1`}
                             rules={{ required: "Input is required" }}
                             render={({ field }) => (
                               <FormItem>
@@ -737,7 +737,7 @@ const CompanyQuestions = () => {
 
                           <FormField
                             control={form.control}
-                            name={`testcases.${index}.expectedOutput`}
+                            name={`testcases.${index}.output1`}
                             rules={{ required: "Expected output is required" }}
                             render={({ field }) => (
                               <FormItem>
@@ -758,17 +758,15 @@ const CompanyQuestions = () => {
                         <div className="grid grid-cols-2 gap-4 mt-4">
                           <FormField
                             control={form.control}
-                            name={`testcases.${index}.timeLimitMs`}
+                            name={`testcases.${index}.test2`}
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel className="text-slate-200">Time Limit (ms)</FormLabel>
+                                <FormLabel className="text-slate-200">Input</FormLabel>
                                 <FormControl>
-                                  <Input
-                                    type="number"
-                                    placeholder="1000"
+                                  <Textarea
+                                    placeholder="Test case input"
                                     className="bg-slate-600 border-slate-500 text-white"
                                     {...field}
-                                    onChange={(e) => field.onChange(Number(e.target.value))}
                                   />
                                 </FormControl>
                                 <FormMessage />
@@ -778,18 +776,56 @@ const CompanyQuestions = () => {
 
                           <FormField
                             control={form.control}
-                            name={`testcases.${index}.isPublic`}
+                            name={`testcases.${index}.output2`}
                             render={({ field }) => (
-                              <FormItem className="flex items-center space-x-2 mt-8">
+                              <FormItem>
+                                <FormLabel className="text-slate-200">Expected Output</FormLabel>
                                 <FormControl>
-                                  <input
-                                    type="checkbox"
-                                    checked={field.value}
-                                    onChange={field.onChange}
-                                    className="w-4 h-4"
+                                  <Textarea
+                                    placeholder="Expected output"
+                                    className="bg-slate-600 border-slate-500 text-white"
+                                    {...field}
                                   />
                                 </FormControl>
-                                <FormLabel className="text-slate-200">Public Test Case</FormLabel>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4 mt-4">
+                          <FormField
+                            control={form.control}
+                            name={`testcases.${index}.test3`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-slate-200">Input</FormLabel>
+                                <FormControl>
+                                  <Textarea
+                                    placeholder="Test case input"
+                                    className="bg-slate-600 border-slate-500 text-white"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name={`testcases.${index}.output3`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-slate-200">Expected Output</FormLabel>
+                                <FormControl>
+                                  <Textarea
+                                    placeholder="Expected output"
+                                    className="bg-slate-600 border-slate-500 text-white"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
                               </FormItem>
                             )}
                           />

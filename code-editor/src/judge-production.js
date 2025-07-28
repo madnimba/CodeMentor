@@ -37,15 +37,6 @@ const languageMap = {
   cpp: 54,
   python: 71,
   javascript: 63,
-  java: 62,
-  c: 50,
-  csharp: 51,
-  php: 68,
-  ruby: 72,
-  swift: 83,
-  go: 60,
-  rust: 73,
-  kotlin: 78
 };
 
 // Request queue for managing concurrent executions
@@ -77,7 +68,7 @@ function processQueue() {
 }
 
 async function executeCode(req, res) {
-  const { code, language } = req.body;
+  const { code, language, input = "" } = req.body; // Extract input parameter
   const languageId = languageMap[language];
 
   if (!languageId) {
@@ -96,7 +87,7 @@ async function executeCode(req, res) {
   }
 
   try {
-    console.log(`[${new Date().toISOString()}] Executing ${language} code...`);
+    console.log(`[${new Date().toISOString()}] Executing ${language} code with input: ${input}`);
     
     // Step 1: Submit the code
     const submissionRes = await axios.post(
@@ -104,7 +95,7 @@ async function executeCode(req, res) {
       {
         source_code: code,
         language_id: languageId,
-        stdin: "",
+        stdin: input, // Use the provided input
         cpu_time_limit: 5, // 5 seconds limit
         memory_limit: 512000, // 512MB limit
       },

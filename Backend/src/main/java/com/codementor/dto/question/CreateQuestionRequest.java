@@ -32,14 +32,11 @@ public class CreateQuestionRequest {
 
     @Data
     public static class TestcaseRequest {
-        @NotBlank(message = "Input is required")
-        private String input;
-
-        @NotBlank(message = "Expected output is required")
-        private String expectedOutput;
-
-        private Integer timeLimitMs = 1000;
-
-        private Boolean isPublic = false;
+        private String test1;
+        private String output1;
+        private String test2;
+        private String output2;
+        private String test3;
+        private String output3;
     }
 } 

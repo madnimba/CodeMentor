@@ -13,4 +13,5 @@ public class CompanyQuestionDTO {
     private String solution;
     private Integer year;
     private String position;
+    private Boolean isCoding;
 }

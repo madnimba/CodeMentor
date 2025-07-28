@@ -11,10 +11,12 @@ import { toast } from 'sonner';
 
 interface Testcase {
   id: number;
-  input: string;
-  expectedOutput: string;
-  timeLimitMs: number;
-  isPublic: boolean;
+  test1: string;
+  output1: string;
+  test2: string;
+  output2: string;
+  test3: string;
+  output3: string;
 }
 
 interface TestcaseManagerProps {
@@ -33,10 +35,12 @@ export const TestcaseManager: React.FC<TestcaseManagerProps> = ({
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingTestcase, setEditingTestcase] = useState<Testcase | null>(null);
   const [newTestcase, setNewTestcase] = useState({
-    input: '',
-    expectedOutput: '',
-    timeLimitMs: 1000,
-    isPublic: false
+    test1: '',
+    output1: '',
+    test2: '',
+    output2: '',
+    test3: '',
+    output3: ''
   });
 
   useEffect(() => {
@@ -56,17 +60,21 @@ export const TestcaseManager: React.FC<TestcaseManagerProps> = ({
       setTestcases([
         {
           id: 1,
-          input: '[1, 2, 3, 4, 5]',
-          expectedOutput: '15',
-          timeLimitMs: 1000,
-          isPublic: true
+          test1: '[1, 2, 3, 4, 5]',
+          output1: '15',
+          test2: '[10, 20, 30]',
+          output2: '60',
+          test3: '[1, 1, 1, 1, 1]',
+          output3: '5'
         },
         {
           id: 2,
-          input: '[10, 20, 30]',
-          expectedOutput: '60',
-          timeLimitMs: 1000,
-          isPublic: false
+          test1: '[1, 2, 3]',
+          output1: '6',
+          test2: '[10, 20]',
+          output2: '30',
+          test3: '[1, 2, 3, 4, 5]',
+          output3: '15'
         }
       ]);
     } catch (error) {
@@ -77,7 +85,7 @@ export const TestcaseManager: React.FC<TestcaseManagerProps> = ({
   };
 
   const handleAddTestcase = async () => {
-    if (!newTestcase.input || !newTestcase.expectedOutput) {
+    if (!newTestcase.test1 || !newTestcase.output1) {
       toast.error('Input and expected output are required');
       return;
     }
@@ -93,10 +101,12 @@ export const TestcaseManager: React.FC<TestcaseManagerProps> = ({
       
       setTestcases([...testcases, testcase]);
       setNewTestcase({
-        input: '',
-        expectedOutput: '',
-        timeLimitMs: 1000,
-        isPublic: false
+        test1: '',
+        output1: '',
+        test2: '',
+        output2: '',
+        test3: '',
+        output3: ''
       });
       toast.success('Testcase added successfully');
     } catch (error) {
@@ -171,43 +181,62 @@ export const TestcaseManager: React.FC<TestcaseManagerProps> = ({
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-slate-200">Input</Label>
+                  <Label className="text-slate-200">Test 1 Input</Label>
                   <Textarea
                     placeholder="Test case input"
                     className="bg-slate-600 border-slate-500 text-white"
-                    value={newTestcase.input}
-                    onChange={(e) => setNewTestcase({...newTestcase, input: e.target.value})}
+                    value={newTestcase.test1}
+                    onChange={(e) => setNewTestcase({...newTestcase, test1: e.target.value})}
                   />
                 </div>
                 <div>
-                  <Label className="text-slate-200">Expected Output</Label>
+                  <Label className="text-slate-200">Test 1 Output</Label>
                   <Textarea
                     placeholder="Expected output"
                     className="bg-slate-600 border-slate-500 text-white"
-                    value={newTestcase.expectedOutput}
-                    onChange={(e) => setNewTestcase({...newTestcase, expectedOutput: e.target.value})}
+                    value={newTestcase.output1}
+                    onChange={(e) => setNewTestcase({...newTestcase, output1: e.target.value})}
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-slate-200">Time Limit (ms)</Label>
-                  <Input
-                    type="number"
-                    placeholder="1000"
+                  <Label className="text-slate-200">Test 2 Input</Label>
+                  <Textarea
+                    placeholder="Test case input"
                     className="bg-slate-600 border-slate-500 text-white"
-                    value={newTestcase.timeLimitMs}
-                    onChange={(e) => setNewTestcase({...newTestcase, timeLimitMs: Number(e.target.value)})}
+                    value={newTestcase.test2}
+                    onChange={(e) => setNewTestcase({...newTestcase, test2: e.target.value})}
                   />
                 </div>
-                <div className="flex items-center space-x-2 mt-8">
-                  <input
-                    type="checkbox"
-                    checked={newTestcase.isPublic}
-                    onChange={(e) => setNewTestcase({...newTestcase, isPublic: e.target.checked})}
-                    className="w-4 h-4"
+                <div>
+                  <Label className="text-slate-200">Test 2 Output</Label>
+                  <Textarea
+                    placeholder="Expected output"
+                    className="bg-slate-600 border-slate-500 text-white"
+                    value={newTestcase.output2}
+                    onChange={(e) => setNewTestcase({...newTestcase, output2: e.target.value})}
                   />
-                  <Label className="text-slate-200">Public Test Case</Label>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-slate-200">Test 3 Input</Label>
+                  <Textarea
+                    placeholder="Test case input"
+                    className="bg-slate-600 border-slate-500 text-white"
+                    value={newTestcase.test3}
+                    onChange={(e) => setNewTestcase({...newTestcase, test3: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label className="text-slate-200">Test 3 Output</Label>
+                  <Textarea
+                    placeholder="Expected output"
+                    className="bg-slate-600 border-slate-500 text-white"
+                    value={newTestcase.output3}
+                    onChange={(e) => setNewTestcase({...newTestcase, output3: e.target.value})}
+                  />
                 </div>
               </div>
               <Button
@@ -253,15 +282,8 @@ export const TestcaseManager: React.FC<TestcaseManagerProps> = ({
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
-                        <Badge className={
-                          testcase.isPublic 
-                            ? "bg-green-500/20 text-green-400 border-green-500/30" 
-                            : "bg-orange-500/20 text-orange-400 border-orange-500/30"
-                        }>
-                          {testcase.isPublic ? "Public" : "Private"}
-                        </Badge>
                         <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
-                          {testcase.timeLimitMs}ms
+                          Testcase {testcase.id}
                         </Badge>
                       </div>
                       <div className="flex gap-2">
@@ -285,15 +307,43 @@ export const TestcaseManager: React.FC<TestcaseManagerProps> = ({
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label className="text-slate-400 text-sm">Input</Label>
+                        <Label className="text-slate-400 text-sm">Test 1 Input</Label>
                         <div className="mt-1 p-2 bg-slate-800 rounded border border-slate-600 text-white text-sm font-mono">
-                          {testcase.input}
+                          {testcase.test1}
                         </div>
                       </div>
                       <div>
-                        <Label className="text-slate-400 text-sm">Expected Output</Label>
+                        <Label className="text-slate-400 text-sm">Test 1 Output</Label>
                         <div className="mt-1 p-2 bg-slate-800 rounded border border-slate-600 text-white text-sm font-mono">
-                          {testcase.expectedOutput}
+                          {testcase.output1}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 mt-2">
+                      <div>
+                        <Label className="text-slate-400 text-sm">Test 2 Input</Label>
+                        <div className="mt-1 p-2 bg-slate-800 rounded border border-slate-600 text-white text-sm font-mono">
+                          {testcase.test2}
+                        </div>
+                      </div>
+                      <div>
+                        <Label className="text-slate-400 text-sm">Test 2 Output</Label>
+                        <div className="mt-1 p-2 bg-slate-800 rounded border border-slate-600 text-white text-sm font-mono">
+                          {testcase.output2}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 mt-2">
+                      <div>
+                        <Label className="text-slate-400 text-sm">Test 3 Input</Label>
+                        <div className="mt-1 p-2 bg-slate-800 rounded border border-slate-600 text-white text-sm font-mono">
+                          {testcase.test3}
+                        </div>
+                      </div>
+                      <div>
+                        <Label className="text-slate-400 text-sm">Test 3 Output</Label>
+                        <div className="mt-1 p-2 bg-slate-800 rounded border border-slate-600 text-white text-sm font-mono">
+                          {testcase.output3}
                         </div>
                       </div>
                     </div>
@@ -314,43 +364,62 @@ export const TestcaseManager: React.FC<TestcaseManagerProps> = ({
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-slate-200">Input</Label>
+                    <Label className="text-slate-200">Test 1 Input</Label>
                     <Textarea
                       placeholder="Test case input"
                       className="bg-slate-600 border-slate-500 text-white"
-                      value={editingTestcase.input}
-                      onChange={(e) => setEditingTestcase({...editingTestcase, input: e.target.value})}
+                      value={editingTestcase.test1}
+                      onChange={(e) => setEditingTestcase({...editingTestcase, test1: e.target.value})}
                     />
                   </div>
                   <div>
-                    <Label className="text-slate-200">Expected Output</Label>
+                    <Label className="text-slate-200">Test 1 Output</Label>
                     <Textarea
                       placeholder="Expected output"
                       className="bg-slate-600 border-slate-500 text-white"
-                      value={editingTestcase.expectedOutput}
-                      onChange={(e) => setEditingTestcase({...editingTestcase, expectedOutput: e.target.value})}
+                      value={editingTestcase.output1}
+                      onChange={(e) => setEditingTestcase({...editingTestcase, output1: e.target.value})}
                     />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-slate-200">Time Limit (ms)</Label>
-                    <Input
-                      type="number"
-                      placeholder="1000"
+                    <Label className="text-slate-200">Test 2 Input</Label>
+                    <Textarea
+                      placeholder="Test case input"
                       className="bg-slate-600 border-slate-500 text-white"
-                      value={editingTestcase.timeLimitMs}
-                      onChange={(e) => setEditingTestcase({...editingTestcase, timeLimitMs: Number(e.target.value)})}
+                      value={editingTestcase.test2}
+                      onChange={(e) => setEditingTestcase({...editingTestcase, test2: e.target.value})}
                     />
                   </div>
-                  <div className="flex items-center space-x-2 mt-8">
-                    <input
-                      type="checkbox"
-                      checked={editingTestcase.isPublic}
-                      onChange={(e) => setEditingTestcase({...editingTestcase, isPublic: e.target.checked})}
-                      className="w-4 h-4"
+                  <div>
+                    <Label className="text-slate-200">Test 2 Output</Label>
+                    <Textarea
+                      placeholder="Expected output"
+                      className="bg-slate-600 border-slate-500 text-white"
+                      value={editingTestcase.output2}
+                      onChange={(e) => setEditingTestcase({...editingTestcase, output2: e.target.value})}
                     />
-                    <Label className="text-slate-200">Public Test Case</Label>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-slate-200">Test 3 Input</Label>
+                    <Textarea
+                      placeholder="Test case input"
+                      className="bg-slate-600 border-slate-500 text-white"
+                      value={editingTestcase.test3}
+                      onChange={(e) => setEditingTestcase({...editingTestcase, test3: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-slate-200">Test 3 Output</Label>
+                    <Textarea
+                      placeholder="Expected output"
+                      className="bg-slate-600 border-slate-500 text-white"
+                      value={editingTestcase.output3}
+                      onChange={(e) => setEditingTestcase({...editingTestcase, output3: e.target.value})}
+                    />
                   </div>
                 </div>
                 <div className="flex justify-end gap-2">
