@@ -13,10 +13,12 @@ export interface CreateQuestionRequest {
 }
 
 export interface TestcaseRequest {
-  input: string;
-  expectedOutput: string;
-  timeLimitMs?: number;
-  isPublic?: boolean;
+  test1: string;
+  output1: string;
+  test2?: string;
+  output2?: string;
+  test3?: string;
+  output3?: string;
 }
 
 export interface Question {
@@ -42,10 +44,12 @@ export interface Question {
 
 export interface TestcaseResponse {
   id: number;
-  input: string;
-  expectedOutput: string;
-  timeLimitMs: number;
-  isPublic: boolean;
+  test1: string;
+  output1: string;
+  test2?: string;
+  output2?: string;
+  test3?: string;
+  output3?: string;
 }
 
 export const questionService = {
