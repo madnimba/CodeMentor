@@ -8,6 +8,7 @@ import { ArrowLeft, ThumbsUp, Clock, User, BookOpen, Code2, ExternalLink } from 
 import { useState, useEffect } from "react";
 import { api } from "@/services/api";
 import { Markdown } from "@/components/ui/markdown";
+import { questionService, Question } from "@/services/questions";
 
 const Article = () => {
   const { slug, subtopicId } = useParams();
@@ -15,6 +16,8 @@ const Article = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [upvoteStates, setUpvoteStates] = useState<{[key: number]: {count: number, hasUpvoted: boolean}}>({});
+  const [recommendedQuestions, setRecommendedQuestions] = useState<{[key: number]: Question[]}>({});
+  const [loadingQuestions, setLoadingQuestions] = useState<{[key: number]: boolean}>({});
 
   useEffect(() => {
     if (subtopicId) {
@@ -30,6 +33,11 @@ const Article = () => {
           });
           setUpvoteStates(initialUpvoteStates);
           setLoading(false);
+          
+          // Fetch recommended questions for each article
+          articlesData.forEach((article: any) => {
+            fetchRecommendedQuestions(article.id);
+          });
         })
         .catch(() => {
           setError("Failed to load article(s)");
@@ -40,6 +48,19 @@ const Article = () => {
       setArticles([]);
     }
   }, [subtopicId]);
+
+  const fetchRecommendedQuestions = async (articleId: number) => {
+    setLoadingQuestions(prev => ({ ...prev, [articleId]: true }));
+    try {
+      const questions = await questionService.getRecommendedQuestions(articleId);
+      setRecommendedQuestions(prev => ({ ...prev, [articleId]: questions }));
+    } catch (error) {
+      console.error('Failed to fetch recommended questions:', error);
+      setRecommendedQuestions(prev => ({ ...prev, [articleId]: [] }));
+    } finally {
+      setLoadingQuestions(prev => ({ ...prev, [articleId]: false }));
+    }
+  };
 
   const handleUpvote = (articleId: number) => {
     const currentState = upvoteStates[articleId];
@@ -146,6 +167,86 @@ const Article = () => {
                   <Markdown content={article.content || ''} />
                 </CardContent>
               </Card>
+
+              {/* Recommended Practice Questions */}
+              <div className="mb-8">
+                <div className="flex items-center gap-2 mb-6">
+                  <Code2 className="w-5 h-5 text-purple-400" />
+                  <h2 className="text-2xl font-bold text-white">Recommended Practice Questions</h2>
+                </div>
+                
+                {loadingQuestions[article.id] ? (
+                  <div className="text-slate-400 text-center py-8">Loading recommended questions...</div>
+                ) : recommendedQuestions[article.id]?.length > 0 ? (
+                  <div className="grid gap-4">
+                    {recommendedQuestions[article.id].map((question) => (
+                      <Card key={question.id} className="bg-slate-800/30 border-slate-700 hover:bg-slate-800/50 transition-colors">
+                        <CardContent className="p-6">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Badge 
+                                  className={`${
+                                    question.difficulty === 'Easy' 
+                                      ? 'bg-green-500/20 text-green-400 border-green-500/30' 
+                                      : question.difficulty === 'Medium'
+                                      ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+                                      : 'bg-red-500/20 text-red-400 border-red-500/30'
+                                  }`}
+                                >
+                                  {question.difficulty}
+                                </Badge>
+                                {question.isCoding && (
+                                  <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+                                    <Code2 className="w-3 h-3 mr-1" />
+                                    Coding
+                                  </Badge>
+                                )}
+                                {question.importanceTag && (
+                                  <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                                    {question.importanceTag}
+                                  </Badge>
+                                )}
+                              </div>
+                              <h3 className="text-lg font-semibold text-white mb-2">{question.title}</h3>
+                              <p className="text-slate-300 text-sm mb-3 line-clamp-2">
+                                {question.description.replace(/[#*`]/g, '').substring(0, 120)}...
+                              </p>
+                              <div className="flex items-center gap-4 text-sm text-slate-400">
+                                <span className="flex items-center gap-1">
+                                  <ThumbsUp className="w-3 h-3" />
+                                  {question.upvotes}
+                                </span>
+                                <span>By {question.createdByUsername}</span>
+                                {question.subtopicName && (
+                                  <span>{question.subtopicName}</span>
+                                )}
+                              </div>
+                            </div>
+                            <Button 
+                              asChild
+                              variant="outline" 
+                              className="border-purple-500/50 bg-purple-600/20 text-purple-300 hover:bg-purple-600/30 hover:text-white transition-colors"
+                            >
+                              <Link to={question.isCoding ? `/live-coding?questionId=${question.id}` : `/problem-selection?questionId=${question.id}`}>
+                                <ExternalLink className="w-4 h-4 mr-2" />
+                                Practice
+                              </Link>
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                ) : (
+                  <Card className="bg-slate-800/30 border-slate-700">
+                    <CardContent className="p-8 text-center">
+                      <BookOpen className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+                      <p className="text-slate-400">No practice questions available for this topic yet.</p>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
             </div>
           ))}
         </div>

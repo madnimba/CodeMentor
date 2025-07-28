@@ -60,5 +60,10 @@ export const questionService = {
       }
     });
     return response.data.data;
+  },
+
+  async getRecommendedQuestions(articleId: number): Promise<Question[]> {
+    const response = await api.get(`/articles/${articleId}/recommended-questions`);
+    return response.data.data;
   }
 }; 

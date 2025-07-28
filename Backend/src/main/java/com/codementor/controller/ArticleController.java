@@ -3,6 +3,7 @@ package com.codementor.controller;
 import com.codementor.dto.article.ArticleResponse;
 import com.codementor.dto.article.CreateArticleRequest;
 import com.codementor.dto.common.ApiResponse;
+import com.codementor.dto.question.QuestionResponse;
 import com.codementor.service.ArticleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -63,5 +64,11 @@ public class ArticleController {
     public ResponseEntity<ApiResponse<List<ArticleResponse>>> getArticlesBySubtopicId(@PathVariable Integer subtopicId) {
         List<ArticleResponse> articles = articleService.getArticlesBySubtopicId(subtopicId);
         return ResponseEntity.ok(ApiResponse.success(articles));
+    }
+
+    @GetMapping("/{id}/recommended-questions")
+    public ResponseEntity<ApiResponse<List<QuestionResponse>>> getRecommendedQuestions(@PathVariable Integer id) {
+        List<QuestionResponse> questions = articleService.getRecommendedQuestions(id);
+        return ResponseEntity.ok(ApiResponse.success(questions));
     }
 } 

@@ -3,6 +3,7 @@ package com.codementor.service;
 import com.codementor.domain.*;
 import com.codementor.dto.article.ArticleResponse;
 import com.codementor.dto.article.CreateArticleRequest;
+import com.codementor.dto.question.QuestionResponse;
 import com.codementor.exception.ResourceNotFoundException;
 import com.codementor.exception.UnauthorizedException;
 import com.codementor.repository.*;
@@ -13,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -216,5 +218,55 @@ public class ArticleService {
     public List<ArticleResponse> getArticlesBySubtopicId(Integer subtopicId) {
         List<Article> articles = articleRepository.findBySubtopicId(subtopicId);
         return articles.stream().map(this::mapToArticleResponse).collect(Collectors.toList());
+    }
+
+    public List<QuestionResponse> getRecommendedQuestions(Integer articleId) {
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new ResourceNotFoundException("Article not found"));
+        
+        if (article.getTopic() == null) {
+            return new ArrayList<>();
+        }
+        
+        List<Question> questions = questionRepository.findByTopicIdAndApproved(article.getTopic().getId());
+        
+        // Limit to top 5 questions for recommendation
+        return questions.stream()
+                .limit(5)
+                .map(this::mapToQuestionResponse)
+                .collect(Collectors.toList());
+    }
+
+    private QuestionResponse mapToQuestionResponse(Question question) {
+        QuestionResponse response = new QuestionResponse();
+        response.setId(question.getId());
+        response.setTitle(question.getTitle());
+        response.setSlug(question.getSlug());
+        response.setDescription(question.getDescription());
+        response.setDifficulty(question.getDifficulty() != null ? question.getDifficulty().name() : null);
+        response.setImportanceTag(question.getImportanceTag());
+        
+        if (question.getTrack() != null) {
+            response.setTrackId(question.getTrack().getId());
+            response.setTrackName(question.getTrack().getName());
+        }
+        
+        if (question.getSubtopic() != null) {
+            response.setSubtopicId(question.getSubtopic().getId());
+            response.setSubtopicName(question.getSubtopic().getName());
+        }
+        
+        if (question.getCreatedBy() != null) {
+            response.setCreatedById(question.getCreatedBy().getId());
+            response.setCreatedByUsername(question.getCreatedBy().getUsername());
+        }
+        
+        response.setUpvotes(question.getUpvotes());
+        response.setDownvotes(question.getDownvotes());
+        response.setIsApproved(question.getIsApproved());
+        response.setIsCoding(question.getIsCoding());
+        response.setCreatedAt(question.getCreatedAt());
+        
+        return response;
     }
 } 
