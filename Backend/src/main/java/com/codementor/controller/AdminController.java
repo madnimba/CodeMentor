@@ -156,4 +156,17 @@ public class AdminController {
         adminService.deleteCompany(id);
         return ResponseEntity.ok(ApiResponse.success("Company deleted successfully", null));
     }
+
+    // Bulk Operations
+    @PostMapping("/articles/approve-all")
+    public ResponseEntity<ApiResponse<String>> approveAllArticles() {
+        int count = adminService.approveAllArticles();
+        return ResponseEntity.ok(ApiResponse.success("All articles approved successfully", count + " articles approved"));
+    }
+
+    @PostMapping("/questions/approve-all")
+    public ResponseEntity<ApiResponse<String>> approveAllQuestions() {
+        int count = adminService.approveAllQuestions();
+        return ResponseEntity.ok(ApiResponse.success("All questions approved successfully", count + " questions approved"));
+    }
 } 

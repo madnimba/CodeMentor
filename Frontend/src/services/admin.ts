@@ -248,6 +248,16 @@ class AdminService {
   async deleteCompany(id: number): Promise<void> {
     await api.delete(`${API_URL}/companies/${id}`);
   }
+
+  async approveAllArticles(): Promise<{ message: string; count: number }> {
+    const response = await api.post(`${API_URL}/articles/approve-all`);
+    return response.data.data;
+  }
+
+  async approveAllQuestions(): Promise<{ message: string; count: number }> {
+    const response = await api.post(`${API_URL}/questions/approve-all`);
+    return response.data.data;
+  }
 }
 
 export const adminService = new AdminService(); 

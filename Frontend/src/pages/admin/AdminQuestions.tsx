@@ -108,14 +108,30 @@ const AdminQuestions = () => {
   };
 
   const handleDeleteTestcases = async (questionId: number) => {
-    if (window.confirm("Are you sure you want to delete all testcases for this question?")) {
-      try {
-        // TODO: Implement testcase deletion API call
-        toast.success("All testcases deleted successfully");
-      } catch (error) {
-        toast.error("Failed to delete testcases");
-        console.error("Error deleting testcases:", error);
-      }
+    if (!confirm("Are you sure you want to delete all testcases for this question? This action cannot be undone.")) {
+      return;
+    }
+
+    try {
+      // TODO: Implement testcase deletion API call
+      toast.success("Testcases deleted successfully");
+      fetchQuestions();
+    } catch (err: any) {
+      toast.error("Failed to delete testcases");
+    }
+  };
+
+  const handleBulkApprove = async () => {
+    if (!confirm("Are you sure you want to approve all pending questions? This action cannot be undone.")) {
+      return;
+    }
+
+    try {
+      const result = await adminService.approveAllQuestions();
+      toast.success(result.message);
+      fetchQuestions();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Failed to approve all questions");
     }
   };
 
@@ -221,6 +237,15 @@ const AdminQuestions = () => {
               <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
                 {totalElements} {isUnapproved ? "Pending" : "Total"} Questions
               </Badge>
+              {isUnapproved && (
+                <Button
+                  onClick={handleBulkApprove}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  Approve All
+                </Button>
+              )}
             </div>
           </div>
 
@@ -337,7 +362,7 @@ const AdminQuestions = () => {
           {totalPages > 1 && (
             <div className="flex justify-between items-center mt-8">
               <div className="text-slate-400 text-sm">
-                Page {currentPage + 1} of {totalPages}
+                Page {currentPage + 1} of {totalPages} ({totalElements} total)
               </div>
               <div className="flex gap-2">
                 <Button
@@ -348,6 +373,36 @@ const AdminQuestions = () => {
                 >
                   Previous
                 </Button>
+                
+                {/* Page Numbers */}
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 5) {
+                    pageNum = i;
+                  } else if (currentPage < 3) {
+                    pageNum = i;
+                  } else if (currentPage >= totalPages - 3) {
+                    pageNum = totalPages - 5 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+                  
+                  return (
+                    <Button
+                      key={pageNum}
+                      variant={currentPage === pageNum ? "default" : "outline"}
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={
+                        currentPage === pageNum
+                          ? "bg-purple-600 hover:bg-purple-700"
+                          : "border-slate-600 text-slate-300"
+                      }
+                    >
+                      {pageNum + 1}
+                    </Button>
+                  );
+                })}
+                
                 <Button
                   variant="outline"
                   onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))}

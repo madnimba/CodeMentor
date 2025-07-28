@@ -94,6 +94,20 @@ const AdminArticles = () => {
     setIsViewDialogOpen(true);
   };
 
+  const handleBulkApprove = async () => {
+    if (!confirm("Are you sure you want to approve all pending articles? This action cannot be undone.")) {
+      return;
+    }
+
+    try {
+      const result = await adminService.approveAllArticles();
+      toast.success(result.message);
+      fetchArticles();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Failed to approve all articles");
+    }
+  };
+
   const filteredArticles = articles.filter(article =>
     article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     article.createdBy?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -183,6 +197,15 @@ const AdminArticles = () => {
               <Badge className="bg-cyan-500/20 text-cyan-400 border-cyan-500/30">
                 {totalElements} {isUnapproved ? "Pending" : "Total"} Articles
               </Badge>
+              {isUnapproved && (
+                <Button
+                  onClick={handleBulkApprove}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  Approve All
+                </Button>
+              )}
             </div>
           </div>
 
@@ -276,7 +299,7 @@ const AdminArticles = () => {
           {totalPages > 1 && (
             <div className="flex justify-between items-center mt-8">
               <div className="text-slate-400 text-sm">
-                Page {currentPage + 1} of {totalPages}
+                Page {currentPage + 1} of {totalPages} ({totalElements} total)
               </div>
               <div className="flex gap-2">
                 <Button
@@ -287,6 +310,36 @@ const AdminArticles = () => {
                 >
                   Previous
                 </Button>
+                
+                {/* Page Numbers */}
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 5) {
+                    pageNum = i;
+                  } else if (currentPage < 3) {
+                    pageNum = i;
+                  } else if (currentPage >= totalPages - 3) {
+                    pageNum = totalPages - 5 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+                  
+                  return (
+                    <Button
+                      key={pageNum}
+                      variant={currentPage === pageNum ? "default" : "outline"}
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={
+                        currentPage === pageNum
+                          ? "bg-cyan-600 hover:bg-cyan-700"
+                          : "border-slate-600 text-slate-300"
+                      }
+                    >
+                      {pageNum + 1}
+                    </Button>
+                  );
+                })}
+                
                 <Button
                   variant="outline"
                   onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))}

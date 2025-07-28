@@ -271,6 +271,25 @@ public class AdminService {
         companyRepository.deleteById(id);
     }
 
+    // Bulk Operations
+    public int approveAllArticles() {
+        List<Article> unapprovedArticles = articleRepository.findByIsApprovedFalse();
+        for (Article article : unapprovedArticles) {
+            article.setIsApproved(true);
+        }
+        articleRepository.saveAll(unapprovedArticles);
+        return unapprovedArticles.size();
+    }
+
+    public int approveAllQuestions() {
+        List<Question> unapprovedQuestions = questionRepository.findByIsApprovedFalse();
+        for (Question question : unapprovedQuestions) {
+            question.setIsApproved(true);
+        }
+        questionRepository.saveAll(unapprovedQuestions);
+        return unapprovedQuestions.size();
+    }
+
     // Mapping methods
     private AdminUserResponse mapToAdminUserResponse(User user) {
         return AdminUserResponse.builder()
