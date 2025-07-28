@@ -10,6 +10,8 @@ vi.mock('@/services/studyMaterials', () => ({
     getAllTracks: vi.fn(),
     getTopicsByTrackId: vi.fn(),
     getSubtopicsByTopicId: vi.fn(),
+    getAllJobRoles: vi.fn(),
+    createArticle: vi.fn(),
   },
 }));
 
@@ -19,6 +21,20 @@ vi.mock('sonner', () => ({
     error: vi.fn(),
     success: vi.fn(),
   },
+}));
+
+// Mock the auth context
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({
+    user: { id: 1, username: 'testuser' },
+    loading: false,
+    signIn: vi.fn(),
+    signUp: vi.fn(),
+    googleSignIn: vi.fn(),
+    googleSignUp: vi.fn(),
+    signOut: vi.fn(),
+  }),
+  AuthProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
 const mockTracksData = [
@@ -44,21 +60,19 @@ const mockTopicsData = {
     {
       id: 1,
       name: 'Arrays',
-      trackId: 1,
       progress: 80,
       subtopics: [
-        { id: 1, name: 'Array Basics', topicId: 1, isRead: true, articleSlug: 'array-basics' },
-        { id: 2, name: 'Array Algorithms', topicId: 1, isRead: false, articleSlug: 'array-algorithms' },
+        { id: 1, name: 'Array Basics', isRead: true },
+        { id: 2, name: 'Array Algorithms', isRead: false },
       ],
     },
     {
       id: 2,
       name: 'Linked Lists',
-      trackId: 1,
       progress: 60,
       subtopics: [
-        { id: 3, name: 'Singly Linked List', topicId: 2, isRead: true, articleSlug: 'singly-linked-list' },
-        { id: 4, name: 'Doubly Linked List', topicId: 2, isRead: false, articleSlug: 'doubly-linked-list' },
+        { id: 3, name: 'Singly Linked List', isRead: true },
+        { id: 4, name: 'Doubly Linked List', isRead: false },
       ],
     },
   ],
@@ -66,10 +80,9 @@ const mockTopicsData = {
     {
       id: 3,
       name: 'Load Balancing',
-      trackId: 2,
       progress: 40,
       subtopics: [
-        { id: 5, name: 'Load Balancer Types', topicId: 3, isRead: false, articleSlug: 'load-balancer-types' },
+        { id: 5, name: 'Load Balancer Types', isRead: false },
       ],
     },
   ],
@@ -77,15 +90,20 @@ const mockTopicsData = {
     {
       id: 4,
       name: 'SQL Fundamentals',
-      trackId: 3,
       progress: 30,
       subtopics: [
-        { id: 6, name: 'Basic Queries', topicId: 4, isRead: true, articleSlug: 'basic-queries' },
-        { id: 7, name: 'Joins', topicId: 4, isRead: false, articleSlug: 'joins' },
+        { id: 6, name: 'Basic Queries', isRead: true },
+        { id: 7, name: 'Joins', isRead: false },
       ],
     },
   ],
 };
+
+const mockJobRolesData = [
+  { id: 1, name: 'Frontend Developer' },
+  { id: 2, name: 'Backend Developer' },
+  { id: 3, name: 'Full Stack Developer' },
+];
 
 describe('StudyMaterials Page', () => {
   beforeEach(() => {
@@ -95,7 +113,9 @@ describe('StudyMaterials Page', () => {
   describe('Loading State', () => {
     it('shows loading spinner while fetching data', async () => {
       const mockGetAllTracks = vi.mocked(studyMaterialService.getAllTracks);
+      const mockGetAllJobRoles = vi.mocked(studyMaterialService.getAllJobRoles);
       mockGetAllTracks.mockImplementation(() => new Promise(() => {})); // Never resolves
+      mockGetAllJobRoles.mockImplementation(() => new Promise(() => {})); // Never resolves
 
       render(<StudyMaterials />);
 
@@ -105,7 +125,9 @@ describe('StudyMaterials Page', () => {
 
     it('renders header and footer during loading', () => {
       const mockGetAllTracks = vi.mocked(studyMaterialService.getAllTracks);
+      const mockGetAllJobRoles = vi.mocked(studyMaterialService.getAllJobRoles);
       mockGetAllTracks.mockImplementation(() => new Promise(() => {}));
+      mockGetAllJobRoles.mockImplementation(() => new Promise(() => {}));
 
       render(<StudyMaterials />);
 
@@ -158,11 +180,13 @@ describe('StudyMaterials Page', () => {
     beforeEach(() => {
       const mockGetAllTracks = vi.mocked(studyMaterialService.getAllTracks);
       const mockGetTopicsByTrackId = vi.mocked(studyMaterialService.getTopicsByTrackId);
+      const mockGetAllJobRoles = vi.mocked(studyMaterialService.getAllJobRoles);
 
       mockGetAllTracks.mockResolvedValue(mockTracksData);
       mockGetTopicsByTrackId.mockImplementation((trackId: number) => {
         return Promise.resolve(mockTopicsData[trackId] || []);
       });
+      mockGetAllJobRoles.mockResolvedValue(mockJobRolesData);
     });
 
     it('renders page title and description', async () => {
@@ -204,11 +228,13 @@ describe('StudyMaterials Page', () => {
     beforeEach(() => {
       const mockGetAllTracks = vi.mocked(studyMaterialService.getAllTracks);
       const mockGetTopicsByTrackId = vi.mocked(studyMaterialService.getTopicsByTrackId);
+      const mockGetAllJobRoles = vi.mocked(studyMaterialService.getAllJobRoles);
 
       mockGetAllTracks.mockResolvedValue(mockTracksData);
       mockGetTopicsByTrackId.mockImplementation((trackId: number) => {
         return Promise.resolve(mockTopicsData[trackId] || []);
       });
+      mockGetAllJobRoles.mockResolvedValue(mockJobRolesData);
     });
 
     it('expands track when clicked', async () => {
@@ -295,11 +321,13 @@ describe('StudyMaterials Page', () => {
     beforeEach(() => {
       const mockGetAllTracks = vi.mocked(studyMaterialService.getAllTracks);
       const mockGetTopicsByTrackId = vi.mocked(studyMaterialService.getTopicsByTrackId);
+      const mockGetAllJobRoles = vi.mocked(studyMaterialService.getAllJobRoles);
 
       mockGetAllTracks.mockResolvedValue(mockTracksData);
       mockGetTopicsByTrackId.mockImplementation((trackId: number) => {
         return Promise.resolve(mockTopicsData[trackId] || []);
       });
+      mockGetAllJobRoles.mockResolvedValue(mockJobRolesData);
     });
 
     it('displays topic progress information', async () => {
@@ -344,11 +372,13 @@ describe('StudyMaterials Page', () => {
     beforeEach(() => {
       const mockGetAllTracks = vi.mocked(studyMaterialService.getAllTracks);
       const mockGetTopicsByTrackId = vi.mocked(studyMaterialService.getTopicsByTrackId);
+      const mockGetAllJobRoles = vi.mocked(studyMaterialService.getAllJobRoles);
 
       mockGetAllTracks.mockResolvedValue(mockTracksData);
       mockGetTopicsByTrackId.mockImplementation((trackId: number) => {
         return Promise.resolve(mockTopicsData[trackId] || []);
       });
+      mockGetAllJobRoles.mockResolvedValue(mockJobRolesData);
     });
 
     it('renders subtopic links with correct URLs', async () => {
@@ -426,11 +456,13 @@ describe('StudyMaterials Page', () => {
     beforeEach(() => {
       const mockGetAllTracks = vi.mocked(studyMaterialService.getAllTracks);
       const mockGetTopicsByTrackId = vi.mocked(studyMaterialService.getTopicsByTrackId);
+      const mockGetAllJobRoles = vi.mocked(studyMaterialService.getAllJobRoles);
 
       mockGetAllTracks.mockResolvedValue(mockTracksData);
       mockGetTopicsByTrackId.mockImplementation((trackId: number) => {
         return Promise.resolve(mockTopicsData[trackId] || []);
       });
+      mockGetAllJobRoles.mockResolvedValue(mockJobRolesData);
     });
 
     it('can expand multiple tracks simultaneously', async () => {
@@ -483,9 +515,11 @@ describe('StudyMaterials Page', () => {
     it('calls the correct API methods in sequence', async () => {
       const mockGetAllTracks = vi.mocked(studyMaterialService.getAllTracks);
       const mockGetTopicsByTrackId = vi.mocked(studyMaterialService.getTopicsByTrackId);
+      const mockGetAllJobRoles = vi.mocked(studyMaterialService.getAllJobRoles);
 
       mockGetAllTracks.mockResolvedValue(mockTracksData);
       mockGetTopicsByTrackId.mockResolvedValue([]);
+      mockGetAllJobRoles.mockResolvedValue(mockJobRolesData);
 
       render(<StudyMaterials />);
 
@@ -495,15 +529,18 @@ describe('StudyMaterials Page', () => {
         expect(mockGetTopicsByTrackId).toHaveBeenCalledWith(1);
         expect(mockGetTopicsByTrackId).toHaveBeenCalledWith(2);
         expect(mockGetTopicsByTrackId).toHaveBeenCalledWith(3);
+        expect(mockGetAllJobRoles).toHaveBeenCalledTimes(1);
       });
     });
 
     it('handles empty data gracefully', async () => {
       const mockGetAllTracks = vi.mocked(studyMaterialService.getAllTracks);
       const mockGetTopicsByTrackId = vi.mocked(studyMaterialService.getTopicsByTrackId);
+      const mockGetAllJobRoles = vi.mocked(studyMaterialService.getAllJobRoles);
 
       mockGetAllTracks.mockResolvedValue([]);
       mockGetTopicsByTrackId.mockResolvedValue([]);
+      mockGetAllJobRoles.mockResolvedValue([]);
 
       render(<StudyMaterials />);
 
@@ -522,11 +559,13 @@ describe('StudyMaterials Page', () => {
     beforeEach(() => {
       const mockGetAllTracks = vi.mocked(studyMaterialService.getAllTracks);
       const mockGetTopicsByTrackId = vi.mocked(studyMaterialService.getTopicsByTrackId);
+      const mockGetAllJobRoles = vi.mocked(studyMaterialService.getAllJobRoles);
 
       mockGetAllTracks.mockResolvedValue(mockTracksData);
       mockGetTopicsByTrackId.mockImplementation((trackId: number) => {
         return Promise.resolve(mockTopicsData[trackId] || []);
       });
+      mockGetAllJobRoles.mockResolvedValue(mockJobRolesData);
     });
 
     it('has proper layout structure', async () => {
@@ -545,11 +584,13 @@ describe('StudyMaterials Page', () => {
     beforeEach(() => {
       const mockGetAllTracks = vi.mocked(studyMaterialService.getAllTracks);
       const mockGetTopicsByTrackId = vi.mocked(studyMaterialService.getTopicsByTrackId);
+      const mockGetAllJobRoles = vi.mocked(studyMaterialService.getAllJobRoles);
 
       mockGetAllTracks.mockResolvedValue(mockTracksData);
       mockGetTopicsByTrackId.mockImplementation((trackId: number) => {
         return Promise.resolve(mockTopicsData[trackId] || []);
       });
+      mockGetAllJobRoles.mockResolvedValue(mockJobRolesData);
     });
 
     it('has proper heading hierarchy', async () => {
