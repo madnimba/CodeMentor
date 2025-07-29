@@ -88,6 +88,8 @@ class ChatService:
         except Exception as e:
             logger.error(f"Error processing message: {str(e)}")
             raise
+
+
     
     def process_message_stream(self, request: ChatRequest) -> Generator[StreamingChunk, None, None]:
         """Process a chat message and return streaming response."""

@@ -13,6 +13,8 @@ export interface ChatResponse {
   error?: string;
 }
 
+
+
 class ChatbotService {
   private apiUrl: string;
 
@@ -41,6 +43,8 @@ class ChatbotService {
       throw error;
     }
   }
+
+
 
   // Method to update the API URL (useful for different environments)
   setApiUrl(url: string) {

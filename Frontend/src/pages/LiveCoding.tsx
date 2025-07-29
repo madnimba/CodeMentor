@@ -6,14 +6,17 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Markdown } from "@/components/ui/markdown";
-import { ArrowLeft, Code2, Play, CheckCircle, AlertCircle, ChevronDown, Loader2, Search } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { ArrowLeft, Code2, Play, CheckCircle, AlertCircle, ChevronDown, Loader2, Search, Bot, Send, X } from "lucide-react";
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Editor from "@monaco-editor/react";
 import { useToast } from "@/components/ui/use-toast";
 import { judge0Service, CodeExecutionResponse } from "@/services/judge0";
 import { api } from "@/services/api";
 import { submissionsApi, CreateSubmissionRequest } from "@/services/submissions";
+import { chatbotService, ChatMessage } from "@/services/chatbot";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from "@/components/ui/pagination";
 
 interface QuestionDetails {
@@ -64,6 +67,16 @@ const LiveCoding = () => {
   const [testInput, setTestInput] = useState(""); // New state for test input
   const { toast } = useToast();
   const [questionDetails, setQuestionDetails] = useState<QuestionDetails | null>(null);
+  const [isAISolutionOpen, setIsAISolutionOpen] = useState(false);
+  const [isAIDebuggerOpen, setIsAIDebuggerOpen] = useState(false);
+  const [aiMessages, setAIMessages] = useState<ChatMessage[]>([]);
+  const [aiDebuggerMessages, setAIDebuggerMessages] = useState<ChatMessage[]>([]);
+  const [isLoadingAI, setIsLoadingAI] = useState(false);
+  const [isLoadingDebugger, setIsLoadingDebugger] = useState(false);
+  const [aiInputMessage, setAIInputMessage] = useState("");
+  const [aiDebuggerInputMessage, setAIDebuggerInputMessage] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const debuggerMessagesEndRef = useRef<HTMLDivElement>(null);
 
   // Fetch questions from the database
   useEffect(() => {
@@ -434,6 +447,229 @@ const LiveCoding = () => {
     // setCode(templates[language as keyof typeof templates] || templates.javascript);
   };
 
+  const handleAISolution = async () => {
+    if (!questionDetails) {
+      toast({
+        title: "Error",
+        description: "No question details available",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoadingAI(true);
+    setIsAISolutionOpen(true);
+    
+    // Create initial message with problem details
+    const problemDescription = `Problem: ${questionDetails.title}\n\nDescription: ${questionDetails.description}\n\nDifficulty: ${questionDetails.difficulty}`;
+    
+    const initialMessage: ChatMessage = {
+      role: 'user',
+      content: `Please help me solve this coding problem:\n\n${problemDescription}\n\nCurrent code:\n\`\`\`${selectedLanguage}\n${code}\n\`\`\``
+    };
+    
+    setAIMessages([initialMessage]);
+
+    try {
+      // Use the existing chat endpoint instead of custom endpoints
+      const response = await chatbotService.sendMessage({
+        message: `Please help me solve this coding problem:\n\n${problemDescription}\n\nCurrent code:\n\`\`\`${selectedLanguage}\n${code}\n\`\`\``,
+        history: []
+      });
+      
+      const assistantMessage: ChatMessage = {
+        role: 'assistant',
+        content: response.response
+      };
+      
+      setAIMessages(prev => [...prev, assistantMessage]);
+      
+      toast({
+        title: "AI Solution Generated",
+        description: "Solution has been generated successfully",
+      });
+    } catch (error: any) {
+      const errorMessage: ChatMessage = {
+        role: 'assistant',
+        content: `Sorry, I encountered an error while generating the solution: ${error.message}`
+      };
+      setAIMessages(prev => [...prev, errorMessage]);
+      
+      toast({
+        title: "AI Solution Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingAI(false);
+    }
+  };
+
+  const handleSendMessage = async (message: string) => {
+    if (!message.trim()) return;
+
+    const userMessage: ChatMessage = {
+      role: 'user',
+      content: message
+    };
+    
+    setAIMessages(prev => [...prev, userMessage]);
+    setAIInputMessage("");
+    setIsLoadingAI(true);
+
+    try {
+      // Use the existing chat endpoint with conversation history
+      const response = await chatbotService.sendMessage({
+        message: message,
+        history: aiMessages
+      });
+      
+      const assistantMessage: ChatMessage = {
+        role: 'assistant',
+        content: response.response
+      };
+      
+      setAIMessages(prev => [...prev, assistantMessage]);
+    } catch (error: any) {
+      const errorMessage: ChatMessage = {
+        role: 'assistant',
+        content: `Sorry, I encountered an error: ${error.message}`
+      };
+      setAIMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoadingAI(false);
+    }
+  };
+
+  const handleCloseAISolution = () => {
+    setIsAISolutionOpen(false);
+    setAIMessages([]);
+    setAIInputMessage("");
+  };
+
+  const handleAIDebugger = async () => {
+    if (!code.trim()) {
+      toast({
+        title: "Error",
+        description: "Please write some code first before debugging",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!questionDetails) {
+      toast({
+        title: "Error",
+        description: "No question details available",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoadingDebugger(true);
+    setIsAIDebuggerOpen(true);
+    
+    // Create initial message with problem context and code for debugging
+    const problemContext = `Problem: ${questionDetails.title}\n\nDescription: ${questionDetails.description}\n\nDifficulty: ${questionDetails.difficulty}`;
+    
+    const debugMessage: ChatMessage = {
+      role: 'user',
+      content: `Please debug this code for the following problem:\n\n${problemContext}\n\nMy solution:\n\`\`\`${selectedLanguage}\n${code}\n\`\`\`\n\nPlease analyze my code and tell me what's wrong with it and how to fix it.`
+    };
+    
+    setAIDebuggerMessages([debugMessage]);
+
+    try {
+      // Use the existing chat endpoint for debugging with full context
+      const response = await chatbotService.sendMessage({
+        message: `Please debug this code for the following problem:\n\n${problemContext}\n\nMy solution:\n\`\`\`${selectedLanguage}\n${code}\n\`\`\`\n\nPlease analyze my code and tell me what's wrong with it and how to fix it.`,
+        history: []
+      });
+      
+      const assistantMessage: ChatMessage = {
+        role: 'assistant',
+        content: response.response
+      };
+      
+      setAIDebuggerMessages(prev => [...prev, assistantMessage]);
+      
+      toast({
+        title: "AI Debugger Analysis",
+        description: "Code analysis completed successfully",
+      });
+    } catch (error: any) {
+      const errorMessage: ChatMessage = {
+        role: 'assistant',
+        content: `Sorry, I encountered an error while analyzing your code: ${error.message}`
+      };
+      setAIDebuggerMessages(prev => [...prev, errorMessage]);
+      
+      toast({
+        title: "AI Debugger Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingDebugger(false);
+    }
+  };
+
+  const handleSendDebuggerMessage = async (message: string) => {
+    if (!message.trim()) return;
+
+    const userMessage: ChatMessage = {
+      role: 'user',
+      content: message
+    };
+    
+    setAIDebuggerMessages(prev => [...prev, userMessage]);
+    setAIDebuggerInputMessage("");
+    setIsLoadingDebugger(true);
+
+    try {
+      // Use the existing chat endpoint with conversation history
+      const response = await chatbotService.sendMessage({
+        message: message,
+        history: aiDebuggerMessages
+      });
+      
+      const assistantMessage: ChatMessage = {
+        role: 'assistant',
+        content: response.response
+      };
+      
+      setAIDebuggerMessages(prev => [...prev, assistantMessage]);
+    } catch (error: any) {
+      const errorMessage: ChatMessage = {
+        role: 'assistant',
+        content: `Sorry, I encountered an error: ${error.message}`
+      };
+      setAIDebuggerMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoadingDebugger(false);
+    }
+  };
+
+  const handleCloseAIDebugger = () => {
+    setIsAIDebuggerOpen(false);
+    setAIDebuggerMessages([]);
+    setAIDebuggerInputMessage("");
+  };
+
+  // Auto-scroll to bottom of messages
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [aiMessages]);
+
+  // Auto-scroll to bottom of debugger messages
+  useEffect(() => {
+    if (debuggerMessagesEndRef.current) {
+      debuggerMessagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [aiDebuggerMessages]);
+
   // Mock data - in real app, this would come from an API
   const questionData: QuestionDetails = questionDetails || {
     title: 'Two Sum',
@@ -634,18 +870,38 @@ const LiveCoding = () => {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-white">Code Editor</CardTitle>
-                    <Select value={selectedLanguage} onValueChange={handleLanguageChange}>
-                      <SelectTrigger className="w-32 bg-slate-700 border-slate-600">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-slate-700 border-slate-600">
-                        {judge0Service.getSupportedLanguages().map((lang) => (
-                          <SelectItem key={lang.id} value={lang.id} className="text-slate-300">
-                            {lang.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-3">
+                      <Button 
+                        onClick={handleAIDebugger}
+                        disabled={isLoadingDebugger || !code.trim()}
+                        variant="outline"
+                        className="bg-orange-600 hover:bg-orange-700 border-orange-500 text-white"
+                      >
+                        {isLoadingDebugger ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Analyzing...
+                          </>
+                        ) : (
+                          <>
+                            <AlertCircle className="w-4 h-4 mr-2" />
+                            AI Debugger
+                          </>
+                        )}
+                      </Button>
+                      <Select value={selectedLanguage} onValueChange={handleLanguageChange}>
+                        <SelectTrigger className="w-32 bg-slate-700 border-slate-600">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-700 border-slate-600">
+                          {judge0Service.getSupportedLanguages().map((lang) => (
+                            <SelectItem key={lang.id} value={lang.id} className="text-slate-300">
+                              {lang.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -714,9 +970,9 @@ const LiveCoding = () => {
               </Card>
 
               {/* Action Buttons */}
-              <div className="flex gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <Button 
-                  className="flex-1 bg-purple-600 hover:bg-purple-700"
+                  className="bg-purple-600 hover:bg-purple-700"
                   onClick={handleRunCode}
                   disabled={isRunning || !isConnected}
                 >
@@ -733,7 +989,7 @@ const LiveCoding = () => {
                   )}
                 </Button>
                 <Button 
-                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  className="bg-green-600 hover:bg-green-700"
                   onClick={handleSubmit}
                   disabled={isRunning || !isConnected}
                 >
@@ -749,6 +1005,23 @@ const LiveCoding = () => {
                     </>
                   )}
                 </Button>
+                <Button 
+                  className="bg-blue-600 hover:bg-blue-700"
+                  onClick={handleAISolution}
+                  disabled={isRunning || !isConnected || isLoadingAI}
+                >
+                  {isLoadingAI ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Bot className="w-4 h-4 mr-2" />
+                      Solve with AI
+                    </>
+                  )}
+                </Button>
               </div>
             </div>
           </div>
@@ -756,6 +1029,160 @@ const LiveCoding = () => {
       </div>
 
       <Footer />
+
+      {/* AI Solution Dialog */}
+      <Dialog open={isAISolutionOpen} onOpenChange={setIsAISolutionOpen}>
+        <DialogContent className="max-w-4xl w-[80vw] max-h-[80vh] bg-slate-800 border-slate-700">
+          <DialogHeader>
+            <DialogTitle className="text-white flex items-center gap-2">
+              <Bot className="w-5 h-5" />
+              AI Solution Assistant
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col h-[600px]">
+            {/* Messages Area */}
+            <div className="flex-1 overflow-y-auto pr-2 space-y-4 mb-4">
+              {aiMessages.map((message, index) => (
+                <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`p-4 rounded-lg max-w-[85%] ${
+                    message.role === 'user' 
+                      ? 'bg-purple-600 text-white' 
+                      : 'bg-slate-700 text-slate-200 border border-slate-600'
+                  }`}>
+                    {message.role === 'assistant' ? (
+                      <Markdown content={message.content} />
+                    ) : (
+                      <div className="whitespace-pre-wrap">{message.content}</div>
+                    )}
+                  </div>
+                </div>
+              ))}
+              {isLoadingAI && (
+                <div className="flex justify-start">
+                  <div className="p-4 rounded-lg bg-slate-700 text-slate-200 border border-slate-600">
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      AI is thinking...
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+            
+            {/* Input Area */}
+            <div className="flex gap-2">
+              <Textarea
+                placeholder="Ask a follow-up question or request clarification..."
+                className="flex-1 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 resize-none"
+                value={aiInputMessage}
+                onChange={(e) => setAIInputMessage(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage(aiInputMessage);
+                  }
+                }}
+                rows={3}
+              />
+              <div className="flex flex-col gap-2">
+                <Button 
+                  onClick={() => handleSendMessage(aiInputMessage)} 
+                  disabled={!aiInputMessage.trim() || isLoadingAI}
+                  className="bg-purple-600 hover:bg-purple-700"
+                >
+                  <Send className="w-4 h-4" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  onClick={handleCloseAISolution} 
+                  disabled={isLoadingAI}
+                  className="text-slate-400 hover:text-white"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* AI Debugger Dialog */}
+      <Dialog open={isAIDebuggerOpen} onOpenChange={setIsAIDebuggerOpen}>
+        <DialogContent className="max-w-4xl w-[80vw] max-h-[80vh] bg-slate-800 border-slate-700">
+          <DialogHeader>
+            <DialogTitle className="text-white flex items-center gap-2">
+              <AlertCircle className="w-5 h-5" />
+              AI Code Debugger
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col h-[600px]">
+            {/* Messages Area */}
+            <div className="flex-1 overflow-y-auto pr-2 space-y-4 mb-4">
+              {aiDebuggerMessages.map((message, index) => (
+                <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`p-4 rounded-lg max-w-[85%] ${
+                    message.role === 'user' 
+                      ? 'bg-orange-600 text-white' 
+                      : 'bg-slate-700 text-slate-200 border border-slate-600'
+                  }`}>
+                    {message.role === 'assistant' ? (
+                      <Markdown content={message.content} />
+                    ) : (
+                      <div className="whitespace-pre-wrap">{message.content}</div>
+                    )}
+                  </div>
+                </div>
+              ))}
+              {isLoadingDebugger && (
+                <div className="flex justify-start">
+                  <div className="p-4 rounded-lg bg-slate-700 text-slate-200 border border-slate-600">
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      AI is analyzing your code...
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div ref={debuggerMessagesEndRef} />
+            </div>
+            
+            {/* Input Area */}
+            <div className="flex gap-2">
+              <Textarea
+                placeholder="Ask follow-up questions about the debugging analysis..."
+                className="flex-1 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 resize-none"
+                value={aiDebuggerInputMessage}
+                onChange={(e) => setAIDebuggerInputMessage(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendDebuggerMessage(aiDebuggerInputMessage);
+                  }
+                }}
+                rows={3}
+              />
+              <div className="flex flex-col gap-2">
+                <Button 
+                  onClick={() => handleSendDebuggerMessage(aiDebuggerInputMessage)} 
+                  disabled={!aiDebuggerInputMessage.trim() || isLoadingDebugger}
+                  className="bg-orange-600 hover:bg-orange-700"
+                >
+                  <Send className="w-4 h-4" />
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  onClick={handleCloseAIDebugger} 
+                  disabled={isLoadingDebugger}
+                  className="text-slate-400 hover:text-white"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
