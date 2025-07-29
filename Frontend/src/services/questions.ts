@@ -6,6 +6,7 @@ export interface CreateQuestionRequest {
   difficulty: 'Easy' | 'Medium' | 'Hard';
   importanceTag?: string;
   trackId: number;
+  topicId?: number;
   subtopicId?: number;
   companyId?: number;
   isCoding?: boolean;

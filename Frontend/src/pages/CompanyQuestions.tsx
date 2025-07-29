@@ -20,7 +20,7 @@ import { useState, useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import Editor from "@monaco-editor/react";
 import { api } from "@/services/api";
-import { studyMaterialService, Track, Subtopic } from "@/services/studyMaterials";
+import { studyMaterialService, Track, Subtopic, Topic } from "@/services/studyMaterials";
 import { questionService, CreateQuestionRequest, TestcaseRequest } from "@/services/questions";
 import { companiesService, Company as CompanyType } from "@/services/companies";
 import { useAuth } from "@/contexts/AuthContext";
@@ -86,6 +86,7 @@ const CompanyQuestions = () => {
   const [isQuestionDialogOpen, setIsQuestionDialogOpen] = useState(false);
   const [tracks, setTracks] = useState<Track[]>([]);
   const [subtopics, setSubtopics] = useState<{ [key: number]: Subtopic[] }>({});
+  const [topics, setTopics] = useState<{ [key: number]: Topic[] }>({});
   const [companies, setCompanies] = useState<CompanyType[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -98,6 +99,7 @@ const CompanyQuestions = () => {
       difficulty: "Medium",
       importanceTag: "",
       trackId: 0,
+      topicId: undefined,
       subtopicId: undefined,
       companyId: companyId ? Number(companyId) : undefined,
       isCoding: false,
@@ -112,6 +114,8 @@ const CompanyQuestions = () => {
   });
 
   const selectedTrackId = form.watch("trackId");
+  const selectedTopicId = form.watch("topicId");
+  const isCoding = form.watch("isCoding");
 
   // Fetch tracks and companies for question creation
   useEffect(() => {
@@ -130,25 +134,35 @@ const CompanyQuestions = () => {
     fetchData();
   }, []);
 
-  // Fetch subtopics when track is selected
+  // Fetch topics when track is selected
   useEffect(() => {
     if (selectedTrackId && selectedTrackId > 0) {
+      const fetchTopics = async () => {
+        try {
+          const trackTopics = await studyMaterialService.getTopicsByTrackId(selectedTrackId);
+          setTopics(prev => ({ ...prev, [selectedTrackId]: trackTopics }));
+        } catch (err) {
+          console.error("Failed to fetch topics:", err);
+        }
+      };
+      fetchTopics();
+    }
+  }, [selectedTrackId]);
+
+  // Fetch subtopics when topic is selected
+  useEffect(() => {
+    if (selectedTopicId && selectedTopicId > 0) {
       const fetchSubtopics = async () => {
         try {
-          const topics = await studyMaterialService.getTopicsByTrackId(selectedTrackId);
-          const allSubtopics: Subtopic[] = [];
-          for (const topic of topics) {
-            const topicSubtopics = await studyMaterialService.getSubtopicsByTopicId(topic.id);
-            allSubtopics.push(...topicSubtopics);
-          }
-          setSubtopics(prev => ({ ...prev, [selectedTrackId]: allSubtopics }));
+          const topicSubtopics = await studyMaterialService.getSubtopicsByTopicId(selectedTopicId);
+          setSubtopics(prev => ({ ...prev, [selectedTopicId]: topicSubtopics }));
         } catch (err) {
           console.error("Failed to fetch subtopics:", err);
         }
       };
       fetchSubtopics();
     }
-  }, [selectedTrackId]);
+  }, [selectedTopicId]);
 
   useEffect(() => {
     if (!companyId) {
@@ -205,6 +219,17 @@ const CompanyQuestions = () => {
     if (!user) {
       toast.error("You must be logged in to create a question");
       return;
+    }
+
+    // Validate testcases for coding questions
+    if (data.isCoding) {
+      const hasValidTestcases = data.testcases.some(testcase => 
+        testcase.test1 && testcase.output1
+      );
+      if (!hasValidTestcases) {
+        toast.error("At least one test case is required for coding questions");
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -554,6 +579,56 @@ const CompanyQuestions = () => {
                   )}
                 />
 
+<div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="companyId"
+                    rules={{ required: "Company is required" }}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-slate-200">Company</FormLabel>
+                        <Select onValueChange={(value) => field.onChange(Number(value))} value={field.value?.toString()}>
+                          <FormControl>
+                            <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                              <SelectValue placeholder="Select a company" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-slate-700 border-slate-600">
+                            {companies.map((company) => (
+                              <SelectItem key={company.id} value={company.id.toString()}>
+                                {company.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+<FormField
+                    control={form.control}
+                    name="question_year"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-slate-200">question_year</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="2024"
+                            className="bg-slate-700 border-slate-600 text-white"
+                            {...field}
+                            onChange={(e) => field.onChange(Number(e.target.value))}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  
+                </div>
+
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -582,57 +657,42 @@ const CompanyQuestions = () => {
                   <FormField
                     control={form.control}
                     name="importanceTag"
+                    rules={{ required: "Importance tag is required" }}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-slate-200">Importance Tag</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="e.g., High, Medium, Low"
-                            className="bg-slate-700 border-slate-600 text-white"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="companyId"
-                    rules={{ required: "Company is required" }}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-slate-200">Company</FormLabel>
-                        <Select onValueChange={(value) => field.onChange(Number(value))} value={field.value?.toString()}>
+                        <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
-                              <SelectValue placeholder="Select a company" />
+                              <SelectValue placeholder="Select importance" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent className="bg-slate-700 border-slate-600">
-                            {companies.map((company) => (
-                              <SelectItem key={company.id} value={company.id.toString()}>
-                                {company.name}
-                              </SelectItem>
-                            ))}
+                            <SelectItem value="High">High</SelectItem>
+                            <SelectItem value="Medium">Medium</SelectItem>
+                            <SelectItem value="Low">Low</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+                </div>
 
-                  <FormField
+                <div className="grid grid-cols-3 gap-4">
+                <FormField
                     control={form.control}
                     name="trackId"
                     rules={{ required: "Track is required" }}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-slate-200">Track</FormLabel>
-                        <Select onValueChange={(value) => field.onChange(Number(value))} value={field.value?.toString()}>
+                        <Select onValueChange={(value) => {
+                          field.onChange(Number(value));
+                          // Reset topic and subtopic when track changes
+                          form.setValue("topicId", undefined);
+                          form.setValue("subtopicId", undefined);
+                        }} value={field.value?.toString()}>
                           <FormControl>
                             <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
                               <SelectValue placeholder="Select a track" />
@@ -650,29 +710,31 @@ const CompanyQuestions = () => {
                       </FormItem>
                     )}
                   />
-                </div>
 
-                <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="subtopicId"
+                    name="topicId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-slate-200">Subtopic (Optional)</FormLabel>
+                        <FormLabel className="text-slate-200">Topic (Optional)</FormLabel>
                         <Select 
-                          onValueChange={(value) => field.onChange(value ? Number(value) : undefined)} 
+                          onValueChange={(value) => {
+                            field.onChange(value ? Number(value) : undefined);
+                            // Reset subtopic when topic changes
+                            form.setValue("subtopicId", undefined);
+                          }} 
                           value={field.value?.toString()}
                           disabled={!selectedTrackId || selectedTrackId === 0}
                         >
                           <FormControl>
                             <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
-                              <SelectValue placeholder="Select a subtopic (optional)" />
+                              <SelectValue placeholder="Select a topic (optional)" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent className="bg-slate-700 border-slate-600">
-                            {subtopics[selectedTrackId]?.map((subtopic) => (
-                              <SelectItem key={subtopic.id} value={subtopic.id.toString()}>
-                                {subtopic.name}
+                            {topics[selectedTrackId]?.map((topic) => (
+                              <SelectItem key={topic.id} value={topic.id.toString()}>
+                                {topic.name}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -684,19 +746,28 @@ const CompanyQuestions = () => {
 
                   <FormField
                     control={form.control}
-                    name="question_year"
+                    name="subtopicId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-slate-200">question_year</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            placeholder="2024"
-                            className="bg-slate-700 border-slate-600 text-white"
-                            {...field}
-                            onChange={(e) => field.onChange(Number(e.target.value))}
-                          />
-                        </FormControl>
+                        <FormLabel className="text-slate-200">Subtopic (Optional)</FormLabel>
+                        <Select 
+                          onValueChange={(value) => field.onChange(value ? Number(value) : undefined)} 
+                          value={field.value?.toString()}
+                          disabled={!selectedTopicId || selectedTopicId === 0}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                              <SelectValue placeholder="Select a subtopic (optional)" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-slate-700 border-slate-600">
+                            {subtopics[selectedTopicId]?.map((subtopic) => (
+                              <SelectItem key={subtopic.id} value={subtopic.id.toString()}>
+                                {subtopic.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -721,159 +792,161 @@ const CompanyQuestions = () => {
                   )}
                 />
 
-                {/* Testcases Section */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <FormLabel className="text-slate-200">Test Cases</FormLabel>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={addTestcase}
-                      className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add Test Case
-                    </Button>
+                {/* Testcases Section - Only show for coding questions */}
+                {isCoding && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <FormLabel className="text-slate-200">Test Cases (Required for coding questions)</FormLabel>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={addTestcase}
+                        className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Add Test Case
+                      </Button>
+                    </div>
+                    
+                    {fields.map((field, index) => (
+                      <Card key={field.id} className="bg-slate-700/50 border-slate-600">
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-white font-medium">Test Case {index + 1}</h4>
+                            {fields.length > 1 && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeTestcase(index)}
+                                className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            )}
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField
+                              control={form.control}
+                              name={`testcases.${index}.test1`}
+                              rules={{ required: isCoding ? "Input is required for coding questions" : false }}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-slate-200">Input</FormLabel>
+                                  <FormControl>
+                                    <Textarea
+                                      placeholder="Test case input"
+                                      className="bg-slate-600 border-slate-500 text-white"
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name={`testcases.${index}.output1`}
+                              rules={{ required: isCoding ? "Expected output is required for coding questions" : false }}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-slate-200">Expected Output</FormLabel>
+                                  <FormControl>
+                                    <Textarea
+                                      placeholder="Expected output"
+                                      className="bg-slate-600 border-slate-500 text-white"
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4 mt-4">
+                            <FormField
+                              control={form.control}
+                              name={`testcases.${index}.test2`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-slate-200">Input</FormLabel>
+                                  <FormControl>
+                                    <Textarea
+                                      placeholder="Test case input"
+                                      className="bg-slate-600 border-slate-500 text-white"
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name={`testcases.${index}.output2`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-slate-200">Expected Output</FormLabel>
+                                  <FormControl>
+                                    <Textarea
+                                      placeholder="Expected output"
+                                      className="bg-slate-600 border-slate-500 text-white"
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4 mt-4">
+                            <FormField
+                              control={form.control}
+                              name={`testcases.${index}.test3`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-slate-200">Input</FormLabel>
+                                  <FormControl>
+                                    <Textarea
+                                      placeholder="Test case input"
+                                      className="bg-slate-600 border-slate-500 text-white"
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name={`testcases.${index}.output3`}
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel className="text-slate-200">Expected Output</FormLabel>
+                                  <FormControl>
+                                    <Textarea
+                                      placeholder="Expected output"
+                                      className="bg-slate-600 border-slate-500 text-white"
+                                      {...field}
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
                   </div>
-                  
-                  {fields.map((field, index) => (
-                    <Card key={field.id} className="bg-slate-700/50 border-slate-600">
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between mb-3">
-                          <h4 className="text-white font-medium">Test Case {index + 1}</h4>
-                          {fields.length > 1 && (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeTestcase(index)}
-                              className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          )}
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-4">
-                          <FormField
-                            control={form.control}
-                            name={`testcases.${index}.test1`}
-                            rules={{ required: "Input is required" }}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-slate-200">Input</FormLabel>
-                                <FormControl>
-                                  <Textarea
-                                    placeholder="Test case input"
-                                    className="bg-slate-600 border-slate-500 text-white"
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={form.control}
-                            name={`testcases.${index}.output1`}
-                            rules={{ required: "Expected output is required" }}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-slate-200">Expected Output</FormLabel>
-                                <FormControl>
-                                  <Textarea
-                                    placeholder="Expected output"
-                                    className="bg-slate-600 border-slate-500 text-white"
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 mt-4">
-                          <FormField
-                            control={form.control}
-                            name={`testcases.${index}.test2`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-slate-200">Input</FormLabel>
-                                <FormControl>
-                                  <Textarea
-                                    placeholder="Test case input"
-                                    className="bg-slate-600 border-slate-500 text-white"
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={form.control}
-                            name={`testcases.${index}.output2`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-slate-200">Expected Output</FormLabel>
-                                <FormControl>
-                                  <Textarea
-                                    placeholder="Expected output"
-                                    className="bg-slate-600 border-slate-500 text-white"
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 mt-4">
-                          <FormField
-                            control={form.control}
-                            name={`testcases.${index}.test3`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-slate-200">Input</FormLabel>
-                                <FormControl>
-                                  <Textarea
-                                    placeholder="Test case input"
-                                    className="bg-slate-600 border-slate-500 text-white"
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={form.control}
-                            name={`testcases.${index}.output3`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-slate-200">Expected Output</FormLabel>
-                                <FormControl>
-                                  <Textarea
-                                    placeholder="Expected output"
-                                    className="bg-slate-600 border-slate-500 text-white"
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                )}
 
                 <div className="flex justify-end space-x-4">
                   <Button
