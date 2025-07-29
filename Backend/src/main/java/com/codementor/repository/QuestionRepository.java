@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -26,6 +27,11 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     
     @Query("SELECT q FROM Question q WHERE q.isApproved = false")
     List<Question> findByIsApprovedFalse();
+    
+    // Bulk update method for approving all questions efficiently
+    @Modifying
+    @Query("UPDATE Question q SET q.isApproved = true WHERE q.isApproved = false")
+    int bulkApproveAllQuestions();
     
     @Query(value = "SELECT q.* FROM questions q " +
            "JOIN questiontopics qt ON q.id = qt.question_id " +

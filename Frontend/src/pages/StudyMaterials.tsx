@@ -257,7 +257,7 @@ const StudyMaterials = () => {
             </Dialog>
           </div>
 
-          {/* Search Bar */}
+          {/* Search Bar
           <div className="mb-6">
             <div className="relative max-w-md mx-auto">
               <Search className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
@@ -269,7 +269,7 @@ const StudyMaterials = () => {
                 onKeyPress={handleKeyPress}
               />
             </div>
-          </div>
+          </div> */}
 
           {/* Search Results */}
           {searchTrigger.trim() && (

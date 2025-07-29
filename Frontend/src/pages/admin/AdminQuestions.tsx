@@ -255,7 +255,7 @@ const AdminQuestions = () => {
 
           {/* Search and Stats */}
           <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="relative flex-1">
+            {/* <div className="relative flex-1">
               <Search className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
               <Input
                 placeholder="Search questions by title or author..."
@@ -263,7 +263,7 @@ const AdminQuestions = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-            </div>
+            </div> */}
             <div className="flex items-center gap-4">
               <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
                 {totalElements} {isUnapproved ? "Pending" : "Total"} Questions

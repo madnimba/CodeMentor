@@ -299,22 +299,26 @@ public class AdminService {
     }
 
     // Bulk Operations
+    @Transactional
     public int approveAllArticles() {
-        List<Article> unapprovedArticles = articleRepository.findByIsApprovedFalse();
-        for (Article article : unapprovedArticles) {
-            article.setIsApproved(true);
-        }
-        articleRepository.saveAll(unapprovedArticles);
-        return unapprovedArticles.size();
+        // Get count before updating for return value
+        long count = articleRepository.countByIsApprovedFalse();
+        
+        // Use bulk update query instead of loading all articles into memory
+        int updatedCount = articleRepository.bulkApproveAllArticles();
+        
+        return updatedCount;
     }
 
+    @Transactional
     public int approveAllQuestions() {
-        List<Question> unapprovedQuestions = questionRepository.findByIsApprovedFalse();
-        for (Question question : unapprovedQuestions) {
-            question.setIsApproved(true);
-        }
-        questionRepository.saveAll(unapprovedQuestions);
-        return unapprovedQuestions.size();
+        // Get count before updating for return value
+        long count = questionRepository.countByIsApprovedFalse();
+        
+        // Use bulk update query instead of loading all questions into memory
+        int updatedCount = questionRepository.bulkApproveAllQuestions();
+        
+        return updatedCount;
     }
 
     // Mapping methods

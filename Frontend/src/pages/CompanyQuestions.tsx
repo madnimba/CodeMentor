@@ -914,7 +914,7 @@ const CompanyQuestions = () => {
             )}
           </div>
 
-          {/* Search Bar */}
+          {/* Search Bar
           <div className="mb-6">
             <div className="relative max-w-md">
               <Search className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
@@ -926,7 +926,7 @@ const CompanyQuestions = () => {
                 onKeyPress={handleKeyPress}
               />
             </div>
-          </div>
+          </div> */}
 
           <Card className="bg-slate-800/50 border-slate-700 mb-8">
             <CardContent className="p-6">
