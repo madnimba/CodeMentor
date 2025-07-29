@@ -59,6 +59,7 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     Long countSolvedQuestionsByUserAndTopic(@Param("userId") Integer userId, @Param("topicId") Integer topicId);
     
 <<<<<<< HEAD
+<<<<<<< HEAD
     // New methods for questiontopics table queries
     
     /**
@@ -88,6 +89,9 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     Long countSolvedNonCodingQuestionsByUserAndTopicFromQuestionTopics(@Param("userId") Integer userId, @Param("topicId") Integer topicId);
 =======
         // Search questions by multiple criteria
+=======
+    // Search questions by multiple criteria
+>>>>>>> cff9c44 (attempt to fix filters, docker taking forever)
     @Query("SELECT DISTINCT q FROM Question q " +
            "LEFT JOIN CompanyQuestion cq ON cq.question.id = q.id " +
            "LEFT JOIN cq.company c " +
@@ -103,5 +107,68 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
                                    @Param("isApproved") Boolean isApproved,
                                    @Param("isCoding") Boolean isCoding,
                                    Pageable pageable);
+<<<<<<< HEAD
 >>>>>>> 1732d8b (some searches work, some don't)
+=======
+
+    // Comprehensive filtering query for questions
+    @Query("SELECT DISTINCT q FROM Question q " +
+           "LEFT JOIN q.subtopic s " +
+           "LEFT JOIN s.topic t " +
+           "LEFT JOIN q.track tr " +
+           "LEFT JOIN CompanyQuestion cq ON cq.question.id = q.id " +
+           "LEFT JOIN cq.company c " +
+           "WHERE (:searchTerm IS NULL OR " +
+           "LOWER(q.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(q.description) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) AND " +
+           "(:trackId IS NULL OR tr.id = :trackId) AND " +
+           "(:topicId IS NULL OR t.id = :topicId) AND " +
+           "(:subtopicId IS NULL OR s.id = :subtopicId) AND " +
+           "(:difficulty IS NULL OR q.difficulty = :difficulty) AND " +
+           "(:year IS NULL OR q.year = :year) AND " +
+           "(:companyId IS NULL OR c.id = :companyId) AND " +
+           "(:isApproved IS NULL OR q.isApproved = :isApproved) AND " +
+           "(:isCoding IS NULL OR q.isCoding = :isCoding)")
+    Page<Question> findQuestionsWithFilters(@Param("searchTerm") String searchTerm,
+                                          @Param("trackId") Integer trackId,
+                                          @Param("topicId") Integer topicId,
+                                          @Param("subtopicId") Integer subtopicId,
+                                          @Param("difficulty") Question.Difficulty difficulty,
+                                          @Param("year") Short year,
+                                          @Param("companyId") Integer companyId,
+                                          @Param("isApproved") Boolean isApproved,
+                                          @Param("isCoding") Boolean isCoding,
+                                          Pageable pageable);
+
+    // Admin-specific comprehensive filtering
+    @Query("SELECT DISTINCT q FROM Question q " +
+           "LEFT JOIN q.subtopic s " +
+           "LEFT JOIN s.topic t " +
+           "LEFT JOIN q.track tr " +
+           "LEFT JOIN q.createdBy cb " +
+           "LEFT JOIN CompanyQuestion cq ON cq.question.id = q.id " +
+           "LEFT JOIN cq.company c " +
+           "WHERE (:searchTerm IS NULL OR " +
+           "LOWER(q.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(q.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(cb.username) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) AND " +
+           "(:trackId IS NULL OR tr.id = :trackId) AND " +
+           "(:topicId IS NULL OR t.id = :topicId) AND " +
+           "(:subtopicId IS NULL OR s.id = :subtopicId) AND " +
+           "(:difficulty IS NULL OR q.difficulty = :difficulty) AND " +
+           "(:year IS NULL OR q.year = :year) AND " +
+           "(:companyId IS NULL OR c.id = :companyId) AND " +
+           "(:isApproved IS NULL OR q.isApproved = :isApproved) AND " +
+           "(:isCoding IS NULL OR q.isCoding = :isCoding)")
+    Page<Question> findQuestionsWithFiltersAdmin(@Param("searchTerm") String searchTerm,
+                                               @Param("trackId") Integer trackId,
+                                               @Param("topicId") Integer topicId,
+                                               @Param("subtopicId") Integer subtopicId,
+                                               @Param("difficulty") Question.Difficulty difficulty,
+                                               @Param("year") Short year,
+                                               @Param("companyId") Integer companyId,
+                                               @Param("isApproved") Boolean isApproved,
+                                               @Param("isCoding") Boolean isCoding,
+                                               Pageable pageable);
+>>>>>>> cff9c44 (attempt to fix filters, docker taking forever)
 } 

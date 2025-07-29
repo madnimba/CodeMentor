@@ -72,6 +72,22 @@ public class CompanyController {
         return ResponseEntity.ok(companyQuestionService.searchCompanyQuestions(companyId, searchTerm, isCoding, pageable));
     }
 
+    @GetMapping("/{companyId}/questions/filter")
+    public ResponseEntity<Page<CompanyQuestionDTO>> getCompanyQuestionsWithFilters(
+            @PathVariable Integer companyId,
+            @RequestParam(required = false) String searchTerm,
+            @RequestParam(required = false) Integer trackId,
+            @RequestParam(required = false) Integer topicId,
+            @RequestParam(required = false) Integer subtopicId,
+            @RequestParam(required = false) String difficulty,
+            @RequestParam(required = false) Short year,
+            @RequestParam(required = false) Boolean isCoding,
+            Pageable pageable) {
+        return ResponseEntity.ok(companyQuestionService.getCompanyQuestionsWithFilters(
+            companyId, searchTerm, trackId, topicId, subtopicId, difficulty, year, isCoding, pageable
+        ));
+    }
+
     @GetMapping("/{companyId}/questions/coding")
     public ResponseEntity<List<CompanyQuestionDTO>> getCompanyCodingQuestions(@PathVariable Integer companyId) {
         return ResponseEntity.ok(companyQuestionService.getCompanyCodingQuestions(companyId));

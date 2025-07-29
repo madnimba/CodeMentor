@@ -100,6 +100,82 @@ public class QuestionService {
         return questions.map(this::mapToQuestionResponse);
     }
 
+    // Comprehensive filtering method
+    public org.springframework.data.domain.Page<QuestionResponse> getQuestionsWithFilters(
+            String searchTerm,
+            Integer trackId,
+            Integer topicId,
+            Integer subtopicId,
+            String difficulty,
+            Short year,
+            Integer companyId,
+            Boolean isCoding,
+            Boolean isApproved,
+            Pageable pageable) {
+        
+        Question.Difficulty difficultyEnum = null;
+        if (difficulty != null && !difficulty.isEmpty()) {
+            try {
+                difficultyEnum = Question.Difficulty.valueOf(difficulty);
+            } catch (IllegalArgumentException e) {
+                // Invalid difficulty, ignore
+            }
+        }
+        
+        org.springframework.data.domain.Page<Question> questions = questionRepository.findQuestionsWithFilters(
+            searchTerm,
+            trackId,
+            topicId,
+            subtopicId,
+            difficultyEnum,
+            year,
+            companyId,
+            isApproved != null ? isApproved : true, // Default to approved questions for public endpoints
+            isCoding,
+            pageable
+        );
+        
+        return questions.map(this::mapToQuestionResponse);
+    }
+
+    // Admin-specific filtering method
+    public org.springframework.data.domain.Page<QuestionResponse> getQuestionsWithFiltersAdmin(
+            String searchTerm,
+            Integer trackId,
+            Integer topicId,
+            Integer subtopicId,
+            String difficulty,
+            Short year,
+            Integer companyId,
+            Boolean isCoding,
+            Boolean isApproved,
+            Pageable pageable) {
+        
+        Question.Difficulty difficultyEnum = null;
+        if (difficulty != null && !difficulty.isEmpty()) {
+            try {
+                difficultyEnum = Question.Difficulty.valueOf(difficulty);
+            } catch (IllegalArgumentException e) {
+                // Invalid difficulty, ignore
+            }
+        }
+        
+        org.springframework.data.domain.Page<Question> questions = questionRepository.findQuestionsWithFiltersAdmin(
+            searchTerm,
+            trackId,
+            topicId,
+            subtopicId,
+            difficultyEnum,
+            year,
+            companyId,
+            isApproved,
+            isCoding,
+            pageable
+        );
+        
+        return questions.map(this::mapToQuestionResponse);
+    }
+
     private User getCurrentUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByEmail(email)

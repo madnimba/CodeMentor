@@ -91,6 +91,34 @@ export const questionService = {
     return response.data.data;
   },
 
+  async getQuestionsWithFilters(
+    searchTerm?: string,
+    trackId?: number,
+    topicId?: number,
+    subtopicId?: number,
+    difficulty?: string,
+    year?: number,
+    companyId?: number,
+    isCoding?: boolean,
+    page: number = 0,
+    size: number = 10
+  ): Promise<PaginatedResponse<Question>> {
+    const params = new URLSearchParams();
+    if (searchTerm) params.append('searchTerm', searchTerm);
+    if (trackId) params.append('trackId', trackId.toString());
+    if (topicId) params.append('topicId', topicId.toString());
+    if (subtopicId) params.append('subtopicId', subtopicId.toString());
+    if (difficulty) params.append('difficulty', difficulty);
+    if (year) params.append('year', year.toString());
+    if (companyId) params.append('companyId', companyId.toString());
+    if (isCoding !== undefined) params.append('isCoding', isCoding.toString());
+    params.append('page', page.toString());
+    params.append('size', size.toString());
+    
+    const response = await api.get(`/questions/filter?${params.toString()}`);
+    return response.data.data;
+  },
+
   async getRecommendedQuestions(articleId: number): Promise<Question[]> {
     const response = await api.get(`/articles/${articleId}/recommended-questions`);
     return response.data.data;

@@ -36,4 +36,22 @@ public class QuestionController {
             Pageable pageable) {
         return ResponseEntity.ok(ApiResponse.success(questionService.searchQuestions(searchTerm, isCoding, pageable)));
     }
+
+    @GetMapping("/filter")
+    public ResponseEntity<ApiResponse<Page<QuestionResponse>>> getQuestionsWithFilters(
+            @RequestParam(required = false) String searchTerm,
+            @RequestParam(required = false) Integer trackId,
+            @RequestParam(required = false) Integer topicId,
+            @RequestParam(required = false) Integer subtopicId,
+            @RequestParam(required = false) String difficulty,
+            @RequestParam(required = false) Short year,
+            @RequestParam(required = false) Integer companyId,
+            @RequestParam(required = false) Boolean isCoding,
+            Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(
+            questionService.getQuestionsWithFilters(
+                searchTerm, trackId, topicId, subtopicId, difficulty, year, companyId, isCoding, null, pageable
+            )
+        ));
+    }
 } 

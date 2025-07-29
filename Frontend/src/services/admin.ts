@@ -237,6 +237,36 @@ class AdminService {
     return response.data.data;
   }
 
+  async getQuestionsWithFilters(
+    searchTerm?: string,
+    trackId?: number,
+    topicId?: number,
+    subtopicId?: number,
+    difficulty?: string,
+    year?: number,
+    companyId?: number,
+    isCoding?: boolean,
+    isApproved?: boolean,
+    page: number = 0,
+    size: number = 10
+  ): Promise<PaginatedResponse<AdminQuestion>> {
+    const params = new URLSearchParams();
+    if (searchTerm) params.append('searchTerm', searchTerm);
+    if (trackId) params.append('trackId', trackId.toString());
+    if (topicId) params.append('topicId', topicId.toString());
+    if (subtopicId) params.append('subtopicId', subtopicId.toString());
+    if (difficulty) params.append('difficulty', difficulty);
+    if (year) params.append('year', year.toString());
+    if (companyId) params.append('companyId', companyId.toString());
+    if (isCoding !== undefined) params.append('isCoding', isCoding.toString());
+    if (isApproved !== undefined) params.append('isApproved', isApproved.toString());
+    params.append('page', page.toString());
+    params.append('size', size.toString());
+    
+    const response = await api.get(`${API_URL}/questions/filter?${params.toString()}`);
+    return response.data.data;
+  }
+
   async getUnapprovedQuestions(page: number = 0, size: number = 10): Promise<PaginatedResponse<AdminQuestion>> {
     console.log('AdminService.getUnapprovedQuestions called with:', { page, size });
     const response = await api.get(`${API_URL}/questions/unapproved?page=${page}&size=${size}`);

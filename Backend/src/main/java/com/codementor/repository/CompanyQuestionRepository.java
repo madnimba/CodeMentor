@@ -1,6 +1,7 @@
 package com.codementor.repository;
 
 import com.codementor.domain.CompanyQuestion;
+import com.codementor.domain.Question;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;
@@ -49,6 +50,33 @@ public interface CompanyQuestionRepository extends JpaRepository<CompanyQuestion
                                                 @Param("searchTerm") String searchTerm,
                                                 @Param("isCoding") Boolean isCoding,
                                                 Pageable pageable);
+    
+    // Comprehensive filtering for company questions
+    @Query("SELECT cq FROM CompanyQuestion cq " +
+           "JOIN FETCH cq.question q " +
+           "LEFT JOIN q.subtopic s " +
+           "LEFT JOIN s.topic t " +
+           "LEFT JOIN q.track tr " +
+           "WHERE cq.company.id = :companyId AND " +
+           "(:searchTerm IS NULL OR " +
+           "LOWER(q.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(q.description) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) AND " +
+           "(:trackId IS NULL OR tr.id = :trackId) AND " +
+           "(:topicId IS NULL OR t.id = :topicId) AND " +
+           "(:subtopicId IS NULL OR s.id = :subtopicId) AND " +
+           "(:difficulty IS NULL OR q.difficulty = :difficulty) AND " +
+           "(:year IS NULL OR q.year = :year) AND " +
+           "(:isCoding IS NULL OR q.isCoding = :isCoding) AND " +
+           "q.isApproved = true")
+    Page<CompanyQuestion> findCompanyQuestionsWithFilters(@Param("companyId") Integer companyId,
+                                                         @Param("searchTerm") String searchTerm,
+                                                         @Param("trackId") Integer trackId,
+                                                         @Param("topicId") Integer topicId,
+                                                         @Param("subtopicId") Integer subtopicId,
+                                                         @Param("difficulty") Question.Difficulty difficulty,
+                                                         @Param("year") Short year,
+                                                         @Param("isCoding") Boolean isCoding,
+                                                         Pageable pageable);
     
     // Count solved questions by user for a specific company
     @Query("SELECT COUNT(DISTINCT s.question.id) FROM Submission s " +

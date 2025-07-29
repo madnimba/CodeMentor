@@ -124,6 +124,25 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.success(adminService.searchQuestions(searchTerm, isApproved, isCoding, pageable)));
     }
 
+    @GetMapping("/questions/filter")
+    public ResponseEntity<ApiResponse<Page<AdminQuestionResponse>>> getQuestionsWithFilters(
+            @RequestParam(required = false) String searchTerm,
+            @RequestParam(required = false) Integer trackId,
+            @RequestParam(required = false) Integer topicId,
+            @RequestParam(required = false) Integer subtopicId,
+            @RequestParam(required = false) String difficulty,
+            @RequestParam(required = false) Short year,
+            @RequestParam(required = false) Integer companyId,
+            @RequestParam(required = false) Boolean isCoding,
+            @RequestParam(required = false) Boolean isApproved,
+            Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(
+            adminService.getQuestionsWithFilters(
+                searchTerm, trackId, topicId, subtopicId, difficulty, year, companyId, isCoding, isApproved, pageable
+            )
+        ));
+    }
+
     @GetMapping("/questions/unapproved")
     public ResponseEntity<ApiResponse<Page<AdminQuestionResponse>>> getUnapprovedQuestions(Pageable pageable) {
         return ResponseEntity.ok(ApiResponse.success(adminService.getUnapprovedQuestions(pageable)));

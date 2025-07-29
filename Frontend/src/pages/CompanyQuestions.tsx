@@ -20,7 +20,7 @@ import { useState, useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import Editor from "@monaco-editor/react";
 import { api } from "@/services/api";
-import { studyMaterialService, Track, Subtopic } from "@/services/studyMaterials";
+import { studyMaterialService, Track, Topic, Subtopic } from "@/services/studyMaterials";
 import { questionService, CreateQuestionRequest, TestcaseRequest } from "@/services/questions";
 import { companiesService, Company as CompanyType } from "@/services/companies";
 import { completedQuestionsApi } from "@/services/completedQuestions";
@@ -70,6 +70,16 @@ interface PaginatedResponse<T> {
   last: boolean;
 }
 
+interface FilterState {
+  searchTerm: string;
+  trackId: number | undefined;
+  topicId: number | undefined;
+  subtopicId: number | undefined;
+  difficulty: string;
+  year: number | undefined;
+  isCoding: boolean | undefined;
+}
+
 const CompanyQuestions = () => {
   const { companyId } = useParams();
   const navigate = useNavigate();
@@ -85,9 +95,22 @@ const CompanyQuestions = () => {
   const [totalElements, setTotalElements] = useState(0);
   const [pageSize] = useState(10); // 10 questions per page
 
+  // Filter state
+  const [filters, setFilters] = useState<FilterState>({
+    searchTerm: "",
+    trackId: undefined,
+    topicId: undefined,
+    subtopicId: undefined,
+    difficulty: "all",
+    year: undefined,
+    isCoding: undefined,
+  });
+
   // Question creation state
   const [isQuestionDialogOpen, setIsQuestionDialogOpen] = useState(false);
   const [tracks, setTracks] = useState<Track[]>([]);
+  const [topics, setTopics] = useState<Topic[]>([]);
+  const [allSubtopics, setAllSubtopics] = useState<Subtopic[]>([]);
   const [subtopics, setSubtopics] = useState<{ [key: number]: Subtopic[] }>({});
   const [companies, setCompanies] = useState<CompanyType[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -117,27 +140,71 @@ const CompanyQuestions = () => {
 
   const selectedTrackId = form.watch("trackId");
 
-  // Fetch tracks and companies for question creation
+  // Update filter
+  const updateFilter = (key: keyof FilterState, value: any) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+    setCurrentPage(0); // Reset to first page when filters change
+  };
+
+  // Clear all filters
+  const clearFilters = () => {
+    setFilters({
+      searchTerm: "",
+      trackId: undefined,
+      topicId: undefined,
+      subtopicId: undefined,
+      difficulty: "all",
+      year: undefined,
+      isCoding: undefined,
+    });
+    setCurrentPage(0);
+  };
+
+  // Load filter options
   useEffect(() => {
-    const fetchData = async () => {
+    const loadFilterOptions = async () => {
       try {
         const [tracksData, companiesData] = await Promise.all([
           studyMaterialService.getAllTracks(),
           companiesService.getAllCompanies()
         ]);
+        
         setTracks(tracksData);
         setCompanies(companiesData);
+        
+        // Generate years (current year and previous 5 years)
+        const currentYear = new Date().getFullYear();
+        const yearOptions = Array.from({ length: 6 }, (_, i) => currentYear - i);
+        setYears(yearOptions);
+        
+        // Load all topics and subtopics for filtering
+        const allTopics: Topic[] = [];
+        const allSubtopicsData: Subtopic[] = [];
+        
+        for (const track of tracksData) {
+          const trackTopics = await studyMaterialService.getTopicsByTrackId(track.id);
+          allTopics.push(...trackTopics);
+          
+          for (const topic of trackTopics) {
+            const topicSubtopics = await studyMaterialService.getSubtopicsByTopicId(topic.id);
+            allSubtopicsData.push(...topicSubtopics);
+          }
+        }
+        
+        setTopics(allTopics);
+        setAllSubtopics(allSubtopicsData);
       } catch (err) {
-        console.error("Failed to fetch data:", err);
+        console.error("Failed to load filter options:", err);
       }
     };
-    fetchData();
+    
+    loadFilterOptions();
   }, []);
 
-  // Fetch subtopics when track is selected
+  // Fetch topics and subtopics when track is selected
   useEffect(() => {
     if (selectedTrackId && selectedTrackId > 0) {
-      const fetchSubtopics = async () => {
+      const fetchTopicsAndSubtopics = async () => {
         try {
           const topics = await studyMaterialService.getTopicsByTrackId(selectedTrackId);
           const allSubtopics: Subtopic[] = [];
@@ -147,10 +214,10 @@ const CompanyQuestions = () => {
           }
           setSubtopics(prev => ({ ...prev, [selectedTrackId]: allSubtopics }));
         } catch (err) {
-          console.error("Failed to fetch subtopics:", err);
+          console.error("Failed to fetch topics and subtopics:", err);
         }
       };
-      fetchSubtopics();
+      fetchTopicsAndSubtopics();
     }
   }, [selectedTrackId]);
 
@@ -182,17 +249,37 @@ const CompanyQuestions = () => {
 
     const fetchData = async () => {
       try {
-        const [companyRes, questionsRes] = await Promise.all([
-          api.get(`/companies/${companyId}`),
-          searchTrigger.trim() 
-            ? api.get(`/companies/${companyId}/questions/search?searchTerm=${encodeURIComponent(searchTrigger)}&page=${currentPage}&size=${pageSize}`)
-            : api.get(`/companies/${companyId}/questions/paginated?page=${currentPage}&size=${pageSize}`)
-        ]);
-
+        const companyRes = await api.get(`/companies/${companyId}`);
         setCompanyData(companyRes.data);
 
-        const paginatedData: PaginatedResponse<any> = questionsRes.data;
-        const mappedQuestions: Question[] = paginatedData.content.map((cq: any) => ({
+        // Use comprehensive filtering if any filters are applied
+        const hasFilters = filters.searchTerm.trim() || 
+                          filters.trackId || 
+                          filters.topicId || 
+                          filters.subtopicId || 
+                          (filters.difficulty && filters.difficulty !== "all") ||
+                          filters.year || 
+                          filters.isCoding !== undefined;
+
+        let questionsRes;
+        if (hasFilters) {
+          questionsRes = await companiesService.getCompanyQuestionsWithFilters(
+            Number(companyId),
+            filters.searchTerm.trim() || undefined,
+            filters.trackId,
+            filters.topicId,
+            filters.subtopicId,
+            filters.difficulty !== "all" ? filters.difficulty : undefined,
+            filters.year,
+            filters.isCoding,
+            currentPage,
+            pageSize
+          );
+        } else {
+          questionsRes = await companiesService.getCompanyQuestions(Number(companyId), currentPage, pageSize);
+        }
+
+        const mappedQuestions: Question[] = questionsRes.content.map((cq: any) => ({
           id: cq.id,
           title: cq.title,
           description: cq.description,
@@ -226,7 +313,7 @@ const CompanyQuestions = () => {
     };
 
     fetchData();
-  }, [companyId, currentPage, pageSize, searchTrigger]);
+  }, [companyId, currentPage, pageSize, filters]);
 
   const toggleAnswer = (questionId: number) => {
     setExpandedQuestionId(expandedQuestionId === questionId ? null : questionId);
@@ -914,19 +1001,208 @@ const CompanyQuestions = () => {
             )}
           </div>
 
-          {/* Search Bar
+          {/* Search Bar */}
           <div className="mb-6">
-            <div className="relative max-w-md">
-              <Search className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
-              <Input
-                placeholder="Search questions... (Press Enter to search)"
-                className="pl-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-400"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyPress={handleKeyPress}
-              />
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              {/* Left side - Search and primary filters */}
+              <div className="lg:col-span-3 space-y-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
+                  <Input
+                    placeholder="Search questions... (Press Enter to search)"
+                    className="pl-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-400"
+                    value={filters.searchTerm}
+                    onChange={(e) => updateFilter("searchTerm", e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && setCurrentPage(0)}
+                  />
+                </div>
+                
+                {/* Active Filters Display */}
+                {(filters.searchTerm || filters.trackId || filters.topicId || filters.subtopicId || 
+                  (filters.difficulty && filters.difficulty !== "all") || filters.year || filters.isCoding !== undefined) && (
+                  <div className="flex flex-wrap gap-2 items-center">
+                    <span className="text-sm text-slate-400">Active filters:</span>
+                    
+                    {filters.searchTerm && (
+                      <Badge variant="secondary" className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+                        Search: "{filters.searchTerm}"
+                      </Badge>
+                    )}
+                    
+                    {filters.trackId && (
+                      <Badge variant="secondary" className="bg-green-500/20 text-green-400 border-green-500/30">
+                        Track: {tracks.find(t => t.id === filters.trackId)?.name || filters.trackId}
+                      </Badge>
+                    )}
+                    
+                    {filters.topicId && (
+                      <Badge variant="secondary" className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                        Topic: {topics.find(t => t.id === filters.topicId)?.name || filters.topicId}
+                      </Badge>
+                    )}
+                    
+                    {filters.subtopicId && (
+                      <Badge variant="secondary" className="bg-pink-500/20 text-pink-400 border-pink-500/30">
+                        Subtopic: {allSubtopics.find(s => s.id === filters.subtopicId)?.name || filters.subtopicId}
+                      </Badge>
+                    )}
+                    
+                    {filters.difficulty && filters.difficulty !== "all" && (
+                      <Badge variant="secondary" className={
+                        filters.difficulty === "Easy" ? "bg-green-500/20 text-green-400 border-green-500/30" :
+                        filters.difficulty === "Medium" ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" :
+                        "bg-red-500/20 text-red-400 border-red-500/30"
+                      }>
+                        {filters.difficulty}
+                      </Badge>
+                    )}
+                    
+                    {filters.year && (
+                      <Badge variant="secondary" className="bg-orange-500/20 text-orange-400 border-orange-500/30">
+                        Year: {filters.year}
+                      </Badge>
+                    )}
+                    
+                    {filters.isCoding !== undefined && (
+                      <Badge variant="secondary" className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                        Type: {filters.isCoding ? "Coding" : "Theory"}
+                      </Badge>
+                    )}
+                    
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearFilters}
+                      className="text-slate-400 hover:text-white h-6 px-2"
+                    >
+                      <X className="w-3 h-3 mr-1" />
+                      Clear all
+                    </Button>
+                  </div>
+                )}
+              </div>
+              
+              {/* Right side - Filter panel */}
+              <div className="lg:col-span-1">
+                <Card className="bg-slate-800/50 border-slate-700">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2 text-sm">
+                      <Filter className="w-4 h-4" />
+                      Filters
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Track Filter */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-slate-300">Track</label>
+                      <Select value={filters.trackId?.toString() || "all"} onValueChange={(value) => updateFilter("trackId", value === "all" ? undefined : parseInt(value, 10))}>
+                        <SelectTrigger className="bg-slate-700 border-slate-600 h-8 text-xs">
+                          <SelectValue placeholder="Select track" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-700 border-slate-600">
+                          <SelectItem value="all" className="text-slate-300">All Tracks</SelectItem>
+                          {tracks.map(track => (
+                            <SelectItem key={track.id} value={track.id.toString()}>
+                              {track.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Topic Filter */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-slate-300">Topic</label>
+                      <Select value={filters.topicId?.toString() || "all"} onValueChange={(value) => updateFilter("topicId", value === "all" ? undefined : parseInt(value, 10))}>
+                        <SelectTrigger className="bg-slate-700 border-slate-600 h-8 text-xs">
+                          <SelectValue placeholder="Select topic" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-700 border-slate-600">
+                          <SelectItem value="all" className="text-slate-300">All Topics</SelectItem>
+                          {topics.filter(topic => !filters.trackId || topic.trackId === filters.trackId).map(topic => (
+                            <SelectItem key={topic.id} value={topic.id.toString()}>
+                              {topic.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Subtopic Filter */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-slate-300">Subtopic</label>
+                      <Select value={filters.subtopicId?.toString() || "all"} onValueChange={(value) => updateFilter("subtopicId", value === "all" ? undefined : parseInt(value, 10))}>
+                        <SelectTrigger className="bg-slate-700 border-slate-600 h-8 text-xs">
+                          <SelectValue placeholder="Select subtopic" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-700 border-slate-600">
+                          <SelectItem value="all" className="text-slate-300">All Subtopics</SelectItem>
+                          {allSubtopics.filter(subtopic => !filters.topicId || subtopic.topicId === filters.topicId).map(subtopic => (
+                            <SelectItem key={subtopic.id} value={subtopic.id.toString()}>
+                              {subtopic.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Difficulty Filter */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-slate-300">Difficulty</label>
+                      <Select value={filters.difficulty} onValueChange={(value) => updateFilter("difficulty", value)}>
+                        <SelectTrigger className="bg-slate-700 border-slate-600 h-8 text-xs">
+                          <SelectValue placeholder="Select difficulty" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-700 border-slate-600">
+                          <SelectItem value="all" className="text-slate-300">All Difficulties</SelectItem>
+                          <SelectItem value="Easy" className="text-green-400">Easy</SelectItem>
+                          <SelectItem value="Medium" className="text-yellow-400">Medium</SelectItem>
+                          <SelectItem value="Hard" className="text-red-400">Hard</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Year Filter */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-slate-300">Year</label>
+                      <Select value={filters.year?.toString() || "all"} onValueChange={(value) => updateFilter("year", value === "all" ? undefined : parseInt(value, 10))}>
+                        <SelectTrigger className="bg-slate-700 border-slate-600 h-8 text-xs">
+                          <SelectValue placeholder="Select year" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-700 border-slate-600">
+                          <SelectItem value="all" className="text-slate-300">All Years</SelectItem>
+                          {years.map(year => (
+                            <SelectItem key={year} value={year.toString()}>
+                              {year}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Type Filter */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-slate-300">Type</label>
+                      <Select value={filters.isCoding?.toString() || "all"} onValueChange={(value) => updateFilter("isCoding", value === "all" ? undefined : value === "true")}>
+                        <SelectTrigger className="bg-slate-700 border-slate-600 h-8 text-xs">
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-700 border-slate-600">
+                          <SelectItem value="all" className="text-slate-300">All Types</SelectItem>
+                          <SelectItem value="true" className="text-purple-400">Coding</SelectItem>
+                          <SelectItem value="false" className="text-gray-400">Theory</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <Button variant="outline" onClick={clearFilters} className="w-full text-slate-400 hover:text-white border-slate-600 hover:bg-slate-600/50 h-8 text-xs">
+                      <X className="w-3 h-3 mr-1" /> Clear
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
-          </div> */}
+          </div>
 
           <Card className="bg-slate-800/50 border-slate-700 mb-8">
             <CardContent className="p-6">

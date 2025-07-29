@@ -250,6 +250,44 @@ public class AdminService {
         return questions.map(this::mapToAdminQuestionResponse);
     }
 
+    // Comprehensive filtering for admin question searches
+    public Page<AdminQuestionResponse> getQuestionsWithFilters(
+            String searchTerm,
+            Integer trackId,
+            Integer topicId,
+            Integer subtopicId,
+            String difficulty,
+            Short year,
+            Integer companyId,
+            Boolean isCoding,
+            Boolean isApproved,
+            Pageable pageable) {
+        
+        Question.Difficulty difficultyEnum = null;
+        if (difficulty != null && !difficulty.isEmpty()) {
+            try {
+                difficultyEnum = Question.Difficulty.valueOf(difficulty);
+            } catch (IllegalArgumentException e) {
+                // Invalid difficulty, ignore
+            }
+        }
+        
+        Page<Question> questions = questionRepository.findQuestionsWithFiltersAdmin(
+            searchTerm,
+            trackId,
+            topicId,
+            subtopicId,
+            difficultyEnum,
+            year,
+            companyId,
+            isApproved,
+            isCoding,
+            pageable
+        );
+        
+        return questions.map(this::mapToAdminQuestionResponse);
+    }
+
     // Company Management
     public Page<AdminCompanyResponse> getAllCompanies(Pageable pageable) {
         return companyRepository.findAll(pageable).map(this::mapToAdminCompanyResponse);

@@ -86,6 +86,42 @@ public class CompanyQuestionService {
         return questions.map(this::convertToDTO);
     }
 
+    // Comprehensive filtering for company questions
+    public Page<CompanyQuestionDTO> getCompanyQuestionsWithFilters(
+            Integer companyId,
+            String searchTerm,
+            Integer trackId,
+            Integer topicId,
+            Integer subtopicId,
+            String difficulty,
+            Short year,
+            Boolean isCoding,
+            Pageable pageable) {
+        
+        Question.Difficulty difficultyEnum = null;
+        if (difficulty != null && !difficulty.isEmpty()) {
+            try {
+                difficultyEnum = Question.Difficulty.valueOf(difficulty);
+            } catch (IllegalArgumentException e) {
+                // Invalid difficulty, ignore
+            }
+        }
+        
+        Page<CompanyQuestion> questions = companyQuestionRepository.findCompanyQuestionsWithFilters(
+            companyId,
+            searchTerm,
+            trackId,
+            topicId,
+            subtopicId,
+            difficultyEnum,
+            year,
+            isCoding,
+            pageable
+        );
+        
+        return questions.map(this::convertToDTO);
+    }
+
     public QuestionDetailsDTO getQuestionDetails(Integer companyId, Integer questionId) {
         CompanyQuestion companyQuestion = companyQuestionRepository.findByCompanyIdAndQuestionId(companyId, questionId);
         if (companyQuestion == null) {
