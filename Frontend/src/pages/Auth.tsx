@@ -211,13 +211,13 @@ const Auth = () => {
                     <span className="mx-2 text-slate-400 text-xs">or</span>
                     <div className="flex-grow border-t border-slate-600" />
                   </div>
-                  <div className="w-full">
+                  {/* <div className="w-full">
                     <GoogleSignInButton
                       clientId={GOOGLE_CLIENT_ID}
                       onCredential={handleGoogleSignIn}
                       buttonText="Continue with Google"
                     />
-                  </div>
+                  </div> */}
                   </form>
                   <div className="text-center text-sm text-slate-400">
                     Don't have an account?{" "}
@@ -331,14 +331,14 @@ const Auth = () => {
                     <span className="mx-2 text-slate-400 text-xs">or</span>
                     <div className="flex-grow border-t border-slate-600" />
                   </div>
-                  <div className="w-full">
+                  {/* <div className="w-full">
                     <GoogleSignInButton
                       clientId={GOOGLE_CLIENT_ID}
                       onCredential={handleGoogleSignUp}
                       buttonText="Continue with Google"
                     />
                   </div>
-                  
+                   */}
                   </form>
                   <div className="text-center text-sm text-slate-400">
                     Already have an account?{" "}

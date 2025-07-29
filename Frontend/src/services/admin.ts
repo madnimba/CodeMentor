@@ -92,7 +92,8 @@ export interface UpdateQuestionRequest {
   description: string;
   difficulty: string;
   importanceTag?: string;
-  trackId: number;
+  trackId?: number; // Optional - only update track if provided
+  topicId?: number; // Optional - only update topic if provided
   subtopicId?: number;
   isApproved?: boolean;
   isCoding?: boolean;

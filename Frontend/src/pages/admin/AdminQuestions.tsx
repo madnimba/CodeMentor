@@ -87,9 +87,14 @@ const AdminQuestions = () => {
     importanceTag: "",
     year: 2024,
     isCoding: false,
-    trackId: 0,
+    trackId: undefined as number | undefined,
+    topicId: undefined as number | undefined,
     subtopicId: undefined as number | undefined,
   });
+  
+  // Available options for edit form cascading dropdowns
+  const [availableTopicsForEdit, setAvailableTopicsForEdit] = useState<Topic[]>([]);
+  const [availableSubtopicsForEdit, setAvailableSubtopicsForEdit] = useState<Subtopic[]>([]);
   
   // Testcase manager state
   const [isTestcaseManagerOpen, setIsTestcaseManagerOpen] = useState(false);
@@ -121,12 +126,25 @@ const AdminQuestions = () => {
   useEffect(() => {
     const loadFilterOptions = async () => {
       try {
-        const [tracksData, companiesData] = await Promise.all([
-          studyMaterialService.getAllTracks(),
-          companiesService.getAllCompanies()
-        ]);
+        console.log("Starting to load filter options...");
+        
+        // Test direct API call to see what's happening
+        console.log("Testing direct API call to /articles/tracks...");
+        
+        // Load tracks first
+        const tracksData = await studyMaterialService.getAllTracks();
+        console.log("✅ Successfully loaded tracks:", tracksData);
+        console.log("Number of tracks:", tracksData.length);
+        
+        if (tracksData.length === 0) {
+          console.warn("⚠️ No tracks found in database");
+        }
         
         setTracks(tracksData);
+        
+        // Load companies
+        const companiesData = await companiesService.getAllCompanies();
+        console.log("✅ Successfully loaded companies:", companiesData.length);
         setCompanies(companiesData);
         
         // Generate years (current year and previous 5 years)
@@ -134,24 +152,52 @@ const AdminQuestions = () => {
         const yearOptions = Array.from({ length: 6 }, (_, i) => currentYear - i);
         setYears(yearOptions);
         
-        // Load all topics and subtopics for filtering
-        const allTopics: Topic[] = [];
-        const allSubtopicsData: Subtopic[] = [];
-        
-        for (const track of tracksData) {
-          const trackTopics = await studyMaterialService.getTopicsByTrackId(track.id);
-          allTopics.push(...trackTopics);
+        // Only load topics and subtopics if we have tracks
+        if (tracksData.length > 0) {
+          console.log(`Loading topics for ${tracksData.length} tracks...`);
           
-          for (const topic of trackTopics) {
-            const topicSubtopics = await studyMaterialService.getSubtopicsByTopicId(topic.id);
-            allSubtopicsData.push(...topicSubtopics);
+          // Load all topics and subtopics for filtering
+          const allTopics: Topic[] = [];
+          const allSubtopicsData: Subtopic[] = [];
+          
+          for (const track of tracksData) {
+            try {
+              const trackTopics = await studyMaterialService.getTopicsByTrackId(track.id);
+              console.log(`Loaded ${trackTopics.length} topics for track ${track.name}`);
+              allTopics.push(...trackTopics);
+              
+              for (const topic of trackTopics) {
+                try {
+                  const topicSubtopics = await studyMaterialService.getSubtopicsByTopicId(topic.id);
+                  console.log(`Loaded ${topicSubtopics.length} subtopics for topic ${topic.name}`);
+                  allSubtopicsData.push(...topicSubtopics);
+                } catch (subtopicErr) {
+                  console.error(`Failed to load subtopics for topic ${topic.name}:`, subtopicErr);
+                }
+              }
+            } catch (topicErr) {
+              console.error(`Failed to load topics for track ${track.name}:`, topicErr);
+            }
           }
+          
+          console.log("Final topics loaded:", allTopics.length);
+          console.log("Final subtopics loaded:", allSubtopicsData.length);
+          
+          setTopics(allTopics);
+          setAllSubtopics(allSubtopicsData);
+        } else {
+          console.log("Skipping topics/subtopics loading because no tracks found");
+          setTopics([]);
+          setAllSubtopics([]);
         }
         
-        setTopics(allTopics);
-        setAllSubtopics(allSubtopicsData);
+        console.log("✅ Filter options loading completed successfully");
       } catch (err) {
-        console.error("Failed to load filter options:", err);
+        console.error("❌ Failed to load filter options:", err);
+        if (err instanceof Error) {
+          console.error("Error message:", err.message);
+          console.error("Error stack:", err.stack);
+        }
       }
     };
     
@@ -231,8 +277,14 @@ const AdminQuestions = () => {
     setIsViewDialogOpen(true);
   };
 
-  const handleEditQuestion = (question: AdminQuestion) => {
+  const handleEditQuestion = async (question: AdminQuestion) => {
     setEditingQuestion(question);
+    
+    // Find current track, topic, subtopic IDs from the names
+    const currentTrack = tracks.find(t => t.name === question.track);
+    const currentSubtopic = allSubtopics.find(s => s.name === question.subtopic);
+    const currentTopic = currentSubtopic ? topics.find(t => t.id === currentSubtopic.topicId) : undefined;
+    
     setEditForm({
       title: question.title,
       description: question.description,
@@ -240,10 +292,59 @@ const AdminQuestions = () => {
       importanceTag: question.importanceTag || "",
       year: question.question_year,
       isCoding: question.isCoding,
-      trackId: 0, // Default value since AdminQuestion doesn't have trackId
-      subtopicId: undefined, // Default value since AdminQuestion doesn't have subtopicId
+      trackId: currentTrack?.id,
+      topicId: currentTopic?.id,
+      subtopicId: currentSubtopic?.id,
     });
+    
+    // Load available topics and subtopics for the current track/topic
+    if (currentTrack) {
+      try {
+        const trackTopics = await studyMaterialService.getTopicsByTrackId(currentTrack.id);
+        setAvailableTopicsForEdit(trackTopics);
+        
+        if (currentTopic) {
+          const topicSubtopics = await studyMaterialService.getSubtopicsByTopicId(currentTopic.id);
+          setAvailableSubtopicsForEdit(topicSubtopics);
+        }
+      } catch (error) {
+        console.error("Failed to load topics/subtopics for edit:", error);
+      }
+    }
+    
     setIsEditDialogOpen(true);
+  };
+
+  // Handle cascading selection for edit form
+  const handleEditTrackChange = async (trackId: string) => {
+    const newTrackId = trackId === "none" ? undefined : parseInt(trackId);
+    setEditForm(prev => ({ ...prev, trackId: newTrackId, topicId: undefined, subtopicId: undefined }));
+    setAvailableTopicsForEdit([]);
+    setAvailableSubtopicsForEdit([]);
+    
+    if (newTrackId) {
+      try {
+        const trackTopics = await studyMaterialService.getTopicsByTrackId(newTrackId);
+        setAvailableTopicsForEdit(trackTopics);
+      } catch (error) {
+        console.error("Failed to load topics:", error);
+      }
+    }
+  };
+
+  const handleEditTopicChange = async (topicId: string) => {
+    const newTopicId = topicId === "none" ? undefined : parseInt(topicId);
+    setEditForm(prev => ({ ...prev, topicId: newTopicId, subtopicId: undefined }));
+    setAvailableSubtopicsForEdit([]);
+    
+    if (newTopicId) {
+      try {
+        const topicSubtopics = await studyMaterialService.getSubtopicsByTopicId(newTopicId);
+        setAvailableSubtopicsForEdit(topicSubtopics);
+      } catch (error) {
+        console.error("Failed to load subtopics:", error);
+      }
+    }
   };
 
   const handleUpdateQuestion = async () => {
@@ -252,12 +353,18 @@ const AdminQuestions = () => {
     try {
       await adminService.updateQuestion(editingQuestion.id, editForm);
       toast.success("Question updated successfully");
-      setIsEditDialogOpen(false);
-      setEditingQuestion(null);
+      handleCloseEditDialog();
       fetchQuestions();
     } catch (err: any) {
       toast.error(err?.response?.data?.message || "Failed to update question");
     }
+  };
+
+  const handleCloseEditDialog = () => {
+    setIsEditDialogOpen(false);
+    setEditingQuestion(null);
+    setAvailableTopicsForEdit([]);
+    setAvailableSubtopicsForEdit([]);
   };
 
   const handleViewTestcases = (questionId: number) => {
@@ -381,6 +488,43 @@ const AdminQuestions = () => {
               </TabsTrigger>
             </TabsList>
           </Tabs>
+
+          {/* Debug Info */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="mb-4 p-3 bg-slate-800/30 border border-slate-700 rounded-lg text-sm">
+              <div className="text-slate-300">
+                <strong>Debug Info:</strong> Tracks loaded: {tracks.length} | Topics: {topics.length} | Subtopics: {allSubtopics.length}
+              </div>
+              {tracks.length === 0 && (
+                <div className="text-yellow-400 mt-1 flex items-center gap-2">
+                  ⚠️ No tracks loaded - check console for errors or verify database has track data
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={async () => {
+                      console.log("Manual track reload test...");
+                      try {
+                        const testTracks = await studyMaterialService.getAllTracks();
+                        console.log("Manual test result:", testTracks);
+                        if (testTracks.length > 0) {
+                          setTracks(testTracks);
+                          toast.success(`Loaded ${testTracks.length} tracks manually`);
+                        } else {
+                          toast.warning("API works but no tracks found in database");
+                        }
+                      } catch (err) {
+                        console.error("Manual test failed:", err);
+                        toast.error("Failed to load tracks manually");
+                      }
+                    }}
+                    className="text-xs border-yellow-500 text-yellow-400 hover:bg-yellow-500/10"
+                  >
+                    Test Reload
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Search and Stats */}
           <div className="flex flex-col gap-6 mb-6">
@@ -710,7 +854,9 @@ const AdminQuestions = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleEditQuestion(question)}
-                        className="text-blue-400 hover:text-blue-300"
+                        disabled={tracks.length === 0}
+                        className="text-blue-400 hover:text-blue-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        title={tracks.length === 0 ? "Loading tracks..." : "Edit question"}
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
@@ -929,7 +1075,7 @@ const AdminQuestions = () => {
           </Dialog>
 
           {/* Edit Question Dialog */}
-          <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <Dialog open={isEditDialogOpen} onOpenChange={(open) => !open && handleCloseEditDialog()}>
             <DialogContent className="bg-slate-800 border-slate-700 max-w-2xl max-h-[80vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="text-white">Edit Question</DialogTitle>
@@ -986,6 +1132,73 @@ const AdminQuestions = () => {
                     </div>
                   </div>
                   
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <Label className="text-slate-200">Track</Label>
+                      <Select 
+                        value={editForm.trackId?.toString() || "none"} 
+                        onValueChange={handleEditTrackChange}
+                      >
+                        <SelectTrigger className="bg-slate-700 border-slate-600 text-white mt-1">
+                          <SelectValue placeholder="Select track" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-700 border-slate-600">
+                          <SelectItem value="none">No track selected</SelectItem>
+                          {tracks.length === 0 && (
+                            <SelectItem value="loading" disabled>Loading tracks...</SelectItem>
+                          )}
+                          {tracks.map(track => (
+                            <SelectItem key={track.id} value={track.id.toString()}>
+                              {track.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label className="text-slate-200">Topic</Label>
+                      <Select 
+                        value={editForm.topicId?.toString() || "none"} 
+                        onValueChange={handleEditTopicChange}
+                        disabled={!editForm.trackId}
+                      >
+                        <SelectTrigger className="bg-slate-700 border-slate-600 text-white mt-1">
+                          <SelectValue placeholder="Select topic" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-700 border-slate-600">
+                          <SelectItem value="none">No topic selected</SelectItem>
+                          {availableTopicsForEdit.map(topic => (
+                            <SelectItem key={topic.id} value={topic.id.toString()}>
+                              {topic.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label className="text-slate-200">Subtopic</Label>
+                      <Select 
+                        value={editForm.subtopicId?.toString() || "none"} 
+                        onValueChange={(value) => setEditForm({...editForm, subtopicId: value === "none" ? undefined : parseInt(value)})}
+                        disabled={!editForm.topicId}
+                      >
+                        <SelectTrigger className="bg-slate-700 border-slate-600 text-white mt-1">
+                          <SelectValue placeholder="Select subtopic" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-700 border-slate-600">
+                          <SelectItem value="none">No subtopic selected</SelectItem>
+                          {availableSubtopicsForEdit.map(subtopic => (
+                            <SelectItem key={subtopic.id} value={subtopic.id.toString()}>
+                              {subtopic.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
                   <div>
                     <Label className="text-slate-200">Importance Tag (Optional)</Label>
                     <Input
@@ -1007,7 +1220,7 @@ const AdminQuestions = () => {
                   <div className="flex justify-end space-x-4 pt-4">
                     <Button
                       variant="outline"
-                      onClick={() => setIsEditDialogOpen(false)}
+                      onClick={handleCloseEditDialog}
                       className="border-slate-600 text-slate-300 hover:bg-slate-700"
                     >
                       Cancel
