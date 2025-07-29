@@ -167,15 +167,16 @@ const AdminQuestions = () => {
       setLoading(true);
       
       // Use comprehensive filtering if any filters are applied
-      const hasFilters = filters.searchTerm.trim() || 
-                        filters.trackId || 
-                        filters.topicId || 
-                        filters.subtopicId || 
-                        (filters.difficulty && filters.difficulty !== "all") ||
-                        filters.year || 
-                        filters.companyId ||
-                        filters.isCoding !== undefined ||
-                        filters.isApproved !== undefined;
+      // const hasFilters = filters.searchTerm.trim() || 
+      //                   filters.trackId || 
+      //                   filters.topicId || 
+      //                   filters.subtopicId || 
+      //                   (filters.difficulty && filters.difficulty !== "all") ||
+      //                   filters.year || 
+      //                   filters.companyId ||
+      //                   filters.isCoding !== undefined ||
+      //                   filters.isApproved !== undefined;
+      const hasFilters = false;
 
       let response: PaginatedResponse<AdminQuestion>;
       
