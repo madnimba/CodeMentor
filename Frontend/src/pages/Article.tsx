@@ -286,7 +286,7 @@ const Article = () => {
                               variant="outline" 
                               className="border-purple-500/50 bg-purple-600/20 text-purple-300 hover:bg-purple-600/30 hover:text-white transition-colors"
                             >
-                              <Link to={question.isCoding ? `/live-coding?questionId=${question.id}` : `/problem-selection?questionId=${question.id}`}>
+                              <Link to={question.isCoding ? `/live-coding/${question.id}` : `/problem-selection?questionId=${question.id}`}>
                                 <ExternalLink className="w-4 h-4 mr-2" />
                                 Practice
                               </Link>
