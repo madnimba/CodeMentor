@@ -1,6 +1,7 @@
 package com.codementor.controller;
 
 import com.codementor.dto.CompanyDTO;
+import com.codementor.dto.CompanyStatsDTO;
 import com.codementor.dto.CompanyQuestionDTO;
 import com.codementor.dto.QuestionDetailsDTO;
 import com.codementor.service.CompanyService;
@@ -36,6 +37,11 @@ public class CompanyController {
     @GetMapping("/{id}")
     public ResponseEntity<CompanyDTO> getCompanyById(@PathVariable Integer id) {
         return ResponseEntity.ok(companyService.getCompanyById(id));
+    }
+
+    @GetMapping("/featured")
+    public ResponseEntity<List<CompanyStatsDTO>> getFeaturedCompanies() {
+        return ResponseEntity.ok(companyService.getFeaturedCompanies());
     }
 
     @GetMapping("/{companyId}/questions")

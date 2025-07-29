@@ -9,6 +9,7 @@ export interface Track {
 export interface Topic {
   id: number;
   name: string;
+  trackId: number;
   progress: number;
   subtopics: Subtopic[];
 }
@@ -16,13 +17,15 @@ export interface Topic {
 export interface Subtopic {
   id: number;
   name: string;
+  topicId: number;
   isRead: boolean;
+  articleSlug: string;
 }
 
 export interface JobRole {
   id: number;
   name: string;
-  category?: string;
+  description: string;
 }
 
 export interface CreateArticleRequest {
@@ -31,8 +34,7 @@ export interface CreateArticleRequest {
   trackId: number;
   topicId: number;
   subtopicId?: number;
-  jobRoleIds?: number[];
-  questionIds?: number[];
+  jobRoleIds: number[];
 }
 
 export interface Article {
@@ -81,6 +83,23 @@ export const studyMaterialService = {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     });
+    return response.data.data;
+  },
+
+  // Track article read
+  async trackArticleRead(articleId: number): Promise<void> {
+    await api.post(`/user-article-reads/track/${articleId}`);
+  },
+
+  // Check if user has read an article
+  async hasUserReadArticle(articleId: number): Promise<boolean> {
+    const response = await api.get(`/user-article-reads/check/${articleId}`);
+    return response.data.data;
+  },
+
+  // Get total articles read by user
+  async getTotalArticlesRead(): Promise<number> {
+    const response = await api.get('/user-article-reads/count');
     return response.data.data;
   }
 }; 

@@ -2,6 +2,7 @@ package com.codementor.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import java.util.List;
 
 @Data
 @Entity
@@ -17,4 +18,7 @@ public class Subtopic {
 
     @Column(nullable = false)
     private String name;
+
+    @OneToMany(mappedBy = "subtopic", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Question> questions;
 } 

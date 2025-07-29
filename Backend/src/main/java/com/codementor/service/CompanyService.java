@@ -2,9 +2,15 @@ package com.codementor.service;
 
 import com.codementor.domain.Company;
 import com.codementor.dto.CompanyDTO;
+import com.codementor.dto.CompanyStatsDTO;
 import com.codementor.repository.CompanyRepository;
 import com.codementor.repository.CompanyQuestionRepository;
+import com.codementor.repository.UserRepository;
+import com.codementor.domain.User;
+import com.codementor.exception.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -22,6 +28,9 @@ public class CompanyService {
     @Autowired
     private CompanyQuestionRepository companyQuestionRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     public List<CompanyDTO> getAllCompanies() {
         List<Company> companies = companyRepository.findAll();
         return companies.stream()
@@ -29,7 +38,7 @@ public class CompanyService {
             .collect(Collectors.toList());
     }
 
-        public Page<CompanyDTO> getAllCompanies(Pageable pageable) {
+    public Page<CompanyDTO> getAllCompanies(Pageable pageable) {
         Page<Company> companies = companyRepository.findAll(pageable);
         return companies.map(this::convertToDTO);
     }
@@ -38,6 +47,44 @@ public class CompanyService {
         Company company = companyRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Company not found"));
         return convertToDTO(company);
+    }
+
+    public List<CompanyStatsDTO> getFeaturedCompanies() {
+        // Get current user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
+
+        // Get companies with most coding questions (limit to 4)
+        List<Object[]> companiesData = companyQuestionRepository.findCompaniesWithMostCodingQuestions();
+        
+        return companiesData.stream()
+                .limit(4)
+                .map(data -> {
+                    CompanyStatsDTO dto = new CompanyStatsDTO();
+                    dto.setId((Integer) data[0]);
+                    dto.setName((String) data[1]);
+                    dto.setLogoUrl((String) data[2]);
+                    dto.setCountry((String) data[3]);
+                    dto.setDescription((String) data[4]);
+                    dto.setTotalQuestions(((Number) data[5]).intValue());
+                    
+                    // Get solved questions by user for this company
+                    Long solvedQuestions = companyQuestionRepository.countSolvedQuestionsByUserForCompany(dto.getId(), user.getId());
+                    dto.setSolvedQuestions(solvedQuestions != null ? solvedQuestions.intValue() : 0);
+                    
+                    // Calculate progress percentage
+                    if (dto.getTotalQuestions() > 0) {
+                        double percentage = (double) dto.getSolvedQuestions() / dto.getTotalQuestions() * 100;
+                        dto.setProgressPercentage(Math.round(percentage * 100.0) / 100.0);
+                    } else {
+                        dto.setProgressPercentage(0.0);
+                    }
+                    
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
     private CompanyDTO convertToDTO(Company company) {

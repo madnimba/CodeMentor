@@ -13,6 +13,7 @@ import Editor from "@monaco-editor/react";
 import { useToast } from "@/components/ui/use-toast";
 import { judge0Service, CodeExecutionResponse } from "@/services/judge0";
 import { api } from "@/services/api";
+import { submissionsApi, CreateSubmissionRequest } from "@/services/submissions";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from "@/components/ui/pagination";
 
 interface QuestionDetails {
@@ -362,6 +363,27 @@ const LiveCoding = () => {
           description: `${passedCount}/${totalCount} test cases passed`,
           variant: "default",
         });
+        
+        // Save submission to database
+        try {
+          console.log('Attempting to save submission to database...');
+          console.log('User token:', localStorage.getItem('token'));
+          console.log('Question ID:', questionId);
+          
+          const submissionRequest: CreateSubmissionRequest = {
+            questionId: parseInt(questionId!),
+            code: code,
+            language: selectedLanguage,
+            status: 'accepted'
+          };
+          
+          console.log('Submission request:', submissionRequest);
+          await submissionsApi.submitCode(submissionRequest);
+          console.log('Submission saved to database successfully');
+        } catch (error) {
+          console.error('Failed to save submission to database:', error);
+          // Don't show error toast to user since the main functionality worked
+        }
       } else {
         setSubmissionResult('failure');
         toast({
@@ -369,6 +391,27 @@ const LiveCoding = () => {
           description: `${passedCount}/${totalCount} test cases passed`,
           variant: "destructive",
         });
+        
+        // Save failed submission to database
+        try {
+          console.log('Attempting to save failed submission to database...');
+          console.log('User token:', localStorage.getItem('token'));
+          console.log('Question ID:', questionId);
+          
+          const submissionRequest: CreateSubmissionRequest = {
+            questionId: parseInt(questionId!),
+            code: code,
+            language: selectedLanguage,
+            status: 'rejected'
+          };
+          
+          console.log('Failed submission request:', submissionRequest);
+          await submissionsApi.submitCode(submissionRequest);
+          console.log('Failed submission saved to database successfully');
+        } catch (error) {
+          console.error('Failed to save submission to database:', error);
+          // Don't show error toast to user since the main functionality worked
+        }
       }
 
     } catch (error: any) {

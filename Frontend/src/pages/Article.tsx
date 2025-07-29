@@ -19,6 +19,16 @@ const Article = () => {
   const [recommendedQuestions, setRecommendedQuestions] = useState<{[key: number]: Question[]}>({});
   const [loadingQuestions, setLoadingQuestions] = useState<{[key: number]: boolean}>({});
 
+  // Track article read
+  const trackArticleRead = async (articleId: number) => {
+    try {
+      await api.post(`/user-article-reads/track/${articleId}`);
+      console.log(`Article ${articleId} read tracked successfully`);
+    } catch (error) {
+      console.error('Failed to track article read:', error);
+    }
+  };
+
   useEffect(() => {
     if (subtopicId) {
       setLoading(true);
@@ -37,6 +47,11 @@ const Article = () => {
           // Fetch recommended questions for each article
           articlesData.forEach((article: any) => {
             fetchRecommendedQuestions(article.id);
+          });
+
+          // Track that user has read these articles
+          articlesData.forEach((article: any) => {
+            trackArticleRead(article.id);
           });
         })
         .catch(() => {

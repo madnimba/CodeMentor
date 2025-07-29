@@ -2,6 +2,7 @@ package com.codementor.repository;
 
 import com.codementor.domain.Topic;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -12,4 +13,7 @@ public interface TopicRepository extends JpaRepository<Topic, Integer> {
     Optional<Topic> findByName(String name);
     boolean existsByName(String name);
     List<Topic> findByTrackId(Integer trackId);
+    
+    @Query("SELECT t FROM Topic t ORDER BY t.name")
+    List<Topic> findAllOrderedByName();
 } 
