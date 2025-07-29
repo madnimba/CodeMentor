@@ -417,7 +417,7 @@ const ProblemSelection = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Left Sidebar - Filters */}
-            <div className="lg:col-span-1 space-y-6">
+            {/* <div className="lg:col-span-1 space-y-6">
               <Card className="bg-slate-800/50 border-slate-700">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
@@ -425,7 +425,7 @@ const ProblemSelection = () => {
                     Filters
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-6"> */}
                   {/* Search
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-300">Search</label>
@@ -552,9 +552,9 @@ const ProblemSelection = () => {
                   {/* <Button variant="outline" onClick={clearFilters} className="w-full text-slate-400 hover:text-white border-slate-600 hover:bg-slate-600/50">
                     <X className="w-4 h-4 mr-2" /> Clear Filters
                   </Button> */}
-                </CardContent>
+                {/* </CardContent>
               </Card>
-            </div>
+            </div> */}
 
             {/* Main Content - Problems List */}
             <div className="lg:col-span-3 space-y-6">
@@ -675,19 +675,27 @@ const ProblemSelection = () => {
                               {problem.company}
                             </Badge>
                             <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
-                              {problem.year}
+                              {problem.question_year}
                             </Badge>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Button
+                        <Button
+                            className="bg-purple-600 hover:bg-purple-700"
+                            onClick={() =>
+                              handleProblemSelect(problem)
+                            }
+                          >
+                            Solve This
+                          </Button>
+                          {/* <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => handleProblemSelect(problem)}
                             className="text-blue-400 hover:text-blue-300"
                           >
                             <ArrowRight className="w-4 h-4" />
-                          </Button>
+                          </Button> */}
                         </div>
                       </div>
                     </CardHeader>

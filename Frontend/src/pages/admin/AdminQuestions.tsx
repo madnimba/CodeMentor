@@ -167,15 +167,6 @@ const AdminQuestions = () => {
       setLoading(true);
       
       // Use comprehensive filtering if any filters are applied
-      // const hasFilters = filters.searchTerm.trim() || 
-      //                   filters.trackId || 
-      //                   filters.topicId || 
-      //                   filters.subtopicId || 
-      //                   (filters.difficulty && filters.difficulty !== "all") ||
-      //                   filters.year || 
-      //                   filters.companyId ||
-      //                   filters.isCoding !== undefined ||
-      //                   filters.isApproved !== undefined;
       const hasFilters = false;
 
       let response: PaginatedResponse<AdminQuestion>;
@@ -247,7 +238,7 @@ const AdminQuestions = () => {
       description: question.description,
       difficulty: question.difficulty as "Easy" | "Medium" | "Hard",
       importanceTag: question.importanceTag || "",
-      year: question.year,
+      year: question.question_year,
       isCoding: question.isCoding,
       trackId: 0, // Default value since AdminQuestion doesn't have trackId
       subtopicId: undefined, // Default value since AdminQuestion doesn't have subtopicId
