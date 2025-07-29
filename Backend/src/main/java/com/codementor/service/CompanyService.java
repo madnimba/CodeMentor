@@ -51,6 +51,12 @@ public class CompanyService {
         return companies.map(this::convertToDTO);
     }
 
+    // Search companies
+    public Page<CompanyDTO> searchCompanies(String searchTerm, Pageable pageable) {
+        Page<Company> companies = companyRepository.findByNameContainingIgnoreCase(searchTerm, pageable);
+        return companies.map(this::convertToDTO);
+    }
+
     public CompanyDTO getCompanyById(Integer id) {
         Company company = companyRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Company not found"));
@@ -70,13 +76,16 @@ public class CompanyService {
         return companiesData.stream()
                 .limit(4)
                 .map(data -> {
+                    Company company = (Company) data[0];
+                    Integer questionCount = ((Number) data[1]).intValue();
+                    
                     CompanyStatsDTO dto = new CompanyStatsDTO();
-                    dto.setId((Integer) data[0]);
-                    dto.setName((String) data[1]);
-                    dto.setLogoUrl((String) data[2]);
-                    dto.setCountry((String) data[3]);
-                    dto.setDescription((String) data[4]);
-                    dto.setTotalQuestions(((Number) data[5]).intValue());
+                    dto.setId(company.getId());
+                    dto.setName(company.getName());
+                    dto.setLogoUrl(company.getLogoUrl());
+                    dto.setCountry(company.getCountry());
+                    dto.setDescription(company.getDescription());
+                    dto.setTotalQuestions(questionCount);
                     
                     // Get solved questions by user for this company
                     Long solvedQuestions = companyQuestionRepository.countSolvedQuestionsByUserForCompany(dto.getId(), user.getId());

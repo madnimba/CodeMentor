@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Code2, Database, BookOpen, ChevronRight, ChevronDown, Plus, X } from "lucide-react";
+import { Code2, Database, BookOpen, ChevronRight, ChevronDown, Plus, X, Search } from "lucide-react";
 import { studyMaterialService, Track, Topic, Subtopic, JobRole, CreateArticleRequest } from "@/services/studyMaterials";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -28,6 +28,9 @@ const StudyMaterials = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedJobRoles, setSelectedJobRoles] = useState<number[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [articles, setArticles] = useState<any[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
 
   const { user } = useAuth();
 
@@ -89,6 +92,45 @@ const StudyMaterials = () => {
       fetchSubtopics();
     }
   }, [selectedTopicId]);
+
+  // Handle search on Enter key press
+  const [searchTrigger, setSearchTrigger] = useState("");
+
+  const handleSearchTrigger = (query: string) => {
+    setSearchTrigger(query);
+  };
+
+  // Handle Enter key press in search input
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearchTrigger(searchQuery);
+    }
+  };
+
+  // Handle search
+  useEffect(() => {
+    if (searchTrigger.trim()) {
+      handleSearch();
+    } else {
+      setArticles([]);
+    }
+  }, [searchTrigger]);
+
+  const handleSearch = async () => {
+    if (!searchTrigger.trim()) return;
+    
+    setSearchLoading(true);
+    try {
+      const response = await studyMaterialService.searchArticles(searchTrigger);
+      console.log('Search response:', response); // Debug log
+      setArticles(response.content || []);
+    } catch (error) {
+      console.error('Search failed:', error);
+      toast.error('Search failed');
+    } finally {
+      setSearchLoading(false);
+    }
+  };
 
   const toggleSubject = (subjectId: string) => {
     setExpandedSubjects(prev => 
@@ -214,6 +256,59 @@ const StudyMaterials = () => {
               </DialogTrigger>
             </Dialog>
           </div>
+
+          {/* Search Bar
+          <div className="mb-6">
+            <div className="relative max-w-md mx-auto">
+              <Search className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
+              <Input
+                placeholder="Search articles... (Press Enter to search)"
+                className="pl-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-400"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={handleKeyPress}
+              />
+            </div>
+          </div> */}
+
+          {/* Search Results */}
+          {searchTrigger.trim() && (
+            <div className="mb-6">
+              <h3 className="text-xl font-semibold text-white mb-4">
+                Search Results for "{searchTrigger}"
+                {searchLoading && <span className="text-slate-400 ml-2">(Loading...)</span>}
+              </h3>
+              {articles.length > 0 ? (
+                <div className="grid gap-4">
+                  {articles.map((article) => (
+                    <Card key={article.id} className="bg-slate-800/50 border-slate-700">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="text-white font-medium mb-2">{article.title}</h4>
+                            <p className="text-sm text-slate-400 mb-2">{article.description}</p>
+                            <div className="flex items-center space-x-4 text-xs text-slate-500">
+                              {article.track && <span>Track: {article.track}</span>}
+                              {article.topic && <span>Topic: {article.topic}</span>}
+                              {article.subtopic && <span>Subtopic: {article.subtopic}</span>}
+                            </div>
+                          </div>
+                          <Link
+                            to={`/article/${article.id}`}
+                            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm"
+                          >
+                            Read Article
+                          </Link>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : !searchLoading && (
+                <p className="text-slate-400 text-center">No articles found matching your search.</p>
+              )}
+            </div>
+          )}
 
           <div className="grid gap-6">
             {tracks.map((track) => (

@@ -55,6 +55,16 @@ export interface TestcaseResponse {
   output3?: string;
 }
 
+export interface PaginatedResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
+}
+
 export const questionService = {
   async createQuestion(request: CreateQuestionRequest): Promise<Question> {
     const response = await api.post('/questions', request, {
@@ -62,6 +72,50 @@ export const questionService = {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
     });
+    return response.data.data;
+  },
+
+  async getCodingQuestionsPaginated(page: number = 0, size: number = 10): Promise<PaginatedResponse<Question>> {
+    const response = await api.get(`/questions/coding/paginated?page=${page}&size=${size}`);
+    return response.data.data;
+  },
+
+  async searchQuestions(searchTerm?: string, isCoding?: boolean, page: number = 0, size: number = 10): Promise<PaginatedResponse<Question>> {
+    const params = new URLSearchParams();
+    if (searchTerm) params.append('searchTerm', searchTerm);
+    if (isCoding !== undefined) params.append('isCoding', isCoding.toString());
+    params.append('page', page.toString());
+    params.append('size', size.toString());
+    
+    const response = await api.get(`/questions/search?${params.toString()}`);
+    return response.data.data;
+  },
+
+  async getQuestionsWithFilters(
+    searchTerm?: string,
+    trackId?: number,
+    topicId?: number,
+    subtopicId?: number,
+    difficulty?: string,
+    year?: number,
+    companyId?: number,
+    isCoding?: boolean,
+    page: number = 0,
+    size: number = 10
+  ): Promise<PaginatedResponse<Question>> {
+    const params = new URLSearchParams();
+    if (searchTerm) params.append('searchTerm', searchTerm);
+    if (trackId) params.append('trackId', trackId.toString());
+    if (topicId) params.append('topicId', topicId.toString());
+    if (subtopicId) params.append('subtopicId', subtopicId.toString());
+    if (difficulty) params.append('difficulty', difficulty);
+    if (year) params.append('year', year.toString());
+    if (companyId) params.append('companyId', companyId.toString());
+    if (isCoding !== undefined) params.append('isCoding', isCoding.toString());
+    params.append('page', page.toString());
+    params.append('size', size.toString());
+    
+    const response = await api.get(`/questions/filter?${params.toString()}`);
     return response.data.data;
   },
 

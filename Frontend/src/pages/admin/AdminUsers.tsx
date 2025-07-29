@@ -28,6 +28,7 @@ const AdminUsers = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchTrigger, setSearchTrigger] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
@@ -45,10 +46,6 @@ const AdminUsers = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    fetchUsers();
-  }, [currentPage, pageSize]);
-
   const fetchUsers = async () => {
     try {
       setLoading(true);
@@ -63,6 +60,43 @@ const AdminUsers = () => {
       setLoading(false);
     }
   };
+
+  const handleSearch = async () => {
+    try {
+      setLoading(true);
+      const response: PaginatedResponse<AdminUser> = await adminService.searchUsers(
+        searchQuery || undefined,
+        undefined, // isAdmin - not filtering by admin status in search
+        currentPage,
+        pageSize
+      );
+      setUsers(response.content);
+      setTotalPages(response.totalPages);
+      setTotalElements(response.totalElements);
+    } catch (err: any) {
+      setError(err?.response?.data?.message || "Failed to search users");
+      toast.error("Failed to search users");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Debounced search effect
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchQuery.trim() === '') {
+        fetchUsers();
+      } else {
+        handleSearch();
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, currentPage, pageSize]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [currentPage, pageSize]);
 
   const handleEditUser = (user: AdminUser) => {
     setEditingUser(user);
@@ -106,10 +140,7 @@ const AdminUsers = () => {
     }
   };
 
-  const filteredUsers = users.filter(user =>
-    user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Client-side filtering removed - now using server-side search
 
   if (loading) {
     return (
@@ -201,7 +232,7 @@ const AdminUsers = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredUsers.map((user) => (
+                    {users.map((user) => (
                       <tr key={user.id} className="border-b border-slate-700/50 hover:bg-slate-700/20">
                         <td className="p-3">
                           <div className="flex items-center gap-3">

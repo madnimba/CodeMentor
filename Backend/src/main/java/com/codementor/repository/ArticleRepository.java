@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -50,4 +51,21 @@ public interface ArticleRepository extends JpaRepository<Article, Integer> {
     
     @Query("SELECT a FROM Article a WHERE a.isApproved = false")
     List<Article> findByIsApprovedFalse();
+    
+    // Bulk update method for approving all articles efficiently
+    @Modifying
+    @Query("UPDATE Article a SET a.isApproved = true WHERE a.isApproved = false")
+    int bulkApproveAllArticles();
+    
+    // Search articles by multiple criteria
+    @Query("SELECT a FROM Article a WHERE " +
+           "(:searchTerm IS NULL OR " +
+           "LOWER(a.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(a.track.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(a.topic.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "(a.subtopic IS NOT NULL AND LOWER(a.subtopic.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')))) AND " +
+           "(:isApproved IS NULL OR a.isApproved = :isApproved)")
+    Page<Article> searchArticles(@Param("searchTerm") String searchTerm, 
+                                @Param("isApproved") Boolean isApproved, 
+                                Pageable pageable);
 } 

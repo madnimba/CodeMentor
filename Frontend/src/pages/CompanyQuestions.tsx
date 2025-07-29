@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Markdown } from "@/components/ui/markdown";
 import {
   Building2, ArrowLeft, CheckCircle, Code2,
-  ChevronDown, ChevronUp, Plus, X, Trash2, Circle
+  ChevronDown, ChevronUp, Plus, X, Trash2
 } from "lucide-react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -23,7 +23,6 @@ import { api } from "@/services/api";
 import { studyMaterialService, Track, Subtopic } from "@/services/studyMaterials";
 import { questionService, CreateQuestionRequest, TestcaseRequest } from "@/services/questions";
 import { companiesService, Company as CompanyType } from "@/services/companies";
-import { completedQuestionsApi } from "@/services/completedQuestions";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import {
@@ -48,7 +47,6 @@ interface Question {
   tags?: string[];
   isCoding: boolean;
   question_year?: number;
-  isCompleted?: boolean;
 }
 
 interface Company {
@@ -90,7 +88,6 @@ const CompanyQuestions = () => {
   const [subtopics, setSubtopics] = useState<{ [key: number]: Subtopic[] }>({});
   const [companies, setCompanies] = useState<CompanyType[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [completionStates, setCompletionStates] = useState<{[key: number]: boolean}>({});
 
   const { user } = useAuth();
 
@@ -182,20 +179,11 @@ const CompanyQuestions = () => {
           tags: cq.tags ?? [],
           isCoding: cq.isCoding ?? false,
           question_year: cq.question_year ?? 2024,
-          isCompleted: cq.isCompleted ?? false,
         }));
 
         setQuestions(mappedQuestions);
         setTotalPages(paginatedData.totalPages);
         setTotalElements(paginatedData.totalElements);
-        
-        // Initialize completion states
-        const states: {[key: number]: boolean} = {};
-        mappedQuestions.forEach((question) => {
-          states[question.id] = question.isCompleted || false;
-        });
-        setCompletionStates(states);
-        
         setLoading(false);
       })
       .catch((err) => {
@@ -207,36 +195,6 @@ const CompanyQuestions = () => {
 
   const toggleAnswer = (questionId: number) => {
     setExpandedQuestionId(expandedQuestionId === questionId ? null : questionId);
-  };
-
-  const handleMarkCompleted = async (questionId: number) => {
-    try {
-      await completedQuestionsApi.markQuestionCompleted({ questionId });
-      setCompletionStates(prev => ({ ...prev, [questionId]: true }));
-      toast.success('Question marked as completed!');
-      
-      // Trigger event to refresh companies data
-      localStorage.setItem('questionCompletionUpdate', Date.now().toString());
-      window.dispatchEvent(new Event('questionCompletionUpdate'));
-    } catch (error) {
-      console.error('Failed to mark question as completed:', error);
-      toast.error('Failed to mark question as completed');
-    }
-  };
-
-  const handleMarkIncomplete = async (questionId: number) => {
-    try {
-      await completedQuestionsApi.removeQuestionCompletion(questionId);
-      setCompletionStates(prev => ({ ...prev, [questionId]: false }));
-      toast.success('Question marked as incomplete!');
-      
-      // Trigger event to refresh companies data
-      localStorage.setItem('questionCompletionUpdate', Date.now().toString());
-      window.dispatchEvent(new Event('questionCompletionUpdate'));
-    } catch (error) {
-      console.error('Failed to mark question as incomplete:', error);
-      toast.error('Failed to mark question as incomplete');
-    }
   };
 
   const handlePageChange = (page: number) => {
@@ -482,11 +440,6 @@ const CompanyQuestions = () => {
                           }>
                             {question.isCoding ? "Coding" : "Theory"}
                           </Badge>
-                          {completionStates[question.id] && (
-                            <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                              Completed
-                            </Badge>
-                          )}
                         </div>
                         <div className="text-slate-400">
                           <Markdown content={question.description} />
@@ -501,23 +454,6 @@ const CompanyQuestions = () => {
                         </Badge>
                       </div>
                       <div className="flex gap-2">
-                        {!question.isCoding && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className={`${
-                              completionStates[question.id]
-                                ? "border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300"
-                                : "border-green-500/30 text-green-400 hover:bg-green-500/10 hover:text-green-300"
-                            }`}
-                            onClick={() => completionStates[question.id] 
-                              ? handleMarkIncomplete(question.id) 
-                              : handleMarkCompleted(question.id)
-                            }
-                          >
-                            {completionStates[question.id] ? "Mark as Unread" : "Mark as Read"}
-                          </Button>
-                        )}
                         {question.solution && (
                           <Button
                             variant="outline"

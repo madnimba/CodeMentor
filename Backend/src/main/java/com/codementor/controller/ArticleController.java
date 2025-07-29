@@ -45,6 +45,13 @@ public class ArticleController {
         ));
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<Page<ArticleResponse>>> searchArticles(
+            @RequestParam(required = false) String searchTerm,
+            Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(articleService.searchArticles(searchTerm, pageable)));
+    }
+
     @PutMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<ArticleResponse>> updateArticle(
@@ -68,7 +75,6 @@ public class ArticleController {
 
     @GetMapping("/{id}/recommended-questions")
     public ResponseEntity<ApiResponse<List<QuestionResponse>>> getRecommendedQuestions(@PathVariable Integer id) {
-        List<QuestionResponse> questions = articleService.getRecommendedQuestions(id);
-        return ResponseEntity.ok(ApiResponse.success(questions));
+        return ResponseEntity.ok(ApiResponse.success(articleService.getRecommendedQuestions(id)));
     }
 } 

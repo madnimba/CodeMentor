@@ -21,12 +21,19 @@ import {
   Code2, 
   Search, 
   Filter,
-  Building2
+  Building2,
+  ArrowRight,
+  Target,
+  Calendar,
+  X
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useMemo, useEffect } from "react";
 import { api } from "@/services/api";
 import { useToast } from "@/components/ui/use-toast";
+import { questionService } from "@/services/questions";
+import { studyMaterialService, Track, Topic, Subtopic } from "@/services/studyMaterials";
+import { companiesService, Company } from "@/services/companies";
 
 // Types
 interface Problem {
@@ -39,20 +46,138 @@ interface Problem {
   question_year?: number;
 }
 
+interface FilterState {
+  searchTerm: string;
+  trackId: number | undefined;
+  topicId: number | undefined;
+  subtopicId: number | undefined;
+  difficulty: string;
+  year: number | undefined;
+  companyId: number | undefined;
+}
+
 const ProblemSelection = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all");
+  
+  // Filter state
+  const [filters, setFilters] = useState<FilterState>({
+    searchTerm: "",
+    trackId: undefined,
+    topicId: undefined,
+    subtopicId: undefined,
+    difficulty: "all",
+    year: undefined,
+    companyId: undefined,
+  });
+  
   const [problems, setProblems] = useState<Problem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize] = useState(10); // 10 problems per page
+  const [pageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
+
+  // Filter options
+  const [tracks, setTracks] = useState<Track[]>([]);
+  const [topics, setTopics] = useState<Topic[]>([]);
+  const [subtopics, setSubtopics] = useState<Subtopic[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]);
+  const [years, setYears] = useState<number[]>([]);
+
+  // Load filter options
+  useEffect(() => {
+    const loadFilterOptions = async () => {
+      try {
+        const [tracksData, companiesData] = await Promise.all([
+          studyMaterialService.getAllTracks(),
+          companiesService.getAllCompanies()
+        ]);
+        
+        setTracks(tracksData);
+        setCompanies(companiesData);
+        
+        // Generate years (current year and previous 5 years)
+        const currentYear = new Date().getFullYear();
+        const yearOptions = Array.from({ length: 6 }, (_, i) => currentYear - i);
+        setYears(yearOptions);
+      } catch (err) {
+        console.error('Failed to load filter options:', err);
+      }
+    };
+    
+    loadFilterOptions();
+  }, []);
+
+  // Load topics when track changes
+  useEffect(() => {
+    if (filters.trackId) {
+      const loadTopics = async () => {
+        try {
+          const topicsData = await studyMaterialService.getTopicsByTrackId(filters.trackId!);
+          setTopics(topicsData);
+          // Reset dependent filters
+          setFilters(prev => ({ ...prev, topicId: undefined, subtopicId: undefined }));
+          setSubtopics([]);
+        } catch (err) {
+          console.error('Failed to load topics:', err);
+        }
+      };
+      loadTopics();
+    } else {
+      setTopics([]);
+      setSubtopics([]);
+    }
+  }, [filters.trackId]);
+
+  // Load subtopics when topic changes
+  useEffect(() => {
+    if (filters.topicId) {
+      const loadSubtopics = async () => {
+        try {
+          const subtopicsData = await studyMaterialService.getSubtopicsByTopicId(filters.topicId!);
+          setSubtopics(subtopicsData);
+          // Reset dependent filter
+          setFilters(prev => ({ ...prev, subtopicId: undefined }));
+        } catch (err) {
+          console.error('Failed to load subtopics:', err);
+        }
+      };
+      loadSubtopics();
+    } else {
+      setSubtopics([]);
+    }
+  }, [filters.topicId]);
+
+  // Update filter
+  const updateFilter = (key: keyof FilterState, value: any) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+    setCurrentPage(0); // Reset to first page when filters change
+  };
+
+  // Clear all filters
+  const clearFilters = () => {
+    setFilters({
+      searchTerm: "",
+      trackId: undefined,
+      topicId: undefined,
+      subtopicId: undefined,
+      difficulty: "all",
+      year: undefined,
+      companyId: undefined,
+    });
+    setCurrentPage(0);
+  };
+
+  // Handle search on Enter key press
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      setCurrentPage(0);
+    }
+  };
 
   // Fetch coding problems from all companies
   useEffect(() => {
@@ -61,11 +186,35 @@ const ProblemSelection = () => {
       setError(null);
       
       try {
-        // Use the global coding questions endpoint with pagination
-        const response = await api.get(`/questions/coding/paginated?page=${currentPage}&size=${pageSize}`);
-        const pageData = response.data.data;
+        let response;
         
-        const allCodingProblems: Problem[] = pageData.content.map((q: any) => ({
+        // Use comprehensive filtering if any filters are applied
+        const hasFilters = filters.searchTerm.trim() || 
+                          filters.trackId || 
+                          filters.topicId || 
+                          filters.subtopicId || 
+                          (filters.difficulty && filters.difficulty !== "all") ||
+                          filters.year || 
+                          filters.companyId;
+        
+        if (hasFilters) {
+          response = await questionService.getQuestionsWithFilters(
+            filters.searchTerm.trim() || undefined,
+            filters.trackId,
+            filters.topicId,
+            filters.subtopicId,
+            filters.difficulty !== "all" ? filters.difficulty : undefined,
+            filters.year,
+            filters.companyId,
+            true, // isCoding = true for coding problems only
+            currentPage,
+            pageSize
+          );
+        } else {
+          response = await questionService.getCodingQuestionsPaginated(currentPage, pageSize);
+        }
+        
+        const allCodingProblems: Problem[] = response.content.map((q: any) => ({
           id: q.id,
           title: q.title,
           description: q.description || "",
@@ -77,14 +226,14 @@ const ProblemSelection = () => {
         
         console.log('Total coding problems found:', allCodingProblems.length);
         setProblems(allCodingProblems);
-        setTotalPages(pageData.totalPages);
-        setTotalElements(pageData.totalElements);
+        setTotalPages(response.totalPages);
+        setTotalElements(response.totalElements);
         setLoading(false);
         
         if (allCodingProblems.length === 0) {
           toast({
             title: "No coding problems found",
-            description: "There are currently no coding problems available. Please check back later or contact an administrator.",
+            description: "There are currently no coding problems available with the selected filters. Try adjusting your filters.",
             variant: "destructive",
           });
         }
@@ -96,20 +245,12 @@ const ProblemSelection = () => {
     };
 
     fetchCodingProblems();
-  }, [toast, currentPage, pageSize]);
+  }, [toast, currentPage, pageSize, filters]);
 
-  // Filter problems
-  const filteredProblems = useMemo(() => {
-    return problems.filter(problem => {
-      // Search filter - only search by title
-      const matchesSearch = problem.title.toLowerCase().includes(searchTerm.toLowerCase());
-
-      // Difficulty filter
-      const matchesDifficulty = selectedDifficulty === "all" || problem.difficulty === selectedDifficulty;
-
-      return matchesSearch && matchesDifficulty;
-    });
-  }, [problems, searchTerm, selectedDifficulty]);
+  // Reset to first page when filters change  
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [filters]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -285,27 +426,82 @@ const ProblemSelection = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  {/* Search */}
+                  {/* Search
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-300">Search</label>
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
                       <Input
                         type="text"
-                        placeholder="Search by title..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
+                        placeholder="Search by title... (Press Enter to search)"
+                        value={filters.searchTerm}
+                        onChange={(e) => updateFilter("searchTerm", e.target.value)}
+                        onKeyPress={handleKeyPress}
                         className="pl-10 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
                       />
                     </div>
-                  </div>
+                  </div> */}
+
+                  {/* Track Filter
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-300">Track</label>
+                    <Select value={filters.trackId?.toString() || "all"} onValueChange={(value) => updateFilter("trackId", value === "all" ? undefined : parseInt(value, 10))}>
+                      <SelectTrigger className="bg-slate-700 border-slate-600">
+                        <SelectValue placeholder="Select a track" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-700 border-slate-600">
+                        <SelectItem value="all" className="text-slate-300">All Tracks</SelectItem>
+                        {tracks.map(track => (
+                          <SelectItem key={track.id} value={track.id.toString()}>
+                            {track.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div> */}
+
+                  {/* Topic Filter
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-300">Topic</label>
+                    <Select value={filters.topicId?.toString() || "all"} onValueChange={(value) => updateFilter("topicId", value === "all" ? undefined : parseInt(value, 10))}>
+                      <SelectTrigger className="bg-slate-700 border-slate-600">
+                        <SelectValue placeholder="Select a topic" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-700 border-slate-600">
+                        <SelectItem value="all" className="text-slate-300">All Topics</SelectItem>
+                        {topics.map(topic => (
+                          <SelectItem key={topic.id} value={topic.id.toString()}>
+                            {topic.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div> */}
+
+                  {/* Subtopic Filter
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-300">Subtopic</label>
+                    <Select value={filters.subtopicId?.toString() || "all"} onValueChange={(value) => updateFilter("subtopicId", value === "all" ? undefined : parseInt(value, 10))}>
+                      <SelectTrigger className="bg-slate-700 border-slate-600">
+                        <SelectValue placeholder="Select a subtopic" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-700 border-slate-600">
+                        <SelectItem value="all" className="text-slate-300">All Subtopics</SelectItem>
+                        {subtopics.map(subtopic => (
+                          <SelectItem key={subtopic.id} value={subtopic.id.toString()}>
+                            {subtopic.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div> */}
 
                   {/* Difficulty Filter */}
-                  <div className="space-y-2">
+                  {/* <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-300">Difficulty</label>
-                    <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
+                    <Select value={filters.difficulty} onValueChange={(value) => updateFilter("difficulty", value)}>
                       <SelectTrigger className="bg-slate-700 border-slate-600">
-                        <SelectValue />
+                        <SelectValue placeholder="Select difficulty" />
                       </SelectTrigger>
                       <SelectContent className="bg-slate-700 border-slate-600">
                         <SelectItem value="all" className="text-slate-300">All Difficulties</SelectItem>
@@ -314,81 +510,199 @@ const ProblemSelection = () => {
                         <SelectItem value="Hard" className="text-red-400">Hard</SelectItem>
                       </SelectContent>
                     </Select>
-                  </div>
+                  </div> */}
+
+                  {/* Year Filter */}
+                  {/* <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-300">Year</label>
+                    <Select value={filters.year?.toString() || "all"} onValueChange={(value) => updateFilter("year", value === "all" ? undefined : parseInt(value, 10))}>
+                      <SelectTrigger className="bg-slate-700 border-slate-600">
+                        <SelectValue placeholder="Select year" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-700 border-slate-600">
+                        <SelectItem value="all" className="text-slate-300">All Years</SelectItem>
+                        {years.map(year => (
+                          <SelectItem key={year} value={year.toString()}>
+                            {year}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div> */}
+
+                  {/* Company Filter */}
+                  {/* <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-300">Company</label>
+                    <Select value={filters.companyId?.toString() || "all"} onValueChange={(value) => updateFilter("companyId", value === "all" ? undefined : parseInt(value, 10))}>
+                      <SelectTrigger className="bg-slate-700 border-slate-600">
+                        <SelectValue placeholder="Select company" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-slate-700 border-slate-600">
+                        <SelectItem value="all" className="text-slate-300">All Companies</SelectItem>
+                        {companies.map(company => (
+                          <SelectItem key={company.id} value={company.id.toString()}>
+                            {company.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div> */}
+
+                  {/* Clear Filters Button */}
+                  {/* <Button variant="outline" onClick={clearFilters} className="w-full text-slate-400 hover:text-white border-slate-600 hover:bg-slate-600/50">
+                    <X className="w-4 h-4 mr-2" /> Clear Filters
+                  </Button> */}
                 </CardContent>
               </Card>
             </div>
 
             {/* Main Content - Problems List */}
             <div className="lg:col-span-3 space-y-6">
-              {/* Results Count */}
-              <div className="flex justify-between items-center">
-                <div className="text-slate-400">
-                  {filteredProblems.length} problem{filteredProblems.length !== 1 ? 's' : ''} found
+              {/* Results Count and Active Filters */}
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <div className="text-slate-400">
+                    {totalElements} problem{totalElements !== 1 ? 's' : ''} found
+                  </div>
                 </div>
-              </div>
 
-              {/* Problems List */}
-              <div className="h-[600px] overflow-y-auto space-y-4 pr-2">
-                {filteredProblems.map((problem) => (
-                  <Card 
-                    key={problem.id} 
-                    className="bg-slate-800/50 border-slate-700 hover:border-purple-500/50 transition-colors cursor-pointer"
-                    onClick={() => handleProblemSelect(problem)}
-                  >
-                    <CardContent className="p-6">
+                {/* Active Filters Display
+                {(filters.searchTerm || filters.trackId || filters.topicId || filters.subtopicId || 
+                  (filters.difficulty && filters.difficulty !== "all") || filters.year || filters.companyId) && (
+                  <div className="flex flex-wrap gap-2 items-center">
+                    <span className="text-sm text-slate-400">Active filters:</span>
+                    
+                    {filters.searchTerm && (
+                      <Badge variant="secondary" className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+                        Search: "{filters.searchTerm}"
+                      </Badge>
+                    )}
+                    
+                    {filters.trackId && (
+                      <Badge variant="secondary" className="bg-green-500/20 text-green-400 border-green-500/30">
+                        Track: {tracks.find(t => t.id === filters.trackId)?.name || filters.trackId}
+                      </Badge>
+                    )}
+                    
+                    {filters.topicId && (
+                      <Badge variant="secondary" className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                        Topic: {topics.find(t => t.id === filters.topicId)?.name || filters.topicId}
+                      </Badge>
+                    )}
+                    
+                    {filters.subtopicId && (
+                      <Badge variant="secondary" className="bg-pink-500/20 text-pink-400 border-pink-500/30">
+                        Subtopic: {subtopics.find(s => s.id === filters.subtopicId)?.name || filters.subtopicId}
+                      </Badge>
+                    )}
+                    
+                    {filters.difficulty && filters.difficulty !== "all" && (
+                      <Badge variant="secondary" className={
+                        filters.difficulty === "Easy" ? "bg-green-500/20 text-green-400 border-green-500/30" :
+                        filters.difficulty === "Medium" ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" :
+                        "bg-red-500/20 text-red-400 border-red-500/30"
+                      }>
+                        {filters.difficulty}
+                      </Badge>
+                    )}
+                    
+                    {filters.year && (
+                      <Badge variant="secondary" className="bg-orange-500/20 text-orange-400 border-orange-500/30">
+                        Year: {filters.year}
+                      </Badge>
+                    )}
+                    
+                    {filters.companyId && (
+                      <Badge variant="secondary" className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+                        Company: {companies.find(c => c.id === filters.companyId)?.name || filters.companyId}
+                      </Badge>
+                    )}
+                    
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearFilters}
+                      className="text-slate-400 hover:text-white h-6 px-2"
+                    >
+                      <X className="w-3 h-3 mr-1" />
+                      Clear all
+                    </Button>
+                  </div>
+                )}
+              </div> */}
+
+              {/* {problems.length === 0 && (
+                <div className="text-center py-12">
+                  <Code2 className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-slate-400 mb-2">No problems found</h3>
+                  <p className="text-slate-500">Try adjusting your filters or search terms</p>
+                </div>
+              )} */}
+
+              {/* Problems Grid */}
+              <div className="grid gap-6">
+                {problems.map((problem) => (
+                  <Card key={problem.id} className="bg-slate-800/50 border-slate-700 hover:border-slate-600 transition-colors">
+                    <CardHeader>
                       <div className="flex justify-between items-start">
-                        <div className="flex-1 space-y-3">
-                          <div className="flex items-center gap-3">
-                            <h3 className="text-xl font-semibold text-white">{problem.title}</h3>
-                            <Badge className={`${
-                              problem.difficulty === 'Easy' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
-                              problem.difficulty === 'Medium' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' :
-                              'bg-red-500/20 text-red-400 border-red-500/30'
-                            }`}>
+                        <div className="flex-1">
+                          <CardTitle className="text-white text-lg mb-2">
+                            <Markdown content={problem.title} />
+                          </CardTitle>
+                          {/* <div className="flex items-center gap-4 text-sm text-slate-400 mb-3">
+                            <div className="flex items-center gap-1">
+                              <Target className="w-4 h-4" />
                               {problem.difficulty}
-                            </Badge>
-                            <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
-                              {problem.question_year || 2024}
-                            </Badge>
-                          </div>
-                          
-                          {problem.description && (
-                            <div className="text-slate-300 text-sm">
-                              <Markdown content={problem.description} />
                             </div>
-                          )}
-                          
-                          {problem.company && (
-                            <div className="flex items-center gap-1 text-sm text-slate-400">
+                            <div className="flex items-center gap-1">
                               <Building2 className="w-4 h-4" />
                               {problem.company}
                             </div>
-                          )}
+                            <div className="flex items-center gap-1">
+                              <Calendar className="w-4 h-4" />
+                              {problem.year}
+                            </div>
+                          </div> */}
+                          <div className="flex flex-wrap gap-2">
+                            <Badge className={
+                              problem.difficulty === "Easy" ? "bg-green-500/20 text-green-400 border-green-500/30" :
+                              problem.difficulty === "Medium" ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" :
+                              "bg-red-500/20 text-red-400 border-red-500/30"
+                            }>
+                              {problem.difficulty}
+                            </Badge>
+                            <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+                              {problem.company}
+                            </Badge>
+                            <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                              {problem.year}
+                            </Badge>
+                          </div>
                         </div>
-                        
-                        <Button className="bg-purple-600 hover:bg-purple-700 ml-4">
-                          Solve
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleProblemSelect(problem)}
+                            className="text-blue-400 hover:text-blue-300"
+                          >
+                            <ArrowRight className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </div>
+                    </CardHeader>
+                    <CardContent>
+                    <Markdown content={problem.description} />
                     </CardContent>
                   </Card>
                 ))}
-                
-                {filteredProblems.length === 0 && (
-                  <div className="text-center py-12">
-                    <Code2 className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-slate-400 mb-2">No problems found</h3>
-                    <p className="text-slate-500">Try adjusting your filters or search terms</p>
-                  </div>
-                )}
               </div>
               {renderPagination()}
             </div>
           </div>
         </div>
       </div>
-      
+      </div>
       <Footer />
     </div>
   );
