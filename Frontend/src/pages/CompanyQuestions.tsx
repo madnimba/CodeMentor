@@ -7,23 +7,22 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Markdown } from "@/components/ui/markdown";
 import {
   Building2, ArrowLeft, CheckCircle, Code2,
-  ChevronDown, ChevronUp, Plus, X, Trash2, Circle
+  ChevronDown, ChevronUp, Plus, X, Trash2
 } from "lucide-react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import Editor from "@monaco-editor/react";
 import { api } from "@/services/api";
-import { studyMaterialService, Track, Topic, Subtopic } from "@/services/studyMaterials";
+import { studyMaterialService, Track, Subtopic } from "@/services/studyMaterials";
 import { questionService, CreateQuestionRequest, TestcaseRequest } from "@/services/questions";
 import { companiesService, Company as CompanyType } from "@/services/companies";
-import { completedQuestionsApi } from "@/services/completedQuestions";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import {
@@ -35,7 +34,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Switch } from "@/components/ui/switch";
 // import DOMPurify from "dompurify"; // ✅ Added for sanitization
 
 interface Question {
@@ -49,7 +47,6 @@ interface Question {
   tags?: string[];
   isCoding: boolean;
   question_year?: number;
-  isCompleted?: boolean;
 }
 
 interface Company {
@@ -70,16 +67,6 @@ interface PaginatedResponse<T> {
   last: boolean;
 }
 
-interface FilterState {
-  searchTerm: string;
-  trackId: number | undefined;
-  topicId: number | undefined;
-  subtopicId: number | undefined;
-  difficulty: string;
-  year: number | undefined;
-  isCoding: boolean | undefined;
-}
-
 const CompanyQuestions = () => {
   const { companyId } = useParams();
   const navigate = useNavigate();
@@ -95,26 +82,12 @@ const CompanyQuestions = () => {
   const [totalElements, setTotalElements] = useState(0);
   const [pageSize] = useState(10); // 10 questions per page
 
-  // Filter state
-  const [filters, setFilters] = useState<FilterState>({
-    searchTerm: "",
-    trackId: undefined,
-    topicId: undefined,
-    subtopicId: undefined,
-    difficulty: "all",
-    year: undefined,
-    isCoding: undefined,
-  });
-
   // Question creation state
   const [isQuestionDialogOpen, setIsQuestionDialogOpen] = useState(false);
   const [tracks, setTracks] = useState<Track[]>([]);
-  const [topics, setTopics] = useState<Topic[]>([]);
-  const [allSubtopics, setAllSubtopics] = useState<Subtopic[]>([]);
   const [subtopics, setSubtopics] = useState<{ [key: number]: Subtopic[] }>({});
   const [companies, setCompanies] = useState<CompanyType[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [completionStates, setCompletionStates] = useState<{[key: number]: boolean}>({});
 
   const { user } = useAuth();
 
@@ -140,71 +113,27 @@ const CompanyQuestions = () => {
 
   const selectedTrackId = form.watch("trackId");
 
-  // Update filter
-  const updateFilter = (key: keyof FilterState, value: any) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-    setCurrentPage(0); // Reset to first page when filters change
-  };
-
-  // Clear all filters
-  const clearFilters = () => {
-    setFilters({
-      searchTerm: "",
-      trackId: undefined,
-      topicId: undefined,
-      subtopicId: undefined,
-      difficulty: "all",
-      year: undefined,
-      isCoding: undefined,
-    });
-    setCurrentPage(0);
-  };
-
-  // Load filter options
+  // Fetch tracks and companies for question creation
   useEffect(() => {
-    const loadFilterOptions = async () => {
+    const fetchData = async () => {
       try {
         const [tracksData, companiesData] = await Promise.all([
           studyMaterialService.getAllTracks(),
           companiesService.getAllCompanies()
         ]);
-        
         setTracks(tracksData);
         setCompanies(companiesData);
-        
-        // Generate years (current year and previous 5 years)
-        const currentYear = new Date().getFullYear();
-        const yearOptions = Array.from({ length: 6 }, (_, i) => currentYear - i);
-        setYears(yearOptions);
-        
-        // Load all topics and subtopics for filtering
-        const allTopics: Topic[] = [];
-        const allSubtopicsData: Subtopic[] = [];
-        
-        for (const track of tracksData) {
-          const trackTopics = await studyMaterialService.getTopicsByTrackId(track.id);
-          allTopics.push(...trackTopics);
-          
-          for (const topic of trackTopics) {
-            const topicSubtopics = await studyMaterialService.getSubtopicsByTopicId(topic.id);
-            allSubtopicsData.push(...topicSubtopics);
-          }
-        }
-        
-        setTopics(allTopics);
-        setAllSubtopics(allSubtopicsData);
       } catch (err) {
-        console.error("Failed to load filter options:", err);
+        console.error("Failed to fetch data:", err);
       }
     };
-    
-    loadFilterOptions();
+    fetchData();
   }, []);
 
-  // Fetch topics and subtopics when track is selected
+  // Fetch subtopics when track is selected
   useEffect(() => {
     if (selectedTrackId && selectedTrackId > 0) {
-      const fetchTopicsAndSubtopics = async () => {
+      const fetchSubtopics = async () => {
         try {
           const topics = await studyMaterialService.getTopicsByTrackId(selectedTrackId);
           const allSubtopics: Subtopic[] = [];
@@ -214,28 +143,12 @@ const CompanyQuestions = () => {
           }
           setSubtopics(prev => ({ ...prev, [selectedTrackId]: allSubtopics }));
         } catch (err) {
-          console.error("Failed to fetch topics and subtopics:", err);
+          console.error("Failed to fetch subtopics:", err);
         }
       };
-      fetchTopicsAndSubtopics();
+      fetchSubtopics();
     }
   }, [selectedTrackId]);
-
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchTrigger, setSearchTrigger] = useState("");
-
-  // Handle search on Enter key press
-  const handleSearch = (query: string) => {
-    setSearchTrigger(query);
-    setCurrentPage(0); // Reset to first page when searching
-  };
-
-  // Handle Enter key press in search input
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSearch(searchQuery);
-    }
-  };
 
   useEffect(() => {
     if (!companyId) {
@@ -247,39 +160,15 @@ const CompanyQuestions = () => {
     setLoading(true);
     setError(null);
 
-    const fetchData = async () => {
-      try {
-        const companyRes = await api.get(`/companies/${companyId}`);
+    Promise.all([
+      api.get(`/companies/${companyId}`),
+      api.get(`/companies/${companyId}/questions/paginated?page=${currentPage}&size=${pageSize}`)
+    ])
+      .then(([companyRes, questionsRes]) => {
         setCompanyData(companyRes.data);
 
-        // Use comprehensive filtering if any filters are applied
-        const hasFilters = filters.searchTerm.trim() || 
-                          filters.trackId || 
-                          filters.topicId || 
-                          filters.subtopicId || 
-                          (filters.difficulty && filters.difficulty !== "all") ||
-                          filters.year || 
-                          filters.isCoding !== undefined;
-
-        let questionsRes;
-        if (hasFilters) {
-          questionsRes = await companiesService.getCompanyQuestionsWithFilters(
-            Number(companyId),
-            filters.searchTerm.trim() || undefined,
-            filters.trackId,
-            filters.topicId,
-            filters.subtopicId,
-            filters.difficulty !== "all" ? filters.difficulty : undefined,
-            filters.year,
-            filters.isCoding,
-            currentPage,
-            pageSize
-          );
-        } else {
-          questionsRes = await companiesService.getCompanyQuestions(Number(companyId), currentPage, pageSize);
-        }
-
-        const mappedQuestions: Question[] = questionsRes.content.map((cq: any) => ({
+        const paginatedData: PaginatedResponse<any> = questionsRes.data;
+        const mappedQuestions: Question[] = paginatedData.content.map((cq: any) => ({
           id: cq.id,
           title: cq.title,
           description: cq.description,
@@ -290,63 +179,22 @@ const CompanyQuestions = () => {
           tags: cq.tags ?? [],
           isCoding: cq.isCoding ?? false,
           question_year: cq.question_year ?? 2024,
-          isCompleted: cq.isCompleted ?? false,
         }));
 
         setQuestions(mappedQuestions);
         setTotalPages(paginatedData.totalPages);
         setTotalElements(paginatedData.totalElements);
-        
-        // Initialize completion states
-        const states: {[key: number]: boolean} = {};
-        mappedQuestions.forEach((question) => {
-          states[question.id] = question.isCompleted || false;
-        });
-        setCompletionStates(states);
-        
         setLoading(false);
-      } catch (err) {
+      })
+      .catch((err) => {
         console.error(err);
         setError("Failed to load company or questions");
         setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [companyId, currentPage, pageSize, filters]);
+      });
+  }, [companyId, currentPage, pageSize]);
 
   const toggleAnswer = (questionId: number) => {
     setExpandedQuestionId(expandedQuestionId === questionId ? null : questionId);
-  };
-
-  const handleMarkCompleted = async (questionId: number) => {
-    try {
-      await completedQuestionsApi.markQuestionCompleted({ questionId });
-      setCompletionStates(prev => ({ ...prev, [questionId]: true }));
-      toast.success('Question marked as completed!');
-      
-      // Trigger event to refresh companies data
-      localStorage.setItem('questionCompletionUpdate', Date.now().toString());
-      window.dispatchEvent(new Event('questionCompletionUpdate'));
-    } catch (error) {
-      console.error('Failed to mark question as completed:', error);
-      toast.error('Failed to mark question as completed');
-    }
-  };
-
-  const handleMarkIncomplete = async (questionId: number) => {
-    try {
-      await completedQuestionsApi.removeQuestionCompletion(questionId);
-      setCompletionStates(prev => ({ ...prev, [questionId]: false }));
-      toast.success('Question marked as incomplete!');
-      
-      // Trigger event to refresh companies data
-      localStorage.setItem('questionCompletionUpdate', Date.now().toString());
-      window.dispatchEvent(new Event('questionCompletionUpdate'));
-    } catch (error) {
-      console.error('Failed to mark question as incomplete:', error);
-      toast.error('Failed to mark question as incomplete');
-    }
   };
 
   const handlePageChange = (page: number) => {
@@ -498,21 +346,28 @@ const CompanyQuestions = () => {
 
       <div className="pt-24 pb-16 px-4">
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-4">
-              <Building2 className="w-12 h-12 text-blue-400" />
-              <div>
-                <h1 className="text-3xl font-bold text-white mb-2">{companyData?.name} Questions</h1>
-                <p className="text-slate-400 text-lg">
-                  Practice questions from {companyData?.name}
-                </p>
-              </div>
-            </div>
-            
-            {user && (
+          <div className="mb-8">
+            <div className="flex items-center justify-between">
+              <Button asChild variant="ghost" className="text-slate-400 hover:text-white">
+                <Link to="/companies">
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Companies
+                </Link>
+              </Button>
+              
+              {/* Create Question Button */}
               <Dialog open={isQuestionDialogOpen} onOpenChange={setIsQuestionDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button className="bg-blue-600 hover:bg-blue-700">
+                  <Button
+                    className="bg-purple-600 hover:bg-purple-700 text-white"
+                    onClick={() => {
+                      if (!user) {
+                        toast.error("Please log in to create a question");
+                        return;
+                      }
+                      setIsQuestionDialogOpen(true);
+                    }}
+                  >
                     <Plus className="w-4 h-4 mr-2" />
                     Add Question
                   </Button>
@@ -585,11 +440,6 @@ const CompanyQuestions = () => {
                           }>
                             {question.isCoding ? "Coding" : "Theory"}
                           </Badge>
-                          {completionStates[question.id] && (
-                            <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-                              Completed
-                            </Badge>
-                          )}
                         </div>
                         <div className="text-slate-400">
                           <Markdown content={question.description} />
@@ -604,23 +454,6 @@ const CompanyQuestions = () => {
                         </Badge>
                       </div>
                       <div className="flex gap-2">
-                        {!question.isCoding && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className={`${
-                              completionStates[question.id]
-                                ? "border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300"
-                                : "border-green-500/30 text-green-400 hover:bg-green-500/10 hover:text-green-300"
-                            }`}
-                            onClick={() => completionStates[question.id] 
-                              ? handleMarkIncomplete(question.id) 
-                              : handleMarkCompleted(question.id)
-                            }
-                          >
-                            {completionStates[question.id] ? "Mark as Unread" : "Mark as Read"}
-                          </Button>
-                        )}
                         {question.solution && (
                           <Button
                             variant="outline"
@@ -702,115 +535,122 @@ const CompanyQuestions = () => {
                   )}
                 />
 
-                      <FormField
-                        control={form.control}
-                        name="description"
-                        rules={{ required: "Description is required" }}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-slate-200">Description</FormLabel>
-                            <FormControl>
-                              <Textarea
-                                placeholder="Describe the question..."
-                                className="bg-slate-700 border-slate-600 text-white min-h-[100px]"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <FormField
-                          control={form.control}
-                          name="difficulty"
-                          rules={{ required: "Difficulty is required" }}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-slate-200">Difficulty</FormLabel>
-                              <Select onValueChange={field.onChange} value={field.value}>
-                                <FormControl>
-                                  <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                </FormControl>
-                                <SelectContent className="bg-slate-700 border-slate-600">
-                                  <SelectItem value="Easy">Easy</SelectItem>
-                                  <SelectItem value="Medium">Medium</SelectItem>
-                                  <SelectItem value="Hard">Hard</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
+                <FormField
+                  control={form.control}
+                  name="description"
+                  rules={{ required: "Description is required" }}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-slate-200">Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Describe the problem statement..."
+                          className="bg-slate-700 border-slate-600 text-white min-h-[150px]"
+                          {...field}
                         />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                        <FormField
-                          control={form.control}
-                          name="year"
-                          rules={{ required: "Year is required" }}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel className="text-slate-200">Year</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  placeholder="2024"
-                                  className="bg-slate-700 border-slate-600 text-white"
-                                  {...field}
-                                  onChange={(e) => field.onChange(parseInt(e.target.value))}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="difficulty"
+                    rules={{ required: "Difficulty is required" }}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-slate-200">Difficulty</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                              <SelectValue placeholder="Select difficulty" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-slate-700 border-slate-600">
+                            <SelectItem value="Easy">Easy</SelectItem>
+                            <SelectItem value="Medium">Medium</SelectItem>
+                            <SelectItem value="Hard">Hard</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                      <FormField
-                        control={form.control}
-                        name="importanceTag"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-slate-200">Importance Tag (Optional)</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder="e.g., High Priority, Must Know"
-                                className="bg-slate-700 border-slate-600 text-white"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                  <FormField
+                    control={form.control}
+                    name="importanceTag"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-slate-200">Importance Tag</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g., High, Medium, Low"
+                            className="bg-slate-700 border-slate-600 text-white"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-                      <FormField
-                        control={form.control}
-                        name="trackId"
-                        rules={{ required: "Track is required" }}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-slate-200">Track</FormLabel>
-                            <Select onValueChange={(value) => field.onChange(Number(value))} value={field.value?.toString()}>
-                              <FormControl>
-                                <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
-                                  <SelectValue placeholder="Select a track" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent className="bg-slate-700 border-slate-600">
-                                {tracks.map((track) => (
-                                  <SelectItem key={track.id} value={track.id.toString()}>
-                                    {track.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="companyId"
+                    rules={{ required: "Company is required" }}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-slate-200">Company</FormLabel>
+                        <Select onValueChange={(value) => field.onChange(Number(value))} value={field.value?.toString()}>
+                          <FormControl>
+                            <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                              <SelectValue placeholder="Select a company" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-slate-700 border-slate-600">
+                            {companies.map((company) => (
+                              <SelectItem key={company.id} value={company.id.toString()}>
+                                {company.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="trackId"
+                    rules={{ required: "Track is required" }}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-slate-200">Track</FormLabel>
+                        <Select onValueChange={(value) => field.onChange(Number(value))} value={field.value?.toString()}>
+                          <FormControl>
+                            <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                              <SelectValue placeholder="Select a track" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-slate-700 border-slate-600">
+                            {tracks.map((track) => (
+                              <SelectItem key={track.id} value={track.id.toString()}>
+                                {track.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
@@ -863,455 +703,200 @@ const CompanyQuestions = () => {
                   />
                 </div>
 
-                      <FormField
-                        control={form.control}
-                        name="isCoding"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-center justify-between rounded-lg border border-slate-600 p-4">
-                            <div className="space-y-0.5">
-                              <FormLabel className="text-slate-200">Coding Question</FormLabel>
-                              <div className="text-sm text-slate-400">
-                                Check if this is a coding question that requires implementation
-                              </div>
-                            </div>
-                            <FormControl>
-                              <Switch
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
+                <FormField
+                  control={form.control}
+                  name="isCoding"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center space-x-2">
+                      <FormControl>
+                        <input
+                          type="checkbox"
+                          checked={field.value}
+                          onChange={field.onChange}
+                          className="w-4 h-4"
+                        />
+                      </FormControl>
+                      <FormLabel className="text-slate-200">Coding Question</FormLabel>
+                    </FormItem>
+                  )}
+                />
 
-                      {/* Testcases */}
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <FormLabel className="text-slate-200">Test Cases</FormLabel>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={addTestcase}
-                            className="border-slate-600 text-slate-300"
-                          >
-                            <Plus className="w-4 h-4 mr-2" />
-                            Add Test Case
-                          </Button>
-                        </div>
-                        
-                        {fields.map((field, index) => (
-                          <div key={field.id} className="space-y-4 p-4 border border-slate-600 rounded-lg">
-                            <div className="flex items-center justify-between">
-                              <h4 className="text-slate-200 font-medium">Test Case {index + 1}</h4>
-                              {fields.length > 1 && (
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => removeTestcase(index)}
-                                  className="border-red-500/30 text-red-400 hover:bg-red-500/10"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              )}
-                            </div>
-                            
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <FormLabel className="text-slate-300 text-sm">Input 1</FormLabel>
-                                <Input
-                                  placeholder="Enter test input"
-                                  className="bg-slate-700 border-slate-600 text-white"
-                                  {...form.register(`testcases.${index}.test1`)}
-                                />
-                              </div>
-                              <div>
-                                <FormLabel className="text-slate-300 text-sm">Expected Output 1</FormLabel>
-                                <Input
-                                  placeholder="Enter expected output"
-                                  className="bg-slate-700 border-slate-600 text-white"
-                                  {...form.register(`testcases.${index}.output1`)}
-                                />
-                              </div>
-                            </div>
-                            
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <FormLabel className="text-slate-300 text-sm">Input 2 (Optional)</FormLabel>
-                                <Input
-                                  placeholder="Enter test input"
-                                  className="bg-slate-700 border-slate-600 text-white"
-                                  {...form.register(`testcases.${index}.test2`)}
-                                />
-                              </div>
-                              <div>
-                                <FormLabel className="text-slate-300 text-sm">Expected Output 2 (Optional)</FormLabel>
-                                <Input
-                                  placeholder="Enter expected output"
-                                  className="bg-slate-700 border-slate-600 text-white"
-                                  {...form.register(`testcases.${index}.output2`)}
-                                />
-                              </div>
-                            </div>
-                            
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <FormLabel className="text-slate-300 text-sm">Input 3 (Optional)</FormLabel>
-                                <Input
-                                  placeholder="Enter test input"
-                                  className="bg-slate-700 border-slate-600 text-white"
-                                  {...form.register(`testcases.${index}.test3`)}
-                                />
-                              </div>
-                              <div>
-                                <FormLabel className="text-slate-300 text-sm">Expected Output 3 (Optional)</FormLabel>
-                                <Input
-                                  placeholder="Enter expected output"
-                                  className="bg-slate-700 border-slate-600 text-white"
-                                  {...form.register(`testcases.${index}.output3`)}
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="flex justify-end space-x-4">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => setIsQuestionDialogOpen(false)}
-                          className="border-slate-600 text-slate-300 hover:bg-slate-700"
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          type="submit"
-                          disabled={isSubmitting}
-                          className="bg-blue-600 hover:bg-blue-700"
-                        >
-                          {isSubmitting ? "Creating..." : "Create Question"}
-                        </Button>
-                      </div>
-                    </form>
-                  </Form>
-                </DialogContent>
-              </Dialog>
-            )}
-          </div>
-
-          {/* Search Bar */}
-          <div className="mb-6">
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              {/* Left side - Search and primary filters */}
-              <div className="lg:col-span-3 space-y-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
-                  <Input
-                    placeholder="Search questions... (Press Enter to search)"
-                    className="pl-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-400"
-                    value={filters.searchTerm}
-                    onChange={(e) => updateFilter("searchTerm", e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && setCurrentPage(0)}
-                  />
-                </div>
-                
-                {/* Active Filters Display */}
-                {(filters.searchTerm || filters.trackId || filters.topicId || filters.subtopicId || 
-                  (filters.difficulty && filters.difficulty !== "all") || filters.year || filters.isCoding !== undefined) && (
-                  <div className="flex flex-wrap gap-2 items-center">
-                    <span className="text-sm text-slate-400">Active filters:</span>
-                    
-                    {filters.searchTerm && (
-                      <Badge variant="secondary" className="bg-blue-500/20 text-blue-400 border-blue-500/30">
-                        Search: "{filters.searchTerm}"
-                      </Badge>
-                    )}
-                    
-                    {filters.trackId && (
-                      <Badge variant="secondary" className="bg-green-500/20 text-green-400 border-green-500/30">
-                        Track: {tracks.find(t => t.id === filters.trackId)?.name || filters.trackId}
-                      </Badge>
-                    )}
-                    
-                    {filters.topicId && (
-                      <Badge variant="secondary" className="bg-purple-500/20 text-purple-400 border-purple-500/30">
-                        Topic: {topics.find(t => t.id === filters.topicId)?.name || filters.topicId}
-                      </Badge>
-                    )}
-                    
-                    {filters.subtopicId && (
-                      <Badge variant="secondary" className="bg-pink-500/20 text-pink-400 border-pink-500/30">
-                        Subtopic: {allSubtopics.find(s => s.id === filters.subtopicId)?.name || filters.subtopicId}
-                      </Badge>
-                    )}
-                    
-                    {filters.difficulty && filters.difficulty !== "all" && (
-                      <Badge variant="secondary" className={
-                        filters.difficulty === "Easy" ? "bg-green-500/20 text-green-400 border-green-500/30" :
-                        filters.difficulty === "Medium" ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" :
-                        "bg-red-500/20 text-red-400 border-red-500/30"
-                      }>
-                        {filters.difficulty}
-                      </Badge>
-                    )}
-                    
-                    {filters.year && (
-                      <Badge variant="secondary" className="bg-orange-500/20 text-orange-400 border-orange-500/30">
-                        Year: {filters.year}
-                      </Badge>
-                    )}
-                    
-                    {filters.isCoding !== undefined && (
-                      <Badge variant="secondary" className="bg-purple-500/20 text-purple-400 border-purple-500/30">
-                        Type: {filters.isCoding ? "Coding" : "Theory"}
-                      </Badge>
-                    )}
-                    
+                {/* Testcases Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <FormLabel className="text-slate-200">Test Cases</FormLabel>
                     <Button
-                      variant="ghost"
+                      type="button"
+                      variant="outline"
                       size="sm"
-                      onClick={clearFilters}
-                      className="text-slate-400 hover:text-white h-6 px-2"
+                      onClick={addTestcase}
+                      className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
                     >
-                      <X className="w-3 h-3 mr-1" />
-                      Clear all
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Test Case
                     </Button>
                   </div>
-                )}
-              </div>
-              
-              {/* Right side - Filter panel */}
-              <div className="lg:col-span-1">
-                <Card className="bg-slate-800/50 border-slate-700">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2 text-sm">
-                      <Filter className="w-4 h-4" />
-                      Filters
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {/* Track Filter */}
-                    <div className="space-y-2">
-                      <label className="text-xs font-medium text-slate-300">Track</label>
-                      <Select value={filters.trackId?.toString() || "all"} onValueChange={(value) => updateFilter("trackId", value === "all" ? undefined : parseInt(value, 10))}>
-                        <SelectTrigger className="bg-slate-700 border-slate-600 h-8 text-xs">
-                          <SelectValue placeholder="Select track" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-slate-700 border-slate-600">
-                          <SelectItem value="all" className="text-slate-300">All Tracks</SelectItem>
-                          {tracks.map(track => (
-                            <SelectItem key={track.id} value={track.id.toString()}>
-                              {track.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                  
+                  {fields.map((field, index) => (
+                    <Card key={field.id} className="bg-slate-700/50 border-slate-600">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-white font-medium">Test Case {index + 1}</h4>
+                          {fields.length > 1 && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeTestcase(index)}
+                              className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name={`testcases.${index}.test1`}
+                            rules={{ required: "Input is required" }}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-slate-200">Input</FormLabel>
+                                <FormControl>
+                                  <Textarea
+                                    placeholder="Test case input"
+                                    className="bg-slate-600 border-slate-500 text-white"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
 
-                    {/* Topic Filter */}
-                    <div className="space-y-2">
-                      <label className="text-xs font-medium text-slate-300">Topic</label>
-                      <Select value={filters.topicId?.toString() || "all"} onValueChange={(value) => updateFilter("topicId", value === "all" ? undefined : parseInt(value, 10))}>
-                        <SelectTrigger className="bg-slate-700 border-slate-600 h-8 text-xs">
-                          <SelectValue placeholder="Select topic" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-slate-700 border-slate-600">
-                          <SelectItem value="all" className="text-slate-300">All Topics</SelectItem>
-                          {topics.filter(topic => !filters.trackId || topic.trackId === filters.trackId).map(topic => (
-                            <SelectItem key={topic.id} value={topic.id.toString()}>
-                              {topic.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                          <FormField
+                            control={form.control}
+                            name={`testcases.${index}.output1`}
+                            rules={{ required: "Expected output is required" }}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-slate-200">Expected Output</FormLabel>
+                                <FormControl>
+                                  <Textarea
+                                    placeholder="Expected output"
+                                    className="bg-slate-600 border-slate-500 text-white"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
 
-                    {/* Subtopic Filter */}
-                    <div className="space-y-2">
-                      <label className="text-xs font-medium text-slate-300">Subtopic</label>
-                      <Select value={filters.subtopicId?.toString() || "all"} onValueChange={(value) => updateFilter("subtopicId", value === "all" ? undefined : parseInt(value, 10))}>
-                        <SelectTrigger className="bg-slate-700 border-slate-600 h-8 text-xs">
-                          <SelectValue placeholder="Select subtopic" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-slate-700 border-slate-600">
-                          <SelectItem value="all" className="text-slate-300">All Subtopics</SelectItem>
-                          {allSubtopics.filter(subtopic => !filters.topicId || subtopic.topicId === filters.topicId).map(subtopic => (
-                            <SelectItem key={subtopic.id} value={subtopic.id.toString()}>
-                              {subtopic.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                        <div className="grid grid-cols-2 gap-4 mt-4">
+                          <FormField
+                            control={form.control}
+                            name={`testcases.${index}.test2`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-slate-200">Input</FormLabel>
+                                <FormControl>
+                                  <Textarea
+                                    placeholder="Test case input"
+                                    className="bg-slate-600 border-slate-500 text-white"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
 
-                    {/* Difficulty Filter */}
-                    <div className="space-y-2">
-                      <label className="text-xs font-medium text-slate-300">Difficulty</label>
-                      <Select value={filters.difficulty} onValueChange={(value) => updateFilter("difficulty", value)}>
-                        <SelectTrigger className="bg-slate-700 border-slate-600 h-8 text-xs">
-                          <SelectValue placeholder="Select difficulty" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-slate-700 border-slate-600">
-                          <SelectItem value="all" className="text-slate-300">All Difficulties</SelectItem>
-                          <SelectItem value="Easy" className="text-green-400">Easy</SelectItem>
-                          <SelectItem value="Medium" className="text-yellow-400">Medium</SelectItem>
-                          <SelectItem value="Hard" className="text-red-400">Hard</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                          <FormField
+                            control={form.control}
+                            name={`testcases.${index}.output2`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-slate-200">Expected Output</FormLabel>
+                                <FormControl>
+                                  <Textarea
+                                    placeholder="Expected output"
+                                    className="bg-slate-600 border-slate-500 text-white"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
 
-                    {/* Year Filter */}
-                    <div className="space-y-2">
-                      <label className="text-xs font-medium text-slate-300">Year</label>
-                      <Select value={filters.year?.toString() || "all"} onValueChange={(value) => updateFilter("year", value === "all" ? undefined : parseInt(value, 10))}>
-                        <SelectTrigger className="bg-slate-700 border-slate-600 h-8 text-xs">
-                          <SelectValue placeholder="Select year" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-slate-700 border-slate-600">
-                          <SelectItem value="all" className="text-slate-300">All Years</SelectItem>
-                          {years.map(year => (
-                            <SelectItem key={year} value={year.toString()}>
-                              {year}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                        <div className="grid grid-cols-2 gap-4 mt-4">
+                          <FormField
+                            control={form.control}
+                            name={`testcases.${index}.test3`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-slate-200">Input</FormLabel>
+                                <FormControl>
+                                  <Textarea
+                                    placeholder="Test case input"
+                                    className="bg-slate-600 border-slate-500 text-white"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
 
-                    {/* Type Filter */}
-                    <div className="space-y-2">
-                      <label className="text-xs font-medium text-slate-300">Type</label>
-                      <Select value={filters.isCoding?.toString() || "all"} onValueChange={(value) => updateFilter("isCoding", value === "all" ? undefined : value === "true")}>
-                        <SelectTrigger className="bg-slate-700 border-slate-600 h-8 text-xs">
-                          <SelectValue placeholder="Select type" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-slate-700 border-slate-600">
-                          <SelectItem value="all" className="text-slate-300">All Types</SelectItem>
-                          <SelectItem value="true" className="text-purple-400">Coding</SelectItem>
-                          <SelectItem value="false" className="text-gray-400">Theory</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <Button variant="outline" onClick={clearFilters} className="w-full text-slate-400 hover:text-white border-slate-600 hover:bg-slate-600/50 h-8 text-xs">
-                      <X className="w-3 h-3 mr-1" /> Clear
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </div>
-
-          <Card className="bg-slate-800/50 border-slate-700 mb-8">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                  <span className="text-white">
-                    {companyData.solvedQuestions} of {companyData.totalQuestions} questions solved
-                  </span>
+                          <FormField
+                            control={form.control}
+                            name={`testcases.${index}.output3`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel className="text-slate-200">Expected Output</FormLabel>
+                                <FormControl>
+                                  <Textarea
+                                    placeholder="Expected output"
+                                    className="bg-slate-600 border-slate-500 text-white"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
-                <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
-                  {Math.round((companyData.solvedQuestions / companyData.totalQuestions) * 100)}% Complete
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
 
-          {/* Questions Section */}
-          <div>
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-white mb-2">Questions</h2>
-              <p className="text-slate-400">
-                Showing {questions.length} of {totalElements} questions
-              </p>
-            </div>
-
-            {/* Questions Grid */}
-            <div className="grid gap-6">
-              {questions.map((question) => (
-                <Card key={question.id} className="bg-slate-800/50 border-slate-700 hover:border-slate-600 transition-colors">
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <CardTitle className="text-white text-lg mb-2">{question.title}</CardTitle>
-                        <div className="flex items-center gap-4 text-sm text-slate-400 mb-3">
-                          <div className="flex items-center gap-1">
-                            <Target className="w-4 h-4" />
-                            {question.difficulty}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Calendar className="w-4 h-4" />
-                            {question.year}
-                          </div>
-                          {question.importanceTag && (
-                            <div className="flex items-center gap-1">
-                              <Star className="w-4 h-4" />
-                              {question.importanceTag}
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          <Badge className={
-                            question.difficulty === "Easy" ? "bg-green-500/20 text-green-400 border-green-500/30" :
-                            question.difficulty === "Medium" ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" :
-                            "bg-red-500/20 text-red-400 border-red-500/30"
-                          }>
-                            {question.difficulty}
-                          </Badge>
-                          {question.importanceTag && (
-                            <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30">
-                              {question.importanceTag}
-                            </Badge>
-                          )}
-                          <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
-                            {question.year}
-                          </Badge>
-                          <Badge className={
-                            question.isCoding 
-                              ? "bg-purple-500/20 text-purple-400 border-purple-500/30" 
-                              : "bg-gray-500/20 text-gray-400 border-gray-500/30"
-                          }>
-                            {question.isCoding ? "Coding" : "Theory"}
-                          </Badge>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => toggleAnswer(question.id)}
-                          className="text-blue-400 hover:text-blue-300"
-                        >
-                          {expandedQuestionId === question.id ? "Hide" : "Show"} Answer
-                        </Button>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-slate-300 text-sm line-clamp-3">
-                      {question.description}
-                    </div>
-                    {expandedQuestionId === question.id && question.solution && (
-                      <div className="mt-4 p-4 bg-slate-900 rounded-lg border border-slate-600">
-                        <h4 className="text-white font-medium mb-2">Solution:</h4>
-                        <div className="text-slate-300 text-sm">
-                          {question.solution}
-                        </div>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            {/* Pagination */}
-            {renderPagination()}
-          </div>
-        </div>
-      </div>
+                <div className="flex justify-end space-x-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsQuestionDialogOpen(false)}
+                    className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="bg-purple-600 hover:bg-purple-700"
+                  >
+                    {isSubmitting ? "Creating..." : "Create Question"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </DialogContent>
+        )}
+      </Dialog>
 
       <Footer />
     </div>

@@ -27,6 +27,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
 
 interface FilterState {
   searchTerm: string;
@@ -75,6 +76,20 @@ const AdminQuestions = () => {
   // View question state
   const [selectedQuestion, setSelectedQuestion] = useState<AdminQuestion | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  
+  // Edit question state
+  const [editingQuestion, setEditingQuestion] = useState<AdminQuestion | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editForm, setEditForm] = useState({
+    title: "",
+    description: "",
+    difficulty: "Medium" as "Easy" | "Medium" | "Hard",
+    importanceTag: "",
+    year: 2024,
+    isCoding: false,
+    trackId: 0,
+    subtopicId: undefined as number | undefined,
+  });
   
   // Testcase manager state
   const [isTestcaseManagerOpen, setIsTestcaseManagerOpen] = useState(false);
@@ -224,6 +239,35 @@ const AdminQuestions = () => {
     setIsViewDialogOpen(true);
   };
 
+  const handleEditQuestion = (question: AdminQuestion) => {
+    setEditingQuestion(question);
+    setEditForm({
+      title: question.title,
+      description: question.description,
+      difficulty: question.difficulty as "Easy" | "Medium" | "Hard",
+      importanceTag: question.importanceTag || "",
+      year: question.year,
+      isCoding: question.isCoding,
+      trackId: 0, // Default value since AdminQuestion doesn't have trackId
+      subtopicId: undefined, // Default value since AdminQuestion doesn't have subtopicId
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdateQuestion = async () => {
+    if (!editingQuestion) return;
+
+    try {
+      await adminService.updateQuestion(editingQuestion.id, editForm);
+      toast.success("Question updated successfully");
+      setIsEditDialogOpen(false);
+      setEditingQuestion(null);
+      fetchQuestions();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "Failed to update question");
+    }
+  };
+
   const handleViewTestcases = (questionId: number) => {
     setSelectedQuestionForTestcases(questionId);
     setIsTestcaseManagerOpen(true);
@@ -353,17 +397,17 @@ const AdminQuestions = () => {
               {/* Left side - Search and primary filters */}
               <div className="lg:col-span-3 space-y-4">
                 <div className="relative">
-                  <Search className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
-                  <Input
+                  {/* <Search className="absolute left-3 top-3 w-4 h-4 text-slate-400" /> */}
+                  {/* <Input
                     placeholder="Search questions by title, description, or author..."
                     className="pl-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-400"
                     value={filters.searchTerm}
                     onChange={(e) => updateFilter("searchTerm", e.target.value)}
-                  />
+                  /> */}
                 </div>
                 
                 {/* Active Filters Display */}
-                {(filters.searchTerm || filters.trackId || filters.topicId || filters.subtopicId || 
+                {/* {(filters.searchTerm || filters.trackId || filters.topicId || filters.subtopicId || 
                   (filters.difficulty && filters.difficulty !== "all") || filters.year || filters.companyId ||
                   filters.isCoding !== undefined) && (
                   <div className="flex flex-wrap gap-2 items-center">
@@ -428,10 +472,10 @@ const AdminQuestions = () => {
                     </Button>
                   </div>
                 )}
-              </div>
+              </div> */}
               
               {/* Right side - Filter panel */}
-              <div className="lg:col-span-1">
+              {/* <div className="lg:col-span-1">
                 <Card className="bg-slate-800/50 border-slate-700">
                   <CardHeader>
                     <CardTitle className="text-white flex items-center gap-2 text-sm">
@@ -439,9 +483,9 @@ const AdminQuestions = () => {
                       Advanced Filters
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-4"> */}
                     {/* Track Filter */}
-                    <div className="space-y-2">
+                    {/* <div className="space-y-2">
                       <label className="text-xs font-medium text-slate-300">Track</label>
                       <Select value={filters.trackId?.toString() || "all"} onValueChange={(value) => updateFilter("trackId", value === "all" ? undefined : parseInt(value, 10))}>
                         <SelectTrigger className="bg-slate-700 border-slate-600 h-8 text-xs">
@@ -456,10 +500,10 @@ const AdminQuestions = () => {
                           ))}
                         </SelectContent>
                       </Select>
-                    </div>
+                    </div> */}
 
                     {/* Topic Filter */}
-                    <div className="space-y-2">
+                    {/* <div className="space-y-2">
                       <label className="text-xs font-medium text-slate-300">Topic</label>
                       <Select value={filters.topicId?.toString() || "all"} onValueChange={(value) => updateFilter("topicId", value === "all" ? undefined : parseInt(value, 10))}>
                         <SelectTrigger className="bg-slate-700 border-slate-600 h-8 text-xs">
@@ -474,10 +518,10 @@ const AdminQuestions = () => {
                           ))}
                         </SelectContent>
                       </Select>
-                    </div>
+                    </div> */}
 
                     {/* Subtopic Filter */}
-                    <div className="space-y-2">
+                    {/* <div className="space-y-2">
                       <label className="text-xs font-medium text-slate-300">Subtopic</label>
                       <Select value={filters.subtopicId?.toString() || "all"} onValueChange={(value) => updateFilter("subtopicId", value === "all" ? undefined : parseInt(value, 10))}>
                         <SelectTrigger className="bg-slate-700 border-slate-600 h-8 text-xs">
@@ -492,10 +536,10 @@ const AdminQuestions = () => {
                           ))}
                         </SelectContent>
                       </Select>
-                    </div>
+                    </div> */}
 
                     {/* Difficulty Filter */}
-                    <div className="space-y-2">
+                    {/* <div className="space-y-2">
                       <label className="text-xs font-medium text-slate-300">Difficulty</label>
                       <Select value={filters.difficulty} onValueChange={(value) => updateFilter("difficulty", value)}>
                         <SelectTrigger className="bg-slate-700 border-slate-600 h-8 text-xs">
@@ -508,10 +552,10 @@ const AdminQuestions = () => {
                           <SelectItem value="Hard" className="text-red-400">Hard</SelectItem>
                         </SelectContent>
                       </Select>
-                    </div>
+                    </div> */}
 
                     {/* Year Filter */}
-                    <div className="space-y-2">
+                    {/* <div className="space-y-2">
                       <label className="text-xs font-medium text-slate-300">Year</label>
                       <Select value={filters.year?.toString() || "all"} onValueChange={(value) => updateFilter("year", value === "all" ? undefined : parseInt(value, 10))}>
                         <SelectTrigger className="bg-slate-700 border-slate-600 h-8 text-xs">
@@ -526,10 +570,10 @@ const AdminQuestions = () => {
                           ))}
                         </SelectContent>
                       </Select>
-                    </div>
+                    </div> */}
 
                     {/* Company Filter */}
-                    <div className="space-y-2">
+                    {/* <div className="space-y-2">
                       <label className="text-xs font-medium text-slate-300">Company</label>
                       <Select value={filters.companyId?.toString() || "all"} onValueChange={(value) => updateFilter("companyId", value === "all" ? undefined : parseInt(value, 10))}>
                         <SelectTrigger className="bg-slate-700 border-slate-600 h-8 text-xs">
@@ -544,10 +588,10 @@ const AdminQuestions = () => {
                           ))}
                         </SelectContent>
                       </Select>
-                    </div>
+                    </div> */}
 
                     {/* Type Filter */}
-                    <div className="space-y-2">
+                    {/* <div className="space-y-2">
                       <label className="text-xs font-medium text-slate-300">Type</label>
                       <Select value={filters.isCoding?.toString() || "all"} onValueChange={(value) => updateFilter("isCoding", value === "all" ? undefined : value === "true")}>
                         <SelectTrigger className="bg-slate-700 border-slate-600 h-8 text-xs">
@@ -563,11 +607,11 @@ const AdminQuestions = () => {
 
                     <Button variant="outline" onClick={clearFilters} className="w-full text-slate-400 hover:text-white border-slate-600 hover:bg-slate-600/50 h-8 text-xs">
                       <X className="w-3 h-3 mr-1" /> Clear
-                    </Button>
-                  </CardContent>
-                </Card>
+                    </Button> */}
+                  {/* </CardContent>
+                </Card>*/}
               </div>
-            </div>
+            </div> 
 
             {/* Stats Section */}
             <div className="flex items-center gap-4">
@@ -593,7 +637,9 @@ const AdminQuestions = () => {
                 <CardHeader>
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <CardTitle className="text-white text-lg mb-2">{question.title}</CardTitle>
+                      <CardTitle className="text-white text-lg mb-2">
+                        <Markdown content={question.title} />
+                      </CardTitle>
                       <div className="flex items-center gap-4 text-sm text-slate-400 mb-3">
                         <div className="flex items-center gap-1">
                           <User className="w-4 h-4" />
@@ -667,6 +713,14 @@ const AdminQuestions = () => {
                         className="text-purple-400 hover:text-purple-300"
                       >
                         <Eye className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEditQuestion(question)}
+                        className="text-blue-400 hover:text-blue-300"
+                      >
+                        <Edit className="w-4 h-4" />
                       </Button>
                       {!question.isApproved && (
                         <Button
@@ -759,7 +813,9 @@ const AdminQuestions = () => {
           <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
             <DialogContent className="bg-slate-800 border-slate-700 max-w-4xl max-h-[80vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle className="text-white">{selectedQuestion?.title}</DialogTitle>
+                <DialogTitle className="text-white">
+                  <Markdown content={selectedQuestion?.title || ""} />
+                </DialogTitle>
                 <DialogDescription className="text-slate-400">
                   Question details and description
                 </DialogDescription>
@@ -873,6 +929,102 @@ const AdminQuestions = () => {
                       onClick={() => handleDeleteTestcases(selectedQuestion.id)}
                     >
                       Delete All Testcases
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
+
+          {/* Edit Question Dialog */}
+          <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+            <DialogContent className="bg-slate-800 border-slate-700 max-w-2xl max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="text-white">Edit Question</DialogTitle>
+                <DialogDescription className="text-slate-400">
+                  Update question details
+                </DialogDescription>
+              </DialogHeader>
+              {editingQuestion && (
+                <div className="space-y-4">
+                  <div>
+                    <Label className="text-slate-200">Title</Label>
+                    <Input
+                      value={editForm.title}
+                      onChange={(e) => setEditForm({...editForm, title: e.target.value})}
+                      className="bg-slate-700 border-slate-600 text-white mt-1"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label className="text-slate-200">Description</Label>
+                    <Textarea
+                      value={editForm.description}
+                      onChange={(e) => setEditForm({...editForm, description: e.target.value})}
+                      className="bg-slate-700 border-slate-600 text-white mt-1 min-h-[100px]"
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-slate-200">Difficulty</Label>
+                      <Select 
+                        value={editForm.difficulty} 
+                        onValueChange={(value) => setEditForm({...editForm, difficulty: value as "Easy" | "Medium" | "Hard"})}
+                      >
+                        <SelectTrigger className="bg-slate-700 border-slate-600 text-white mt-1">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-700 border-slate-600">
+                          <SelectItem value="Easy">Easy</SelectItem>
+                          <SelectItem value="Medium">Medium</SelectItem>
+                          <SelectItem value="Hard">Hard</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label className="text-slate-200">Year</Label>
+                      <Input
+                        type="number"
+                        value={editForm.year}
+                        onChange={(e) => setEditForm({...editForm, year: parseInt(e.target.value)})}
+                        className="bg-slate-700 border-slate-600 text-white mt-1"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label className="text-slate-200">Importance Tag (Optional)</Label>
+                    <Input
+                      value={editForm.importanceTag}
+                      onChange={(e) => setEditForm({...editForm, importanceTag: e.target.value})}
+                      className="bg-slate-700 border-slate-600 text-white mt-1"
+                      placeholder="e.g., High Priority, Must Know"
+                    />
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      checked={editForm.isCoding}
+                      onCheckedChange={(checked) => setEditForm({...editForm, isCoding: checked})}
+                    />
+                    <Label className="text-slate-200">Coding Question</Label>
+                  </div>
+                  
+                  <div className="flex justify-end space-x-4 pt-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsEditDialogOpen(false)}
+                      className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleUpdateQuestion}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      Update Question
                     </Button>
                   </div>
                 </div>

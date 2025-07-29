@@ -426,7 +426,7 @@ const ProblemSelection = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  {/* Search */}
+                  {/* Search
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-300">Search</label>
                     <div className="relative">
@@ -440,9 +440,9 @@ const ProblemSelection = () => {
                         className="pl-10 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
                       />
                     </div>
-                  </div>
+                  </div> */}
 
-                  {/* Track Filter */}
+                  {/* Track Filter
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-300">Track</label>
                     <Select value={filters.trackId?.toString() || "all"} onValueChange={(value) => updateFilter("trackId", value === "all" ? undefined : parseInt(value, 10))}>
@@ -458,9 +458,9 @@ const ProblemSelection = () => {
                         ))}
                       </SelectContent>
                     </Select>
-                  </div>
+                  </div> */}
 
-                  {/* Topic Filter */}
+                  {/* Topic Filter
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-300">Topic</label>
                     <Select value={filters.topicId?.toString() || "all"} onValueChange={(value) => updateFilter("topicId", value === "all" ? undefined : parseInt(value, 10))}>
@@ -476,9 +476,9 @@ const ProblemSelection = () => {
                         ))}
                       </SelectContent>
                     </Select>
-                  </div>
+                  </div> */}
 
-                  {/* Subtopic Filter */}
+                  {/* Subtopic Filter
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-300">Subtopic</label>
                     <Select value={filters.subtopicId?.toString() || "all"} onValueChange={(value) => updateFilter("subtopicId", value === "all" ? undefined : parseInt(value, 10))}>
@@ -494,10 +494,10 @@ const ProblemSelection = () => {
                         ))}
                       </SelectContent>
                     </Select>
-                  </div>
+                  </div> */}
 
                   {/* Difficulty Filter */}
-                  <div className="space-y-2">
+                  {/* <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-300">Difficulty</label>
                     <Select value={filters.difficulty} onValueChange={(value) => updateFilter("difficulty", value)}>
                       <SelectTrigger className="bg-slate-700 border-slate-600">
@@ -510,10 +510,10 @@ const ProblemSelection = () => {
                         <SelectItem value="Hard" className="text-red-400">Hard</SelectItem>
                       </SelectContent>
                     </Select>
-                  </div>
+                  </div> */}
 
                   {/* Year Filter */}
-                  <div className="space-y-2">
+                  {/* <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-300">Year</label>
                     <Select value={filters.year?.toString() || "all"} onValueChange={(value) => updateFilter("year", value === "all" ? undefined : parseInt(value, 10))}>
                       <SelectTrigger className="bg-slate-700 border-slate-600">
@@ -528,10 +528,10 @@ const ProblemSelection = () => {
                         ))}
                       </SelectContent>
                     </Select>
-                  </div>
+                  </div> */}
 
                   {/* Company Filter */}
-                  <div className="space-y-2">
+                  {/* <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-300">Company</label>
                     <Select value={filters.companyId?.toString() || "all"} onValueChange={(value) => updateFilter("companyId", value === "all" ? undefined : parseInt(value, 10))}>
                       <SelectTrigger className="bg-slate-700 border-slate-600">
@@ -546,12 +546,12 @@ const ProblemSelection = () => {
                         ))}
                       </SelectContent>
                     </Select>
-                  </div>
+                  </div> */}
 
                   {/* Clear Filters Button */}
-                  <Button variant="outline" onClick={clearFilters} className="w-full text-slate-400 hover:text-white border-slate-600 hover:bg-slate-600/50">
+                  {/* <Button variant="outline" onClick={clearFilters} className="w-full text-slate-400 hover:text-white border-slate-600 hover:bg-slate-600/50">
                     <X className="w-4 h-4 mr-2" /> Clear Filters
-                  </Button>
+                  </Button> */}
                 </CardContent>
               </Card>
             </div>
@@ -566,7 +566,7 @@ const ProblemSelection = () => {
                   </div>
                 </div>
 
-                {/* Active Filters Display */}
+                {/* Active Filters Display
                 {(filters.searchTerm || filters.trackId || filters.topicId || filters.subtopicId || 
                   (filters.difficulty && filters.difficulty !== "all") || filters.year || filters.companyId) && (
                   <div className="flex flex-wrap gap-2 items-center">
@@ -629,15 +629,15 @@ const ProblemSelection = () => {
                     </Button>
                   </div>
                 )}
-              </div>
+              </div> */}
 
-              {problems.length === 0 && (
+              {/* {problems.length === 0 && (
                 <div className="text-center py-12">
                   <Code2 className="w-16 h-16 text-slate-600 mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-slate-400 mb-2">No problems found</h3>
                   <p className="text-slate-500">Try adjusting your filters or search terms</p>
                 </div>
-              )}
+              )} */}
 
               {/* Problems Grid */}
               <div className="grid gap-6">
@@ -646,8 +646,10 @@ const ProblemSelection = () => {
                     <CardHeader>
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
-                          <CardTitle className="text-white text-lg mb-2">{problem.title}</CardTitle>
-                          <div className="flex items-center gap-4 text-sm text-slate-400 mb-3">
+                          <CardTitle className="text-white text-lg mb-2">
+                            <Markdown content={problem.title} />
+                          </CardTitle>
+                          {/* <div className="flex items-center gap-4 text-sm text-slate-400 mb-3">
                             <div className="flex items-center gap-1">
                               <Target className="w-4 h-4" />
                               {problem.difficulty}
@@ -660,7 +662,7 @@ const ProblemSelection = () => {
                               <Calendar className="w-4 h-4" />
                               {problem.year}
                             </div>
-                          </div>
+                          </div> */}
                           <div className="flex flex-wrap gap-2">
                             <Badge className={
                               problem.difficulty === "Easy" ? "bg-green-500/20 text-green-400 border-green-500/30" :
@@ -690,9 +692,7 @@ const ProblemSelection = () => {
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-slate-300 text-sm line-clamp-3">
-                        {problem.description}
-                      </p>
+                    <Markdown content={problem.description} />
                     </CardContent>
                   </Card>
                 ))}
@@ -702,7 +702,7 @@ const ProblemSelection = () => {
           </div>
         </div>
       </div>
-      
+      </div>
       <Footer />
     </div>
   );
