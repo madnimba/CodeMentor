@@ -24,6 +24,12 @@ const Dashboard = () => {
   const [companiesLoading, setCompaniesLoading] = useState(true);
   const [topicProgress, setTopicProgress] = useState<TopicProgress[]>([]);
   const [topicProgressLoading, setTopicProgressLoading] = useState(true);
+  const [totalProgress, setTotalProgress] = useState({
+    totalArticles: 0,
+    articlesRead: 0,
+    totalQuestions: 0,
+    questionsSolved: 0
+  });
 
   useEffect(() => {
     const fetchUserStats = async () => {
@@ -62,6 +68,16 @@ const Dashboard = () => {
         const progress = await dashboardService.getTopicProgress();
         console.log('Topic progress received:', progress);
         setTopicProgress(progress);
+        
+        // Calculate total progress across all topics
+        const totals = progress.reduce((acc, topic) => ({
+          totalArticles: acc.totalArticles + (topic.totalArticles || 0),
+          articlesRead: acc.articlesRead + (topic.articlesRead || 0),
+          totalQuestions: acc.totalQuestions + (topic.totalQuestions || 0),
+          questionsSolved: acc.questionsSolved + (topic.questionsSolved || 0)
+        }), { totalArticles: 0, articlesRead: 0, totalQuestions: 0, questionsSolved: 0 });
+        
+        setTotalProgress(totals);
       } catch (error) {
         console.error('Failed to fetch topic progress:', error);
         // Set empty array to show the "no data" message
@@ -113,6 +129,45 @@ const Dashboard = () => {
               Keep up the great work! You're on a {userStats.currentStreak}-day streak.
             </p>
           </div>
+
+          {/* Overall Progress Summary */}
+          {!topicProgressLoading && topicProgress.length > 0 && (
+            <Card className="bg-slate-800/50 border-slate-700 mb-8">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5" />
+                  Overall Progress
+                </CardTitle>
+                <CardDescription className="text-slate-400">
+                  Your total progress across all topics
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-white mb-1">
+                      {totalProgress.articlesRead}/{totalProgress.totalArticles}
+                    </div>
+                    <div className="text-sm text-slate-400">Articles Read</div>
+                    <Progress 
+                      value={totalProgress.totalArticles > 0 ? (totalProgress.articlesRead / totalProgress.totalArticles) * 100 : 0} 
+                      className="h-2 mt-2" 
+                    />
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-white mb-1">
+                      {totalProgress.questionsSolved}/{totalProgress.totalQuestions}
+                    </div>
+                    <div className="text-sm text-slate-400">Questions Solved</div>
+                    <Progress 
+                      value={totalProgress.totalQuestions > 0 ? (totalProgress.questionsSolved / totalProgress.totalQuestions) * 100 : 0} 
+                      className="h-2 mt-2" 
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Stats Overview */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
@@ -293,7 +348,7 @@ const Dashboard = () => {
                           <Progress value={topic.progress} className="h-2" />
                           <div className="flex justify-between text-xs text-slate-500">
                             <span>Articles: {topic.articlesRead || 0}/{topic.totalArticles || 0}</span>
-                            <span>Problems: {topic.questionsSolved || 0}/{topic.totalQuestions || 0}</span>
+                            <span>Questions: {topic.questionsSolved || 0}/{topic.totalQuestions || 0}</span>
                           </div>
                         </div>
                       ))}

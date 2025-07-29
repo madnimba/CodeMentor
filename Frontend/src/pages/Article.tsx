@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import { api } from "@/services/api";
 import { Markdown } from "@/components/ui/markdown";
 import { questionService, Question } from "@/services/questions";
+import { articleReadApi } from "@/services/articleRead";
 
 const Article = () => {
   const { slug, subtopicId } = useParams();
@@ -18,14 +19,24 @@ const Article = () => {
   const [upvoteStates, setUpvoteStates] = useState<{[key: number]: {count: number, hasUpvoted: boolean}}>({});
   const [recommendedQuestions, setRecommendedQuestions] = useState<{[key: number]: Question[]}>({});
   const [loadingQuestions, setLoadingQuestions] = useState<{[key: number]: boolean}>({});
+  const [readStates, setReadStates] = useState<{[key: number]: boolean}>({});
 
-  // Track article read
-  const trackArticleRead = async (articleId: number) => {
+  // Handle mark as read/unread
+  const handleMarkAsRead = async (articleId: number) => {
     try {
-      await api.post(`/user-article-reads/track/${articleId}`);
-      console.log(`Article ${articleId} read tracked successfully`);
+      await articleReadApi.markArticleAsRead(articleId);
+      setReadStates(prev => ({ ...prev, [articleId]: true }));
     } catch (error) {
-      console.error('Failed to track article read:', error);
+      console.error('Failed to mark article as read:', error);
+    }
+  };
+
+  const handleMarkAsUnread = async (articleId: number) => {
+    try {
+      await articleReadApi.markArticleAsUnread(articleId);
+      setReadStates(prev => ({ ...prev, [articleId]: false }));
+    } catch (error) {
+      console.error('Failed to mark article as unread:', error);
     }
   };
 
@@ -49,9 +60,21 @@ const Article = () => {
             fetchRecommendedQuestions(article.id);
           });
 
-          // Track that user has read these articles
+          // Initialize read states for each article
+          const initialReadStates: {[key: number]: boolean} = {};
           articlesData.forEach((article: any) => {
-            trackArticleRead(article.id);
+            initialReadStates[article.id] = false; // Will be updated after checking
+          });
+          setReadStates(initialReadStates);
+
+          // Check read status for each article
+          articlesData.forEach(async (article: any) => {
+            try {
+              const hasRead = await articleReadApi.hasUserReadArticle(article.id);
+              setReadStates(prev => ({ ...prev, [article.id]: hasRead }));
+            } catch (error) {
+              console.error(`Failed to check read status for article ${article.id}:`, error);
+            }
           });
         })
         .catch(() => {
@@ -151,6 +174,9 @@ const Article = () => {
                   {article.isApproved && (
                     <Badge className="bg-green-500/20 text-green-400 border-green-500/30">Approved</Badge>
                   )}
+                  {readStates[article.id] && (
+                    <Badge className="bg-green-500/20 text-green-400 border-green-500/30">Completed</Badge>
+                  )}
                 </div>
                 <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white leading-tight">
                   {article.title}
@@ -173,6 +199,20 @@ const Article = () => {
                   >
                     <ThumbsUp className="w-4 h-4 mr-2" />
                     {upvoteStates[article.id]?.count || 42} Upvotes
+                  </Button>
+                  <Button
+                    onClick={() => readStates[article.id] 
+                      ? handleMarkAsUnread(article.id) 
+                      : handleMarkAsRead(article.id)
+                    }
+                    variant="outline"
+                    className={`${
+                      readStates[article.id]
+                        ? "border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300"
+                        : "border-green-500/30 text-green-400 hover:bg-green-500/10 hover:text-green-300"
+                    }`}
+                  >
+                    {readStates[article.id] ? "Mark as Unread" : "Mark as Read"}
                   </Button>
                 </div>
               </div>

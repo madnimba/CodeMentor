@@ -380,6 +380,10 @@ const LiveCoding = () => {
           console.log('Submission request:', submissionRequest);
           await submissionsApi.submitCode(submissionRequest);
           console.log('Submission saved to database successfully');
+          
+          // Trigger event to refresh companies data
+          localStorage.setItem('questionCompletionUpdate', Date.now().toString());
+          window.dispatchEvent(new Event('questionCompletionUpdate'));
         } catch (error) {
           console.error('Failed to save submission to database:', error);
           // Don't show error toast to user since the main functionality worked

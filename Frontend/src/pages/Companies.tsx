@@ -51,6 +51,7 @@ const Companies = () => {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | null>(null);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -90,6 +91,36 @@ const Companies = () => {
   useEffect(() => {
     setCurrentPage(0);
   }, [searchQuery, sortOrder]);
+
+  // Listen for question completion updates
+  useEffect(() => {
+    const handleQuestionCompletionUpdate = () => {
+      // Refresh companies data when question completion changes
+      if (user) {
+        setRefreshing(true);
+        api.get(`/companies/paginated?page=${currentPage}&size=${pageSize}`)
+          .then(res => {
+            const paginatedData: PaginatedResponse<Company> = res.data;
+            setCompanies(paginatedData.content);
+            setTotalPages(paginatedData.totalPages);
+            setTotalElements(paginatedData.totalElements);
+            setRefreshing(false);
+          })
+          .catch((err) => {
+            console.error("Error refreshing companies:", err);
+            setRefreshing(false);
+          });
+      }
+    };
+
+    // Listen for the custom event
+    window.addEventListener('questionCompletionUpdate', handleQuestionCompletionUpdate);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('questionCompletionUpdate', handleQuestionCompletionUpdate);
+    };
+  }, [user, currentPage, pageSize]);
 
   // Mock data - commented out but kept for reference
   /*
@@ -285,9 +316,14 @@ const Companies = () => {
         <div className="max-w-7xl mx-auto">
           {/* Page Title */}
           <div className="mb-8">
-            <h1 className="text-4xl font-bold text-white mb-2">
-              Company Question Banks
-            </h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-4xl font-bold text-white mb-2">
+                Company Question Banks
+              </h1>
+              {refreshing && (
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-500"></div>
+              )}
+            </div>
             <p className="text-slate-400 text-lg">
               Practice questions from top tech companies
             </p>

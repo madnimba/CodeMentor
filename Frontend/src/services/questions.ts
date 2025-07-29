@@ -42,6 +42,7 @@ export interface Question {
   createdAt: string;
   question_year: number;
   testcases: TestcaseResponse[];
+  isCompleted?: boolean; // Whether the current user has completed this question
 }
 
 export interface TestcaseResponse {
