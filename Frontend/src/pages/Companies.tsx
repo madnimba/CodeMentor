@@ -338,8 +338,8 @@ const Companies = () => {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {featuredCompanies.map((company) => (
-                  <Card key={company.id} className="bg-slate-800/50 border-slate-700 hover:border-purple-500/50 transition-colors">
-                    <CardHeader>
+                  <Card key={company.id} className="bg-slate-800/50 border-slate-700 hover:border-purple-500/50 transition-colors flex flex-col h-full">
+                    <CardHeader className="flex-shrink-0">
                       <div className="flex items-center gap-2 mb-2">
                         <Building2 className="w-6 h-6 text-purple-400" />
                         <CardTitle className="text-white">{company.name}</CardTitle>
@@ -348,8 +348,8 @@ const Companies = () => {
                         {company.description}
                       </CardDescription>
                     </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
+                    <CardContent className="flex flex-col flex-grow">
+                      <div className="space-y-4 flex-grow">
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
                             <span className="text-slate-400">Progress</span>
@@ -357,12 +357,12 @@ const Companies = () => {
                           </div>
                           <Progress value={(company.solvedQuestions / company.totalQuestions) * 100} className="h-2" />
                         </div>
-                        <Button asChild className="w-full bg-purple-600 hover:bg-purple-700">
-                          <Link to={`/companies/${company.id}`}>
-                            View Questions <ArrowRight className="ml-2 w-4 h-4" />
-                          </Link>
-                        </Button>
                       </div>
+                      <Button asChild className="w-full bg-purple-600 hover:bg-purple-700 mt-4">
+                        <Link to={`/companies/${company.id}`}>
+                          View Questions <ArrowRight className="ml-2 w-4 h-4" />
+                        </Link>
+                      </Button>
                     </CardContent>
                   </Card>
                 ))}
@@ -420,8 +420,8 @@ const Companies = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredAndSortedCompanies.map((company) => (
-                <Card key={company.id} className="bg-slate-800/50 border-slate-700 hover:border-purple-500/50 transition-colors">
-                  <CardHeader>
+                <Card key={company.id} className="bg-slate-800/50 border-slate-700 hover:border-purple-500/50 transition-colors flex flex-col h-full">
+                  <CardHeader className="flex-shrink-0">
                     <div className="flex items-center gap-2 mb-2">
                       <Building2 className="w-6 h-6 text-purple-400" />
                       <CardTitle className="text-white">{company.name}</CardTitle>
@@ -430,8 +430,8 @@ const Companies = () => {
                       {company.description}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
+                  <CardContent className="flex flex-col flex-grow">
+                    <div className="space-y-4 flex-grow">
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
                           <span className="text-slate-400">Progress</span>
@@ -439,12 +439,12 @@ const Companies = () => {
                         </div>
                         <Progress value={(company.solvedQuestions / company.totalQuestions) * 100} className="h-2" />
                       </div>
-                      <Button asChild className="w-full bg-purple-600 hover:bg-purple-700">
-                        <Link to={`/companies/${company.id}`}>
-                          View Questions <ArrowRight className="ml-2 w-4 h-4" />
-                        </Link>
-                      </Button>
                     </div>
+                    <Button asChild className="w-full bg-purple-600 hover:bg-purple-700 mt-4">
+                      <Link to={`/companies/${company.id}`}>
+                        View Questions <ArrowRight className="ml-2 w-4 h-4" />
+                      </Link>
+                    </Button>
                   </CardContent>
                 </Card>
               ))}
