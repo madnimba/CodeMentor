@@ -96,6 +96,12 @@ public class AdminService {
         userRepository.deleteById(id);
     }
 
+    // Search users
+    public Page<AdminUserResponse> searchUsers(String searchTerm, Boolean isAdmin, Pageable pageable) {
+        Page<User> users = userRepository.searchUsers(searchTerm, isAdmin, pageable);
+        return users.map(this::mapToAdminUserResponse);
+    }
+
     // Article Management
     public Page<AdminArticleResponse> getAllArticles(Pageable pageable) {
         return articleRepository.findAll(pageable).map(this::mapToAdminArticleResponse);
@@ -103,6 +109,12 @@ public class AdminService {
 
     public Page<AdminArticleResponse> getUnapprovedArticles(Pageable pageable) {
         return articleRepository.findByIsApprovedFalse(pageable).map(this::mapToAdminArticleResponse);
+    }
+
+    // Search articles
+    public Page<AdminArticleResponse> searchArticles(String searchTerm, Boolean isApproved, Pageable pageable) {
+        Page<Article> articles = articleRepository.searchArticles(searchTerm, isApproved, pageable);
+        return articles.map(this::mapToAdminArticleResponse);
     }
 
     public AdminArticleResponse getArticleById(Integer id) {
@@ -232,9 +244,21 @@ public class AdminService {
         return mapToAdminQuestionResponse(savedQuestion);
     }
 
+    // Search questions
+    public Page<AdminQuestionResponse> searchQuestions(String searchTerm, Boolean isApproved, Boolean isCoding, Pageable pageable) {
+        Page<Question> questions = questionRepository.searchQuestions(searchTerm, isApproved, isCoding, pageable);
+        return questions.map(this::mapToAdminQuestionResponse);
+    }
+
     // Company Management
     public Page<AdminCompanyResponse> getAllCompanies(Pageable pageable) {
         return companyRepository.findAll(pageable).map(this::mapToAdminCompanyResponse);
+    }
+
+    // Search companies
+    public Page<AdminCompanyResponse> searchCompanies(String searchTerm, Pageable pageable) {
+        Page<Company> companies = companyRepository.findByNameContainingIgnoreCase(searchTerm, pageable);
+        return companies.map(this::mapToAdminCompanyResponse);
     }
 
     public AdminCompanyResponse getCompanyById(Integer id) {

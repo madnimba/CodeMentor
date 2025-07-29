@@ -34,6 +34,13 @@ public class CompanyController {
         return ResponseEntity.ok(companyService.getAllCompanies(pageable));
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<Page<CompanyDTO>> searchCompanies(
+            @RequestParam(required = false) String searchTerm,
+            Pageable pageable) {
+        return ResponseEntity.ok(companyService.searchCompanies(searchTerm, pageable));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<CompanyDTO> getCompanyById(@PathVariable Integer id) {
         return ResponseEntity.ok(companyService.getCompanyById(id));
@@ -54,6 +61,15 @@ public class CompanyController {
             @PathVariable Integer companyId,
             Pageable pageable) {
         return ResponseEntity.ok(companyQuestionService.getCompanyQuestions(companyId, pageable));
+    }
+
+    @GetMapping("/{companyId}/questions/search")
+    public ResponseEntity<Page<CompanyQuestionDTO>> searchCompanyQuestions(
+            @PathVariable Integer companyId,
+            @RequestParam(required = false) String searchTerm,
+            @RequestParam(required = false) Boolean isCoding,
+            Pageable pageable) {
+        return ResponseEntity.ok(companyQuestionService.searchCompanyQuestions(companyId, searchTerm, isCoding, pageable));
     }
 
     @GetMapping("/{companyId}/questions/coding")

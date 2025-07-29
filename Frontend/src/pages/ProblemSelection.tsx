@@ -21,12 +21,16 @@ import {
   Code2, 
   Search, 
   Filter,
-  Building2
+  Building2,
+  ArrowRight,
+  Target,
+  Calendar
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useMemo, useEffect } from "react";
 import { api } from "@/services/api";
 import { useToast } from "@/components/ui/use-toast";
+import { questionService } from "@/services/questions";
 
 // Types
 interface Problem {
@@ -43,6 +47,7 @@ const ProblemSelection = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchTrigger, setSearchTrigger] = useState("");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all");
   const [problems, setProblems] = useState<Problem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -54,6 +59,19 @@ const ProblemSelection = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
 
+  // Handle search on Enter key press
+  const handleSearch = (query: string) => {
+    setSearchTrigger(query);
+    setCurrentPage(0); // Reset to first page when searching
+  };
+
+  // Handle Enter key press in search input
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch(searchTerm);
+    }
+  };
+
   // Fetch coding problems from all companies
   useEffect(() => {
     const fetchCodingProblems = async () => {
@@ -61,11 +79,14 @@ const ProblemSelection = () => {
       setError(null);
       
       try {
-        // Use the global coding questions endpoint with pagination
-        const response = await api.get(`/questions/coding/paginated?page=${currentPage}&size=${pageSize}`);
-        const pageData = response.data.data;
+        let response;
+        if (searchTrigger.trim()) {
+          response = await questionService.searchQuestions(searchTrigger, true, currentPage, pageSize);
+        } else {
+          response = await questionService.getCodingQuestionsPaginated(currentPage, pageSize);
+        }
         
-        const allCodingProblems: Problem[] = pageData.content.map((q: any) => ({
+        const allCodingProblems: Problem[] = response.content.map((q: any) => ({
           id: q.id,
           title: q.title,
           description: q.description || "",
@@ -77,8 +98,8 @@ const ProblemSelection = () => {
         
         console.log('Total coding problems found:', allCodingProblems.length);
         setProblems(allCodingProblems);
-        setTotalPages(pageData.totalPages);
-        setTotalElements(pageData.totalElements);
+        setTotalPages(response.totalPages);
+        setTotalElements(response.totalElements);
         setLoading(false);
         
         if (allCodingProblems.length === 0) {
@@ -96,20 +117,12 @@ const ProblemSelection = () => {
     };
 
     fetchCodingProblems();
-  }, [toast, currentPage, pageSize]);
+  }, [toast, currentPage, pageSize, searchTrigger]);
 
-  // Filter problems
-  const filteredProblems = useMemo(() => {
-    return problems.filter(problem => {
-      // Search filter - only search by title
-      const matchesSearch = problem.title.toLowerCase().includes(searchTerm.toLowerCase());
-
-      // Difficulty filter
-      const matchesDifficulty = selectedDifficulty === "all" || problem.difficulty === selectedDifficulty;
-
-      return matchesSearch && matchesDifficulty;
-    });
-  }, [problems, searchTerm, selectedDifficulty]);
+  // Reset to first page when search term changes
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [selectedDifficulty]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -292,9 +305,10 @@ const ProblemSelection = () => {
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
                       <Input
                         type="text"
-                        placeholder="Search by title..."
+                        placeholder="Search by title... (Press Enter to search)"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
+                        onKeyPress={handleKeyPress}
                         className="pl-10 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
                       />
                     </div>
@@ -324,64 +338,75 @@ const ProblemSelection = () => {
               {/* Results Count */}
               <div className="flex justify-between items-center">
                 <div className="text-slate-400">
-                  {filteredProblems.length} problem{filteredProblems.length !== 1 ? 's' : ''} found
+                  {problems.length} problem{problems.length !== 1 ? 's' : ''} found
                 </div>
               </div>
 
-              {/* Problems List */}
-              <div className="h-[600px] overflow-y-auto space-y-4 pr-2">
-                {filteredProblems.map((problem) => (
-                  <Card 
-                    key={problem.id} 
-                    className="bg-slate-800/50 border-slate-700 hover:border-purple-500/50 transition-colors cursor-pointer"
-                    onClick={() => handleProblemSelect(problem)}
-                  >
-                    <CardContent className="p-6">
+              {problems.length === 0 && (
+                <div className="text-center py-12">
+                  <Code2 className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-slate-400 mb-2">No problems found</h3>
+                  <p className="text-slate-500">Try adjusting your filters or search terms</p>
+                </div>
+              )}
+
+              {/* Problems Grid */}
+              <div className="grid gap-6">
+                {problems.map((problem) => (
+                  <Card key={problem.id} className="bg-slate-800/50 border-slate-700 hover:border-slate-600 transition-colors">
+                    <CardHeader>
                       <div className="flex justify-between items-start">
-                        <div className="flex-1 space-y-3">
-                          <div className="flex items-center gap-3">
-                            <h3 className="text-xl font-semibold text-white">{problem.title}</h3>
-                            <Badge className={`${
-                              problem.difficulty === 'Easy' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
-                              problem.difficulty === 'Medium' ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' :
-                              'bg-red-500/20 text-red-400 border-red-500/30'
-                            }`}>
+                        <div className="flex-1">
+                          <CardTitle className="text-white text-lg mb-2">{problem.title}</CardTitle>
+                          <div className="flex items-center gap-4 text-sm text-slate-400 mb-3">
+                            <div className="flex items-center gap-1">
+                              <Target className="w-4 h-4" />
                               {problem.difficulty}
-                            </Badge>
-                            <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
-                              {problem.question_year || 2024}
-                            </Badge>
-                          </div>
-                          
-                          {problem.description && (
-                            <div className="text-slate-300 text-sm">
-                              <Markdown content={problem.description} />
                             </div>
-                          )}
-                          
-                          {problem.company && (
-                            <div className="flex items-center gap-1 text-sm text-slate-400">
+                            <div className="flex items-center gap-1">
                               <Building2 className="w-4 h-4" />
                               {problem.company}
                             </div>
-                          )}
+                            <div className="flex items-center gap-1">
+                              <Calendar className="w-4 h-4" />
+                              {problem.year}
+                            </div>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            <Badge className={
+                              problem.difficulty === "Easy" ? "bg-green-500/20 text-green-400 border-green-500/30" :
+                              problem.difficulty === "Medium" ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" :
+                              "bg-red-500/20 text-red-400 border-red-500/30"
+                            }>
+                              {problem.difficulty}
+                            </Badge>
+                            <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+                              {problem.company}
+                            </Badge>
+                            <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                              {problem.year}
+                            </Badge>
+                          </div>
                         </div>
-                        
-                        <Button className="bg-purple-600 hover:bg-purple-700 ml-4">
-                          Solve
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleProblemSelect(problem)}
+                            className="text-blue-400 hover:text-blue-300"
+                          >
+                            <ArrowRight className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-slate-300 text-sm line-clamp-3">
+                        {problem.description}
+                      </p>
                     </CardContent>
                   </Card>
                 ))}
-                
-                {filteredProblems.length === 0 && (
-                  <div className="text-center py-12">
-                    <Code2 className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-slate-400 mb-2">No problems found</h3>
-                    <p className="text-slate-500">Try adjusting your filters or search terms</p>
-                  </div>
-                )}
               </div>
               {renderPagination()}
             </div>

@@ -94,6 +94,12 @@ public class QuestionService {
                 .map(this::mapToQuestionResponse);
     }
 
+    // Search questions
+    public org.springframework.data.domain.Page<QuestionResponse> searchQuestions(String searchTerm, Boolean isCoding, Pageable pageable) {
+        org.springframework.data.domain.Page<Question> questions = questionRepository.searchQuestions(searchTerm, true, isCoding, pageable); // Only approved questions
+        return questions.map(this::mapToQuestionResponse);
+    }
+
     private User getCurrentUser() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByEmail(email)

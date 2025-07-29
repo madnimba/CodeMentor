@@ -7,7 +7,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Markdown } from "@/components/ui/markdown";
@@ -35,6 +35,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { Switch } from "@/components/ui/switch";
 // import DOMPurify from "dompurify"; // ✅ Added for sanitization
 
 interface Question {
@@ -153,6 +154,22 @@ const CompanyQuestions = () => {
     }
   }, [selectedTrackId]);
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchTrigger, setSearchTrigger] = useState("");
+
+  // Handle search on Enter key press
+  const handleSearch = (query: string) => {
+    setSearchTrigger(query);
+    setCurrentPage(0); // Reset to first page when searching
+  };
+
+  // Handle Enter key press in search input
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch(searchQuery);
+    }
+  };
+
   useEffect(() => {
     if (!companyId) {
       setCompanyData(null);
@@ -163,11 +180,15 @@ const CompanyQuestions = () => {
     setLoading(true);
     setError(null);
 
-    Promise.all([
-      api.get(`/companies/${companyId}`),
-      api.get(`/companies/${companyId}/questions/paginated?page=${currentPage}&size=${pageSize}`)
-    ])
-      .then(([companyRes, questionsRes]) => {
+    const fetchData = async () => {
+      try {
+        const [companyRes, questionsRes] = await Promise.all([
+          api.get(`/companies/${companyId}`),
+          searchTrigger.trim() 
+            ? api.get(`/companies/${companyId}/questions/search?searchTerm=${encodeURIComponent(searchTrigger)}&page=${currentPage}&size=${pageSize}`)
+            : api.get(`/companies/${companyId}/questions/paginated?page=${currentPage}&size=${pageSize}`)
+        ]);
+
         setCompanyData(companyRes.data);
 
         const paginatedData: PaginatedResponse<any> = questionsRes.data;
@@ -197,13 +218,15 @@ const CompanyQuestions = () => {
         setCompletionStates(states);
         
         setLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error(err);
         setError("Failed to load company or questions");
         setLoading(false);
-      });
-  }, [companyId, currentPage, pageSize]);
+      }
+    };
+
+    fetchData();
+  }, [companyId, currentPage, pageSize, searchTrigger]);
 
   const toggleAnswer = (questionId: number) => {
     setExpandedQuestionId(expandedQuestionId === questionId ? null : questionId);
@@ -388,28 +411,21 @@ const CompanyQuestions = () => {
 
       <div className="pt-24 pb-16 px-4">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
-              <Button asChild variant="ghost" className="text-slate-400 hover:text-white">
-                <Link to="/companies">
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Companies
-                </Link>
-              </Button>
-              
-              {/* Create Question Button */}
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
+              <Building2 className="w-12 h-12 text-blue-400" />
+              <div>
+                <h1 className="text-3xl font-bold text-white mb-2">{companyData?.name} Questions</h1>
+                <p className="text-slate-400 text-lg">
+                  Practice questions from {companyData?.name}
+                </p>
+              </div>
+            </div>
+            
+            {user && (
               <Dialog open={isQuestionDialogOpen} onOpenChange={setIsQuestionDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button
-                    className="bg-purple-600 hover:bg-purple-700 text-white"
-                    onClick={() => {
-                      if (!user) {
-                        toast.error("Please log in to create a question");
-                        return;
-                      }
-                      setIsQuestionDialogOpen(true);
-                    }}
-                  >
+                  <Button className="bg-blue-600 hover:bg-blue-700">
                     <Plus className="w-4 h-4 mr-2" />
                     Add Question
                   </Button>
@@ -599,122 +615,115 @@ const CompanyQuestions = () => {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="description"
-                  rules={{ required: "Description is required" }}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-slate-200">Description</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Describe the problem statement..."
-                          className="bg-slate-700 border-slate-600 text-white min-h-[150px]"
-                          {...field}
+                      <FormField
+                        control={form.control}
+                        name="description"
+                        rules={{ required: "Description is required" }}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-slate-200">Description</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                placeholder="Describe the question..."
+                                className="bg-slate-700 border-slate-600 text-white min-h-[100px]"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="difficulty"
+                          rules={{ required: "Difficulty is required" }}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-slate-200">Difficulty</FormLabel>
+                              <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent className="bg-slate-700 border-slate-600">
+                                  <SelectItem value="Easy">Easy</SelectItem>
+                                  <SelectItem value="Medium">Medium</SelectItem>
+                                  <SelectItem value="Hard">Hard</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
                         />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
 
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="difficulty"
-                    rules={{ required: "Difficulty is required" }}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-slate-200">Difficulty</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
-                              <SelectValue placeholder="Select difficulty" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent className="bg-slate-700 border-slate-600">
-                            <SelectItem value="Easy">Easy</SelectItem>
-                            <SelectItem value="Medium">Medium</SelectItem>
-                            <SelectItem value="Hard">Hard</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                        <FormField
+                          control={form.control}
+                          name="year"
+                          rules={{ required: "Year is required" }}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-slate-200">Year</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  placeholder="2024"
+                                  className="bg-slate-700 border-slate-600 text-white"
+                                  {...field}
+                                  onChange={(e) => field.onChange(parseInt(e.target.value))}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
 
-                  <FormField
-                    control={form.control}
-                    name="importanceTag"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-slate-200">Importance Tag</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="e.g., High, Medium, Low"
-                            className="bg-slate-700 border-slate-600 text-white"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                      <FormField
+                        control={form.control}
+                        name="importanceTag"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-slate-200">Importance Tag (Optional)</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="e.g., High Priority, Must Know"
+                                className="bg-slate-700 border-slate-600 text-white"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="companyId"
-                    rules={{ required: "Company is required" }}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-slate-200">Company</FormLabel>
-                        <Select onValueChange={(value) => field.onChange(Number(value))} value={field.value?.toString()}>
-                          <FormControl>
-                            <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
-                              <SelectValue placeholder="Select a company" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent className="bg-slate-700 border-slate-600">
-                            {companies.map((company) => (
-                              <SelectItem key={company.id} value={company.id.toString()}>
-                                {company.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="trackId"
-                    rules={{ required: "Track is required" }}
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-slate-200">Track</FormLabel>
-                        <Select onValueChange={(value) => field.onChange(Number(value))} value={field.value?.toString()}>
-                          <FormControl>
-                            <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
-                              <SelectValue placeholder="Select a track" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent className="bg-slate-700 border-slate-600">
-                            {tracks.map((track) => (
-                              <SelectItem key={track.id} value={track.id.toString()}>
-                                {track.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                      <FormField
+                        control={form.control}
+                        name="trackId"
+                        rules={{ required: "Track is required" }}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-slate-200">Track</FormLabel>
+                            <Select onValueChange={(value) => field.onChange(Number(value))} value={field.value?.toString()}>
+                              <FormControl>
+                                <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                                  <SelectValue placeholder="Select a track" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent className="bg-slate-700 border-slate-600">
+                                {tracks.map((track) => (
+                                  <SelectItem key={track.id} value={track.id.toString()}>
+                                    {track.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
@@ -767,200 +776,266 @@ const CompanyQuestions = () => {
                   />
                 </div>
 
-                <FormField
-                  control={form.control}
-                  name="isCoding"
-                  render={({ field }) => (
-                    <FormItem className="flex items-center space-x-2">
-                      <FormControl>
-                        <input
-                          type="checkbox"
-                          checked={field.value}
-                          onChange={field.onChange}
-                          className="w-4 h-4"
-                        />
-                      </FormControl>
-                      <FormLabel className="text-slate-200">Coding Question</FormLabel>
-                    </FormItem>
-                  )}
-                />
+                      <FormField
+                        control={form.control}
+                        name="isCoding"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center justify-between rounded-lg border border-slate-600 p-4">
+                            <div className="space-y-0.5">
+                              <FormLabel className="text-slate-200">Coding Question</FormLabel>
+                              <div className="text-sm text-slate-400">
+                                Check if this is a coding question that requires implementation
+                              </div>
+                            </div>
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
 
-                {/* Testcases Section */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <FormLabel className="text-slate-200">Test Cases</FormLabel>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={addTestcase}
-                      className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add Test Case
-                    </Button>
-                  </div>
-                  
-                  {fields.map((field, index) => (
-                    <Card key={field.id} className="bg-slate-700/50 border-slate-600">
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between mb-3">
-                          <h4 className="text-white font-medium">Test Case {index + 1}</h4>
-                          {fields.length > 1 && (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeTestcase(index)}
-                              className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          )}
+                      {/* Testcases */}
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <FormLabel className="text-slate-200">Test Cases</FormLabel>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={addTestcase}
+                            className="border-slate-600 text-slate-300"
+                          >
+                            <Plus className="w-4 h-4 mr-2" />
+                            Add Test Case
+                          </Button>
                         </div>
                         
-                        <div className="grid grid-cols-2 gap-4">
-                          <FormField
-                            control={form.control}
-                            name={`testcases.${index}.test1`}
-                            rules={{ required: "Input is required" }}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-slate-200">Input</FormLabel>
-                                <FormControl>
-                                  <Textarea
-                                    placeholder="Test case input"
-                                    className="bg-slate-600 border-slate-500 text-white"
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                        {fields.map((field, index) => (
+                          <div key={field.id} className="space-y-4 p-4 border border-slate-600 rounded-lg">
+                            <div className="flex items-center justify-between">
+                              <h4 className="text-slate-200 font-medium">Test Case {index + 1}</h4>
+                              {fields.length > 1 && (
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => removeTestcase(index)}
+                                  className="border-red-500/30 text-red-400 hover:bg-red-500/10"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              )}
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <FormLabel className="text-slate-300 text-sm">Input 1</FormLabel>
+                                <Input
+                                  placeholder="Enter test input"
+                                  className="bg-slate-700 border-slate-600 text-white"
+                                  {...form.register(`testcases.${index}.test1`)}
+                                />
+                              </div>
+                              <div>
+                                <FormLabel className="text-slate-300 text-sm">Expected Output 1</FormLabel>
+                                <Input
+                                  placeholder="Enter expected output"
+                                  className="bg-slate-700 border-slate-600 text-white"
+                                  {...form.register(`testcases.${index}.output1`)}
+                                />
+                              </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <FormLabel className="text-slate-300 text-sm">Input 2 (Optional)</FormLabel>
+                                <Input
+                                  placeholder="Enter test input"
+                                  className="bg-slate-700 border-slate-600 text-white"
+                                  {...form.register(`testcases.${index}.test2`)}
+                                />
+                              </div>
+                              <div>
+                                <FormLabel className="text-slate-300 text-sm">Expected Output 2 (Optional)</FormLabel>
+                                <Input
+                                  placeholder="Enter expected output"
+                                  className="bg-slate-700 border-slate-600 text-white"
+                                  {...form.register(`testcases.${index}.output2`)}
+                                />
+                              </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <FormLabel className="text-slate-300 text-sm">Input 3 (Optional)</FormLabel>
+                                <Input
+                                  placeholder="Enter test input"
+                                  className="bg-slate-700 border-slate-600 text-white"
+                                  {...form.register(`testcases.${index}.test3`)}
+                                />
+                              </div>
+                              <div>
+                                <FormLabel className="text-slate-300 text-sm">Expected Output 3 (Optional)</FormLabel>
+                                <Input
+                                  placeholder="Enter expected output"
+                                  className="bg-slate-700 border-slate-600 text-white"
+                                  {...form.register(`testcases.${index}.output3`)}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
 
-                          <FormField
-                            control={form.control}
-                            name={`testcases.${index}.output1`}
-                            rules={{ required: "Expected output is required" }}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-slate-200">Expected Output</FormLabel>
-                                <FormControl>
-                                  <Textarea
-                                    placeholder="Expected output"
-                                    className="bg-slate-600 border-slate-500 text-white"
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
+                      <div className="flex justify-end space-x-4">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setIsQuestionDialogOpen(false)}
+                          className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          type="submit"
+                          disabled={isSubmitting}
+                          className="bg-blue-600 hover:bg-blue-700"
+                        >
+                          {isSubmitting ? "Creating..." : "Create Question"}
+                        </Button>
+                      </div>
+                    </form>
+                  </Form>
+                </DialogContent>
+              </Dialog>
+            )}
+          </div>
 
-                        <div className="grid grid-cols-2 gap-4 mt-4">
-                          <FormField
-                            control={form.control}
-                            name={`testcases.${index}.test2`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-slate-200">Input</FormLabel>
-                                <FormControl>
-                                  <Textarea
-                                    placeholder="Test case input"
-                                    className="bg-slate-600 border-slate-500 text-white"
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+          {/* Search Bar */}
+          <div className="mb-6">
+            <div className="relative max-w-md">
+              <Search className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
+              <Input
+                placeholder="Search questions... (Press Enter to search)"
+                className="pl-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-400"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={handleKeyPress}
+              />
+            </div>
+          </div>
 
-                          <FormField
-                            control={form.control}
-                            name={`testcases.${index}.output2`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-slate-200">Expected Output</FormLabel>
-                                <FormControl>
-                                  <Textarea
-                                    placeholder="Expected output"
-                                    className="bg-slate-600 border-slate-500 text-white"
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4 mt-4">
-                          <FormField
-                            control={form.control}
-                            name={`testcases.${index}.test3`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-slate-200">Input</FormLabel>
-                                <FormControl>
-                                  <Textarea
-                                    placeholder="Test case input"
-                                    className="bg-slate-600 border-slate-500 text-white"
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={form.control}
-                            name={`testcases.${index}.output3`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-slate-200">Expected Output</FormLabel>
-                                <FormControl>
-                                  <Textarea
-                                    placeholder="Expected output"
-                                    className="bg-slate-600 border-slate-500 text-white"
-                                    {...field}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+          <Card className="bg-slate-800/50 border-slate-700 mb-8">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <span className="text-white">
+                    {companyData.solvedQuestions} of {companyData.totalQuestions} questions solved
+                  </span>
                 </div>
+                <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">
+                  {Math.round((companyData.solvedQuestions / companyData.totalQuestions) * 100)}% Complete
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
 
-                <div className="flex justify-end space-x-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsQuestionDialogOpen(false)}
-                    className="border-slate-600 text-slate-300 hover:bg-slate-700"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="bg-purple-600 hover:bg-purple-700"
-                  >
-                    {isSubmitting ? "Creating..." : "Create Question"}
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </DialogContent>
-        )}
-      </Dialog>
+          {/* Questions Section */}
+          <div>
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-white mb-2">Questions</h2>
+              <p className="text-slate-400">
+                Showing {questions.length} of {totalElements} questions
+              </p>
+            </div>
+
+            {/* Questions Grid */}
+            <div className="grid gap-6">
+              {questions.map((question) => (
+                <Card key={question.id} className="bg-slate-800/50 border-slate-700 hover:border-slate-600 transition-colors">
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <CardTitle className="text-white text-lg mb-2">{question.title}</CardTitle>
+                        <div className="flex items-center gap-4 text-sm text-slate-400 mb-3">
+                          <div className="flex items-center gap-1">
+                            <Target className="w-4 h-4" />
+                            {question.difficulty}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-4 h-4" />
+                            {question.year}
+                          </div>
+                          {question.importanceTag && (
+                            <div className="flex items-center gap-1">
+                              <Star className="w-4 h-4" />
+                              {question.importanceTag}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          <Badge className={
+                            question.difficulty === "Easy" ? "bg-green-500/20 text-green-400 border-green-500/30" :
+                            question.difficulty === "Medium" ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" :
+                            "bg-red-500/20 text-red-400 border-red-500/30"
+                          }>
+                            {question.difficulty}
+                          </Badge>
+                          {question.importanceTag && (
+                            <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/30">
+                              {question.importanceTag}
+                            </Badge>
+                          )}
+                          <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+                            {question.year}
+                          </Badge>
+                          <Badge className={
+                            question.isCoding 
+                              ? "bg-purple-500/20 text-purple-400 border-purple-500/30" 
+                              : "bg-gray-500/20 text-gray-400 border-gray-500/30"
+                          }>
+                            {question.isCoding ? "Coding" : "Theory"}
+                          </Badge>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => toggleAnswer(question.id)}
+                          className="text-blue-400 hover:text-blue-300"
+                        >
+                          {expandedQuestionId === question.id ? "Hide" : "Show"} Answer
+                        </Button>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-slate-300 text-sm line-clamp-3">
+                      {question.description}
+                    </div>
+                    {expandedQuestionId === question.id && question.solution && (
+                      <div className="mt-4 p-4 bg-slate-900 rounded-lg border border-slate-600">
+                        <h4 className="text-white font-medium mb-2">Solution:</h4>
+                        <div className="text-slate-300 text-sm">
+                          {question.solution}
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {renderPagination()}
+          </div>
+        </div>
+      </div>
 
       <Footer />
     </div>

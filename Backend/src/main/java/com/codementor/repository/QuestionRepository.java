@@ -42,7 +42,7 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
            "WHERE qt.topic_id = ?1 AND q.is_approved = true", 
            nativeQuery = true)
     Page<Question> findByTopicIdAndApproved(Integer topicId, Pageable pageable);
-
+    
     @Query("SELECT q FROM Question q WHERE q.subtopic.topic.id = :topicId")
     List<Question> findByTopicId(@Param("topicId") Integer topicId);
     
@@ -52,6 +52,7 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     @Query("SELECT COUNT(DISTINCT s.question) FROM Submission s WHERE s.user.id = :userId AND s.question.subtopic.topic.id = :topicId AND s.status = 'accepted'")
     Long countSolvedQuestionsByUserAndTopic(@Param("userId") Integer userId, @Param("topicId") Integer topicId);
     
+<<<<<<< HEAD
     // New methods for questiontopics table queries
     
     /**
@@ -79,4 +80,22 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
            "WHERE cq.user_id = :userId AND qt.topic_id = :topicId " +
            "AND cq.question_id IN (SELECT q.id FROM questions q WHERE q.is_coding = false AND q.is_approved = true)", nativeQuery = true)
     Long countSolvedNonCodingQuestionsByUserAndTopicFromQuestionTopics(@Param("userId") Integer userId, @Param("topicId") Integer topicId);
+=======
+        // Search questions by multiple criteria
+    @Query("SELECT DISTINCT q FROM Question q " +
+           "LEFT JOIN CompanyQuestion cq ON cq.question.id = q.id " +
+           "LEFT JOIN cq.company c " +
+           "WHERE (:searchTerm IS NULL OR " +
+           "LOWER(q.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(q.track.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(q.subtopic.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(c.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "CAST(q.year AS string) LIKE CONCAT('%', :searchTerm, '%')) AND " +
+           "(:isApproved IS NULL OR q.isApproved = :isApproved) AND " +
+           "(:isCoding IS NULL OR q.isCoding = :isCoding)")
+    Page<Question> searchQuestions(@Param("searchTerm") String searchTerm,
+                                   @Param("isApproved") Boolean isApproved,
+                                   @Param("isCoding") Boolean isCoding,
+                                   Pageable pageable);
+>>>>>>> 1732d8b (some searches work, some don't)
 } 

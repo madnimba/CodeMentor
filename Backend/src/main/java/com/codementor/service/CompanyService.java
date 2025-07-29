@@ -51,6 +51,12 @@ public class CompanyService {
         return companies.map(this::convertToDTO);
     }
 
+    // Search companies
+    public Page<CompanyDTO> searchCompanies(String searchTerm, Pageable pageable) {
+        Page<Company> companies = companyRepository.findByNameContainingIgnoreCase(searchTerm, pageable);
+        return companies.map(this::convertToDTO);
+    }
+
     public CompanyDTO getCompanyById(Integer id) {
         Company company = companyRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Company not found"));

@@ -142,6 +142,17 @@ class AdminService {
     return response.data.data;
   }
 
+  async searchUsers(searchTerm?: string, isAdmin?: boolean, page: number = 0, size: number = 10): Promise<PaginatedResponse<AdminUser>> {
+    const params = new URLSearchParams();
+    if (searchTerm) params.append('searchTerm', searchTerm);
+    if (isAdmin !== undefined) params.append('isAdmin', isAdmin.toString());
+    params.append('page', page.toString());
+    params.append('size', size.toString());
+    
+    const response = await api.get(`${API_URL}/users/search?${params.toString()}`);
+    return response.data.data;
+  }
+
   async getUserById(id: number): Promise<AdminUser> {
     const response = await api.get(`${API_URL}/users/${id}`);
     return response.data.data;
@@ -161,6 +172,17 @@ class AdminService {
     console.log('AdminService.getAllArticles called with:', { page, size });
     const response = await api.get(`${API_URL}/articles?page=${page}&size=${size}`);
     console.log('AdminService.getAllArticles response:', response.data);
+    return response.data.data;
+  }
+
+  async searchArticles(searchTerm?: string, isApproved?: boolean, page: number = 0, size: number = 10): Promise<PaginatedResponse<AdminArticle>> {
+    const params = new URLSearchParams();
+    if (searchTerm) params.append('searchTerm', searchTerm);
+    if (isApproved !== undefined) params.append('isApproved', isApproved.toString());
+    params.append('page', page.toString());
+    params.append('size', size.toString());
+    
+    const response = await api.get(`${API_URL}/articles/search?${params.toString()}`);
     return response.data.data;
   }
 
@@ -190,11 +212,28 @@ class AdminService {
     return response.data.data;
   }
 
+  async approveAllArticles(): Promise<{ message: string; count: number }> {
+    const response = await api.post(`${API_URL}/articles/approve-all`);
+    return response.data.data;
+  }
+
   // Question Management
   async getAllQuestions(page: number = 0, size: number = 10): Promise<PaginatedResponse<AdminQuestion>> {
     console.log('AdminService.getAllQuestions called with:', { page, size });
     const response = await api.get(`${API_URL}/questions?page=${page}&size=${size}`);
     console.log('AdminService.getAllQuestions response:', response.data);
+    return response.data.data;
+  }
+
+  async searchQuestions(searchTerm?: string, isApproved?: boolean, isCoding?: boolean, page: number = 0, size: number = 10): Promise<PaginatedResponse<AdminQuestion>> {
+    const params = new URLSearchParams();
+    if (searchTerm) params.append('searchTerm', searchTerm);
+    if (isApproved !== undefined) params.append('isApproved', isApproved.toString());
+    if (isCoding !== undefined) params.append('isCoding', isCoding.toString());
+    params.append('page', page.toString());
+    params.append('size', size.toString());
+    
+    const response = await api.get(`${API_URL}/questions/search?${params.toString()}`);
     return response.data.data;
   }
 
@@ -224,11 +263,26 @@ class AdminService {
     return response.data.data;
   }
 
+  async approveAllQuestions(): Promise<{ message: string; count: number }> {
+    const response = await api.post(`${API_URL}/questions/approve-all`);
+    return response.data.data;
+  }
+
   // Company Management
   async getAllCompanies(page: number = 0, size: number = 10): Promise<PaginatedResponse<AdminCompany>> {
     console.log('AdminService.getAllCompanies called with:', { page, size });
     const response = await api.get(`${API_URL}/companies?page=${page}&size=${size}`);
     console.log('AdminService.getAllCompanies response:', response.data);
+    return response.data.data;
+  }
+
+  async searchCompanies(searchTerm?: string, page: number = 0, size: number = 10): Promise<PaginatedResponse<AdminCompany>> {
+    const params = new URLSearchParams();
+    if (searchTerm) params.append('searchTerm', searchTerm);
+    params.append('page', page.toString());
+    params.append('size', size.toString());
+    
+    const response = await api.get(`${API_URL}/companies/search?${params.toString()}`);
     return response.data.data;
   }
 
@@ -249,16 +303,6 @@ class AdminService {
 
   async deleteCompany(id: number): Promise<void> {
     await api.delete(`${API_URL}/companies/${id}`);
-  }
-
-  async approveAllArticles(): Promise<{ message: string; count: number }> {
-    const response = await api.post(`${API_URL}/articles/approve-all`);
-    return response.data.data;
-  }
-
-  async approveAllQuestions(): Promise<{ message: string; count: number }> {
-    const response = await api.post(`${API_URL}/questions/approve-all`);
-    return response.data.data;
   }
 }
 

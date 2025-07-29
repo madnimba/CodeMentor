@@ -41,6 +41,14 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.success(adminService.getAllUsers(pageable)));
     }
 
+    @GetMapping("/users/search")
+    public ResponseEntity<ApiResponse<Page<AdminUserResponse>>> searchUsers(
+            @RequestParam(required = false) String searchTerm,
+            @RequestParam(required = false) Boolean isAdmin,
+            Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(adminService.searchUsers(searchTerm, isAdmin, pageable)));
+    }
+
     @GetMapping("/users/{id}")
     public ResponseEntity<ApiResponse<AdminUserResponse>> getUserById(@PathVariable Integer id) {
         return ResponseEntity.ok(ApiResponse.success(adminService.getUserById(id)));
@@ -63,6 +71,14 @@ public class AdminController {
     @GetMapping("/articles")
     public ResponseEntity<ApiResponse<Page<AdminArticleResponse>>> getAllArticles(Pageable pageable) {
         return ResponseEntity.ok(ApiResponse.success(adminService.getAllArticles(pageable)));
+    }
+
+    @GetMapping("/articles/search")
+    public ResponseEntity<ApiResponse<Page<AdminArticleResponse>>> searchArticles(
+            @RequestParam(required = false) String searchTerm,
+            @RequestParam(required = false) Boolean isApproved,
+            Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(adminService.searchArticles(searchTerm, isApproved, pageable)));
     }
 
     @GetMapping("/articles/unapproved")
@@ -99,6 +115,15 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.success(adminService.getAllQuestions(pageable)));
     }
 
+    @GetMapping("/questions/search")
+    public ResponseEntity<ApiResponse<Page<AdminQuestionResponse>>> searchQuestions(
+            @RequestParam(required = false) String searchTerm,
+            @RequestParam(required = false) Boolean isApproved,
+            @RequestParam(required = false) Boolean isCoding,
+            Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(adminService.searchQuestions(searchTerm, isApproved, isCoding, pageable)));
+    }
+
     @GetMapping("/questions/unapproved")
     public ResponseEntity<ApiResponse<Page<AdminQuestionResponse>>> getUnapprovedQuestions(Pageable pageable) {
         return ResponseEntity.ok(ApiResponse.success(adminService.getUnapprovedQuestions(pageable)));
@@ -131,6 +156,13 @@ public class AdminController {
     @GetMapping("/companies")
     public ResponseEntity<ApiResponse<Page<AdminCompanyResponse>>> getAllCompanies(Pageable pageable) {
         return ResponseEntity.ok(ApiResponse.success(adminService.getAllCompanies(pageable)));
+    }
+
+    @GetMapping("/companies/search")
+    public ResponseEntity<ApiResponse<Page<AdminCompanyResponse>>> searchCompanies(
+            @RequestParam(required = false) String searchTerm,
+            Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(adminService.searchCompanies(searchTerm, pageable)));
     }
 
     @GetMapping("/companies/{id}")

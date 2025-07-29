@@ -56,6 +56,16 @@ export interface Article {
   questionIds: number[];
 }
 
+export interface PaginatedResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
+}
+
 export const studyMaterialService = {
   async getAllTracks(): Promise<Track[]> {
     const response = await api.get('/articles/tracks');
@@ -74,6 +84,16 @@ export const studyMaterialService = {
 
   async getAllJobRoles(): Promise<JobRole[]> {
     const response = await api.get('/articles/job-roles');
+    return response.data.data;
+  },
+
+  async searchArticles(searchTerm?: string, page: number = 0, size: number = 10): Promise<PaginatedResponse<Article>> {
+    const params = new URLSearchParams();
+    if (searchTerm) params.append('searchTerm', searchTerm);
+    params.append('page', page.toString());
+    params.append('size', size.toString());
+    
+    const response = await api.get(`/articles/search?${params.toString()}`);
     return response.data.data;
   },
 
@@ -98,8 +118,14 @@ export const studyMaterialService = {
   },
 
   // Get total articles read by user
-  async getTotalArticlesRead(): Promise<number> {
-    const response = await api.get('/user-article-reads/count');
+  async getTotalArticlesReadByUser(): Promise<number> {
+    const response = await api.get('/user-article-reads/total');
+    return response.data.data;
+  },
+
+  // Get articles read by user for a specific topic
+  async getArticlesReadByUserForTopic(topicId: number): Promise<number> {
+    const response = await api.get(`/user-article-reads/topic/${topicId}`);
     return response.data.data;
   }
 }; 

@@ -107,6 +107,12 @@ public class ArticleService {
         return articles.map(this::mapToArticleResponse);
     }
 
+    // Search articles
+    public Page<ArticleResponse> searchArticles(String searchTerm, Pageable pageable) {
+        Page<Article> articles = articleRepository.searchArticles(searchTerm, true, pageable); // Only approved articles
+        return articles.map(this::mapToArticleResponse);
+    }
+
     @Transactional
     public ArticleResponse updateArticle(Integer id, CreateArticleRequest request) {
         Article article = articleRepository.findById(id)

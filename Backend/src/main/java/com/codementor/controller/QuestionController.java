@@ -28,4 +28,12 @@ public class QuestionController {
     public ResponseEntity<ApiResponse<Page<QuestionResponse>>> getCodingQuestionsPaginated(Pageable pageable) {
         return ResponseEntity.ok(ApiResponse.success(questionService.getCodingQuestions(pageable)));
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<Page<QuestionResponse>>> searchQuestions(
+            @RequestParam(required = false) String searchTerm,
+            @RequestParam(required = false) Boolean isCoding,
+            Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(questionService.searchQuestions(searchTerm, isCoding, pageable)));
+    }
 } 

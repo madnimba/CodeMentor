@@ -32,6 +32,7 @@ const AdminArticles = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchTrigger, setSearchTrigger] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
@@ -41,9 +42,39 @@ const AdminArticles = () => {
   const [selectedArticle, setSelectedArticle] = useState<AdminArticle | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
 
-  useEffect(() => {
-    fetchArticles();
-  }, [currentPage, pageSize, isUnapproved]);
+  // Handle search on Enter key press
+  const handleSearchTrigger = (query: string) => {
+    setSearchTrigger(query);
+    setCurrentPage(0); // Reset to first page when searching
+  };
+
+  // Handle Enter key press in search input
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearchTrigger(searchQuery);
+    }
+  };
+
+  const handleSearch = async () => {
+    try {
+      setLoading(true);
+      const response: PaginatedResponse<AdminArticle> = await adminService.searchArticles(
+        searchTrigger || undefined,
+        isUnapproved ? false : undefined,
+        currentPage,
+        pageSize
+      );
+      setArticles(response.content);
+      setTotalPages(response.totalPages);
+      setTotalElements(response.totalElements);
+    } catch (err: any) {
+      console.error('AdminArticles.handleSearch error:', err);
+      setError(err?.response?.data?.message || "Failed to search articles");
+      toast.error("Failed to search articles");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchArticles = async () => {
     try {
@@ -64,6 +95,19 @@ const AdminArticles = () => {
       setLoading(false);
     }
   };
+
+  // Trigger search or fetch articles based on search trigger
+  useEffect(() => {
+    if (searchTrigger.trim() === '') {
+      fetchArticles();
+    } else {
+      handleSearch();
+    }
+  }, [searchTrigger, currentPage, pageSize, isUnapproved]);
+
+  useEffect(() => {
+    fetchArticles();
+  }, [currentPage, pageSize, isUnapproved]);
 
   const handleApproveArticle = async (articleId: number) => {
     try {
@@ -108,10 +152,11 @@ const AdminArticles = () => {
     }
   };
 
-  const filteredArticles = articles.filter(article =>
-    article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    article.createdBy?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Remove client-side filtering since we're using server-side search
+  // const filteredArticles = articles.filter(article =>
+  //   article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  //   article.createdBy?.toLowerCase().includes(searchQuery.toLowerCase())
+  // );
 
   if (loading) {
     return (
@@ -187,10 +232,11 @@ const AdminArticles = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
               <Input
-                placeholder="Search articles by title or author..."
+                placeholder="Search articles... (Press Enter to search)"
                 className="pl-10 bg-slate-900/50 border-slate-600 text-white placeholder:text-slate-400"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyPress={handleKeyPress}
               />
             </div>
             <div className="flex items-center gap-4">
@@ -211,7 +257,7 @@ const AdminArticles = () => {
 
           {/* Articles Grid */}
           <div className="grid gap-6">
-            {filteredArticles.map((article) => (
+            {articles.map((article) => (
               <Card key={article.id} className="bg-slate-800/50 border-slate-700 hover:border-slate-600 transition-colors">
                 <CardHeader>
                   <div className="flex justify-between items-start">

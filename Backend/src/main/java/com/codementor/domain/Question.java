@@ -65,8 +65,13 @@ public class Question {
     @Column(name = "is_coding", nullable = false)
     private Boolean isCoding = false;
 
+<<<<<<< HEAD
     @Column(nullable = false)
     private Short question_year = 2024;
+=======
+    @Column(name = "question_year", nullable = false)
+    private Short year = 2024;
+>>>>>>> 1732d8b (some searches work, some don't)
 
     public enum Difficulty {
         Easy, Medium, Hard

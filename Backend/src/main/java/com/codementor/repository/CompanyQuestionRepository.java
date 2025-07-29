@@ -30,23 +30,29 @@ public interface CompanyQuestionRepository extends JpaRepository<CompanyQuestion
     List<CompanyQuestion> findByQuestionId(Integer questionId);
 
     // Get companies with most coding questions
-    @Query("SELECT cq.company.id, cq.company.name, cq.company.logoUrl, cq.company.country, cq.company.description, COUNT(cq.question.id) as totalQuestions " +
-           "FROM CompanyQuestion cq " +
+    @Query("SELECT cq.company, COUNT(cq) as questionCount FROM CompanyQuestion cq " +
            "WHERE cq.question.isCoding = true " +
-           "GROUP BY cq.company.id, cq.company.name, cq.company.logoUrl, cq.company.country, cq.company.description " +
-           "ORDER BY totalQuestions DESC")
+           "GROUP BY cq.company " +
+           "ORDER BY questionCount DESC")
     List<Object[]> findCompaniesWithMostCodingQuestions();
-
+    
+    // Search company questions by multiple criteria
+    @Query("SELECT cq FROM CompanyQuestion cq JOIN FETCH cq.question q " +
+           "WHERE cq.company.id = :companyId AND " +
+           "(:searchTerm IS NULL OR " +
+           "LOWER(q.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(q.track.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(q.subtopic.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "CAST(q.year AS string) LIKE CONCAT('%', :searchTerm, '%')) AND " +
+           "(:isCoding IS NULL OR q.isCoding = :isCoding)")
+    Page<CompanyQuestion> searchCompanyQuestions(@Param("companyId") Integer companyId,
+                                                @Param("searchTerm") String searchTerm,
+                                                @Param("isCoding") Boolean isCoding,
+                                                Pageable pageable);
+    
     // Count solved questions by user for a specific company
-    @Query("SELECT COUNT(DISTINCT s.question.id) " +
-           "FROM Submission s " +
-           "JOIN CompanyQuestion cq ON s.question.id = cq.question.id " +
-           "WHERE cq.company.id = :companyId AND s.user.id = :userId AND s.status = 'accepted'")
-    Long countSolvedQuestionsByUserForCompany(@Param("companyId") Integer companyId, @Param("userId") Integer userId);
-
-    // Count total coding questions for a company
-    @Query("SELECT COUNT(cq.question.id) " +
-           "FROM CompanyQuestion cq " +
-           "WHERE cq.company.id = :companyId AND cq.question.isCoding = true")
-    Long countTotalCodingQuestionsForCompany(@Param("companyId") Integer companyId);
+    @Query("SELECT COUNT(DISTINCT s.question.id) FROM Submission s " +
+           "WHERE s.user.id = :userId AND s.question.id IN " +
+           "(SELECT cq.question.id FROM CompanyQuestion cq WHERE cq.company.id = :companyId)")
+    Long countSolvedQuestionsByUserForCompany(@Param("userId") Integer userId, @Param("companyId") Integer companyId);
 }   

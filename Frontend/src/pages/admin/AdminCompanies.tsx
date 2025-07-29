@@ -45,10 +45,6 @@ const AdminCompanies = () => {
     description: ""
   });
 
-  useEffect(() => {
-    fetchCompanies();
-  }, [currentPage, pageSize]);
-
   const fetchCompanies = async () => {
     try {
       setLoading(true);
@@ -63,6 +59,42 @@ const AdminCompanies = () => {
       setLoading(false);
     }
   };
+
+  const handleSearch = async () => {
+    try {
+      setLoading(true);
+      const response: PaginatedResponse<AdminCompany> = await adminService.searchCompanies(
+        searchQuery || undefined,
+        currentPage,
+        pageSize
+      );
+      setCompanies(response.content);
+      setTotalPages(response.totalPages);
+      setTotalElements(response.totalElements);
+    } catch (err: any) {
+      setError(err?.response?.data?.message || "Failed to search companies");
+      toast.error("Failed to search companies");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Debounced search effect
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchQuery.trim() === '') {
+        fetchCompanies();
+      } else {
+        handleSearch();
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, currentPage, pageSize]);
+
+  useEffect(() => {
+    fetchCompanies();
+  }, [currentPage, pageSize]);
 
   const handleCreateCompany = async () => {
     setIsSubmitting(true);
@@ -134,10 +166,7 @@ const AdminCompanies = () => {
     }
   };
 
-  const filteredCompanies = companies.filter(company =>
-    company.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    company.country?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Client-side filtering removed - now using server-side search
 
   if (loading) {
     return (
@@ -288,7 +317,7 @@ const AdminCompanies = () => {
 
           {/* Companies Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredCompanies.map((company) => (
+            {companies.map((company) => (
               <Card key={company.id} className="bg-slate-800/50 border-slate-700 hover:border-slate-600 transition-colors">
                 <CardHeader>
                   <div className="flex justify-between items-start">

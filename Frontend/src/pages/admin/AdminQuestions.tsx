@@ -68,6 +68,40 @@ const AdminQuestions = () => {
     }
   };
 
+  const handleSearch = async () => {
+    try {
+      setLoading(true);
+      const response: PaginatedResponse<AdminQuestion> = await adminService.searchQuestions(
+        searchQuery || undefined,
+        isUnapproved ? false : undefined,
+        undefined, // isCoding - not filtering by coding type in search
+        currentPage,
+        pageSize
+      );
+      setQuestions(response.content);
+      setTotalPages(response.totalPages);
+      setTotalElements(response.totalElements);
+    } catch (err: any) {
+      setError(err?.response?.data?.message || "Failed to search questions");
+      toast.error("Failed to search questions");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Debounced search effect
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchQuery.trim() === '') {
+        fetchQuestions();
+      } else {
+        handleSearch();
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, currentPage, pageSize, isUnapproved]);
+
   const handleApproveQuestion = async (questionId: number) => {
     try {
       await adminService.approveQuestion(questionId);
@@ -148,10 +182,7 @@ const AdminQuestions = () => {
     }
   };
 
-  const filteredQuestions = questions.filter(question =>
-    question.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    question.createdBy?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Client-side filtering removed - now using server-side search
 
   if (loading) {
     return (
@@ -251,7 +282,7 @@ const AdminQuestions = () => {
 
           {/* Questions Grid */}
           <div className="grid gap-6">
-            {filteredQuestions.map((question) => (
+            {questions.map((question) => (
               <Card key={question.id} className="bg-slate-800/50 border-slate-700 hover:border-slate-600 transition-colors">
                 <CardHeader>
                   <div className="flex justify-between items-start">

@@ -80,13 +80,24 @@ public class CompanyQuestionService {
         return convertToDTO(question);
     }
 
+    // Search company questions
+    public Page<CompanyQuestionDTO> searchCompanyQuestions(Integer companyId, String searchTerm, Boolean isCoding, Pageable pageable) {
+        Page<CompanyQuestion> questions = companyQuestionRepository.searchCompanyQuestions(companyId, searchTerm, isCoding, pageable);
+        return questions.map(this::convertToDTO);
+    }
+
     public QuestionDetailsDTO getQuestionDetails(Integer companyId, Integer questionId) {
         CompanyQuestion companyQuestion = companyQuestionRepository.findByCompanyIdAndQuestionId(companyId, questionId);
         if (companyQuestion == null) {
             throw new RuntimeException("Question not found for this company");
         }
-        Question q = companyQuestion.getQuestion();
+
+        Question question = companyQuestion.getQuestion();
+        List<Testcase> testcases = testcaseRepository.findByQuestionId(questionId);
+        List<Hint> hints = hintRepository.findByQuestionIdOrderByHintOrderAsc(questionId);
+
         QuestionDetailsDTO dto = new QuestionDetailsDTO();
+<<<<<<< HEAD
         dto.setTitle(q.getTitle());
         dto.setDescription(q.getDescription());
         dto.setDifficulty(q.getDifficulty().name());
@@ -95,35 +106,34 @@ public class CompanyQuestionService {
         dto.setDownvotes(q.getDownvotes());
                     dto.setQuestion_year(q.getQuestion_year());
         if (q.getTrack() != null) {
+=======
+        dto.setTitle(question.getTitle());
+        dto.setDescription(question.getDescription());
+        dto.setDifficulty(question.getDifficulty().name());
+        dto.setImportanceTag(question.getImportanceTag());
+        dto.setYear(question.getYear());
+        
+        // Set track
+        if (question.getTrack() != null) {
+>>>>>>> 1732d8b (some searches work, some don't)
             QuestionDetailsDTO.TrackDTO trackDTO = new QuestionDetailsDTO.TrackDTO();
-            trackDTO.setId(q.getTrack().getId());
-            trackDTO.setName(q.getTrack().getName());
+            trackDTO.setId(question.getTrack().getId());
+            trackDTO.setName(question.getTrack().getName());
             dto.setTrack(trackDTO);
         }
-        // Fetch testcases
-        List<Testcase> testcases = testcaseRepository.findByQuestionId(q.getId());
-        List<QuestionDetailsDTO.TestcaseDTO> testcaseDTOs = testcases.stream().map(tc -> {
-            QuestionDetailsDTO.TestcaseDTO t = new QuestionDetailsDTO.TestcaseDTO();
-            t.setId(tc.getId());
-            t.setTest1(tc.getTest1());
-            t.setOutput1(tc.getOutput1());
-            t.setTest2(tc.getTest2());
-            t.setOutput2(tc.getOutput2());
-            t.setTest3(tc.getTest3());
-            t.setOutput3(tc.getOutput3());
-            return t;
-        }).toList();
+        
+        // Convert testcases
+        List<QuestionDetailsDTO.TestcaseDTO> testcaseDTOs = testcases.stream()
+            .map(this::convertTestcaseToDTO)
+            .collect(Collectors.toList());
         dto.setTestcases(testcaseDTOs);
-        // Fetch hints
-        List<Hint> hints = hintRepository.findByQuestionIdOrderByHintOrderAsc(q.getId());
-        List<QuestionDetailsDTO.HintDTO> hintDTOs = hints.stream().map(h -> {
-            QuestionDetailsDTO.HintDTO hd = new QuestionDetailsDTO.HintDTO();
-            hd.setId(h.getId());
-            hd.setContent(h.getContent());
-            hd.setHintOrder(h.getHintOrder());
-            return hd;
-        }).toList();
+        
+        // Convert hints
+        List<QuestionDetailsDTO.HintDTO> hintDTOs = hints.stream()
+            .map(this::convertHintToDTO)
+            .collect(Collectors.toList());
         dto.setHints(hintDTOs);
+        
         return dto;
     }
 
@@ -222,6 +232,26 @@ public class CompanyQuestionService {
         
         // System.out.println("got dto: " + dto.getTitle());
         
+        return dto;
+    }
+    
+    private QuestionDetailsDTO.TestcaseDTO convertTestcaseToDTO(Testcase testcase) {
+        QuestionDetailsDTO.TestcaseDTO dto = new QuestionDetailsDTO.TestcaseDTO();
+        dto.setId(testcase.getId());
+        dto.setTest1(testcase.getTest1());
+        dto.setOutput1(testcase.getOutput1());
+        dto.setTest2(testcase.getTest2());
+        dto.setOutput2(testcase.getOutput2());
+        dto.setTest3(testcase.getTest3());
+        dto.setOutput3(testcase.getOutput3());
+        return dto;
+    }
+    
+    private QuestionDetailsDTO.HintDTO convertHintToDTO(Hint hint) {
+        QuestionDetailsDTO.HintDTO dto = new QuestionDetailsDTO.HintDTO();
+        dto.setId(hint.getId());
+        dto.setContent(hint.getContent());
+        dto.setHintOrder(hint.getHintOrder());
         return dto;
     }
 }

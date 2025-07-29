@@ -19,5 +19,11 @@ public class CompanyQuestion {
     @JoinColumn(name = "question_id")
     private Question question;
 
+<<<<<<< HEAD
+=======
+    @Column(name = "question_year")
+    private Integer year;
+
+>>>>>>> 1732d8b (some searches work, some don't)
     private String position;
 }

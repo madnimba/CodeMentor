@@ -50,4 +50,16 @@ public interface ArticleRepository extends JpaRepository<Article, Integer> {
     
     @Query("SELECT a FROM Article a WHERE a.isApproved = false")
     List<Article> findByIsApprovedFalse();
+    
+    // Search articles by multiple criteria
+    @Query("SELECT a FROM Article a WHERE " +
+           "(:searchTerm IS NULL OR " +
+           "LOWER(a.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(a.track.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(a.topic.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "(a.subtopic IS NOT NULL AND LOWER(a.subtopic.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')))) AND " +
+           "(:isApproved IS NULL OR a.isApproved = :isApproved)")
+    Page<Article> searchArticles(@Param("searchTerm") String searchTerm, 
+                                @Param("isApproved") Boolean isApproved, 
+                                Pageable pageable);
 } 
