@@ -2,7 +2,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: "http://localhost:8080/api/v1", // Updated with correct context path
+  baseURL: "/api/v1", // Updated with correct context path
   withCredentials: true, // if you use cookies/session
 });
 
