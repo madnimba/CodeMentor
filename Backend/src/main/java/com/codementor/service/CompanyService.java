@@ -76,13 +76,16 @@ public class CompanyService {
         return companiesData.stream()
                 .limit(4)
                 .map(data -> {
+                    Company company = (Company) data[0];
+                    Integer questionCount = ((Number) data[1]).intValue();
+                    
                     CompanyStatsDTO dto = new CompanyStatsDTO();
-                    dto.setId((Integer) data[0]);
-                    dto.setName((String) data[1]);
-                    dto.setLogoUrl((String) data[2]);
-                    dto.setCountry((String) data[3]);
-                    dto.setDescription((String) data[4]);
-                    dto.setTotalQuestions(((Number) data[5]).intValue());
+                    dto.setId(company.getId());
+                    dto.setName(company.getName());
+                    dto.setLogoUrl(company.getLogoUrl());
+                    dto.setCountry(company.getCountry());
+                    dto.setDescription(company.getDescription());
+                    dto.setTotalQuestions(questionCount);
                     
                     // Get solved questions by user for this company
                     Long solvedQuestions = companyQuestionRepository.countSolvedQuestionsByUserForCompany(dto.getId(), user.getId());

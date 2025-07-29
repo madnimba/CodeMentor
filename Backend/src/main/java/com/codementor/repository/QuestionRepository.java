@@ -58,8 +58,7 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     @Query("SELECT COUNT(DISTINCT s.question) FROM Submission s WHERE s.user.id = :userId AND s.question.subtopic.topic.id = :topicId AND s.status = 'accepted'")
     Long countSolvedQuestionsByUserAndTopic(@Param("userId") Integer userId, @Param("topicId") Integer topicId);
     
-<<<<<<< HEAD
-<<<<<<< HEAD
+
     // New methods for questiontopics table queries
     
     /**
@@ -87,11 +86,6 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
            "WHERE cq.user_id = :userId AND qt.topic_id = :topicId " +
            "AND cq.question_id IN (SELECT q.id FROM questions q WHERE q.is_coding = false AND q.is_approved = true)", nativeQuery = true)
     Long countSolvedNonCodingQuestionsByUserAndTopicFromQuestionTopics(@Param("userId") Integer userId, @Param("topicId") Integer topicId);
-=======
-        // Search questions by multiple criteria
-=======
-    // Search questions by multiple criteria
->>>>>>> cff9c44 (attempt to fix filters, docker taking forever)
     @Query("SELECT DISTINCT q FROM Question q " +
            "LEFT JOIN CompanyQuestion cq ON cq.question.id = q.id " +
            "LEFT JOIN cq.company c " +
@@ -100,16 +94,13 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
            "LOWER(q.track.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
            "LOWER(q.subtopic.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
            "LOWER(c.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
-           "CAST(q.year AS string) LIKE CONCAT('%', :searchTerm, '%')) AND " +
+           "CAST(q.question_year AS string) LIKE CONCAT('%', :searchTerm, '%')) AND " +
            "(:isApproved IS NULL OR q.isApproved = :isApproved) AND " +
            "(:isCoding IS NULL OR q.isCoding = :isCoding)")
     Page<Question> searchQuestions(@Param("searchTerm") String searchTerm,
                                    @Param("isApproved") Boolean isApproved,
                                    @Param("isCoding") Boolean isCoding,
                                    Pageable pageable);
-<<<<<<< HEAD
->>>>>>> 1732d8b (some searches work, some don't)
-=======
 
     // Comprehensive filtering query for questions
     @Query("SELECT DISTINCT q FROM Question q " +
@@ -125,7 +116,7 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
            "(:topicId IS NULL OR t.id = :topicId) AND " +
            "(:subtopicId IS NULL OR s.id = :subtopicId) AND " +
            "(:difficulty IS NULL OR q.difficulty = :difficulty) AND " +
-           "(:year IS NULL OR q.year = :year) AND " +
+           "(:year IS NULL OR q.question_year = :year) AND " +
            "(:companyId IS NULL OR c.id = :companyId) AND " +
            "(:isApproved IS NULL OR q.isApproved = :isApproved) AND " +
            "(:isCoding IS NULL OR q.isCoding = :isCoding)")
@@ -156,7 +147,7 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
            "(:topicId IS NULL OR t.id = :topicId) AND " +
            "(:subtopicId IS NULL OR s.id = :subtopicId) AND " +
            "(:difficulty IS NULL OR q.difficulty = :difficulty) AND " +
-           "(:year IS NULL OR q.year = :year) AND " +
+           "(:year IS NULL OR q.question_year = :year) AND " +
            "(:companyId IS NULL OR c.id = :companyId) AND " +
            "(:isApproved IS NULL OR q.isApproved = :isApproved) AND " +
            "(:isCoding IS NULL OR q.isCoding = :isCoding)")
@@ -170,5 +161,4 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
                                                @Param("isApproved") Boolean isApproved,
                                                @Param("isCoding") Boolean isCoding,
                                                Pageable pageable);
->>>>>>> cff9c44 (attempt to fix filters, docker taking forever)
-} 
+}

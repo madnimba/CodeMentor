@@ -44,7 +44,7 @@ public interface CompanyQuestionRepository extends JpaRepository<CompanyQuestion
            "LOWER(q.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
            "LOWER(q.track.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
            "LOWER(q.subtopic.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
-           "CAST(q.year AS string) LIKE CONCAT('%', :searchTerm, '%')) AND " +
+           "CAST(q.question_year AS string) LIKE CONCAT('%', :searchTerm, '%')) AND " +
            "(:isCoding IS NULL OR q.isCoding = :isCoding)")
     Page<CompanyQuestion> searchCompanyQuestions(@Param("companyId") Integer companyId,
                                                 @Param("searchTerm") String searchTerm,
@@ -65,7 +65,7 @@ public interface CompanyQuestionRepository extends JpaRepository<CompanyQuestion
            "(:topicId IS NULL OR t.id = :topicId) AND " +
            "(:subtopicId IS NULL OR s.id = :subtopicId) AND " +
            "(:difficulty IS NULL OR q.difficulty = :difficulty) AND " +
-           "(:year IS NULL OR q.year = :year) AND " +
+           "(:year IS NULL OR q.question_year = :year) AND " +
            "(:isCoding IS NULL OR q.isCoding = :isCoding) AND " +
            "q.isApproved = true")
     Page<CompanyQuestion> findCompanyQuestionsWithFilters(@Param("companyId") Integer companyId,

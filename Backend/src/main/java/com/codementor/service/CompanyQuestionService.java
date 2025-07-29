@@ -133,25 +133,14 @@ public class CompanyQuestionService {
         List<Hint> hints = hintRepository.findByQuestionIdOrderByHintOrderAsc(questionId);
 
         QuestionDetailsDTO dto = new QuestionDetailsDTO();
-<<<<<<< HEAD
-        dto.setTitle(q.getTitle());
-        dto.setDescription(q.getDescription());
-        dto.setDifficulty(q.getDifficulty().name());
-        dto.setImportanceTag(q.getImportanceTag());
-        dto.setUpvotes(q.getUpvotes());
-        dto.setDownvotes(q.getDownvotes());
-                    dto.setQuestion_year(q.getQuestion_year());
-        if (q.getTrack() != null) {
-=======
         dto.setTitle(question.getTitle());
         dto.setDescription(question.getDescription());
         dto.setDifficulty(question.getDifficulty().name());
         dto.setImportanceTag(question.getImportanceTag());
-        dto.setYear(question.getYear());
+        dto.setQuestion_year(question.getQuestion_year());
         
         // Set track
         if (question.getTrack() != null) {
->>>>>>> 1732d8b (some searches work, some don't)
             QuestionDetailsDTO.TrackDTO trackDTO = new QuestionDetailsDTO.TrackDTO();
             trackDTO.setId(question.getTrack().getId());
             trackDTO.setName(question.getTrack().getName());
