@@ -266,7 +266,7 @@ public class ArticleService {
         response.setIsApproved(question.getIsApproved());
         response.setIsCoding(question.getIsCoding());
         response.setCreatedAt(question.getCreatedAt());
-        response.setYear(question.getYear());
+                    response.setQuestion_year(question.getQuestion_year());
         
         return response;
     }

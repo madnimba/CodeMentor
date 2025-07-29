@@ -55,7 +55,7 @@ export interface AdminQuestion {
   testcaseCount: number;
   solutionCount: number;
   companies: string[];
-  year: number;
+  question_year: number;
 }
 
 export interface AdminCompany {
@@ -96,7 +96,7 @@ export interface UpdateQuestionRequest {
   subtopicId?: number;
   isApproved?: boolean;
   isCoding?: boolean;
-  year?: number;
+  question_year?: number;
   testcases?: Array<{
     input: string;
     expectedOutput: string;

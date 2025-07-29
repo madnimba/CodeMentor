@@ -46,7 +46,7 @@ interface Question {
   status?: "solved" | "attempted" | "unsolved";
   tags?: string[];
   isCoding: boolean;
-  year?: number;
+  question_year?: number;
 }
 
 interface Company {
@@ -101,7 +101,7 @@ const CompanyQuestions = () => {
       subtopicId: undefined,
       companyId: companyId ? Number(companyId) : undefined,
       isCoding: false,
-      year: 2024,
+      question_year: 2024,
       testcases: [{ test1: "", output1: "", test2: "", output2: "", test3: "", output3: "" }],
     },
   });
@@ -178,7 +178,7 @@ const CompanyQuestions = () => {
           status: cq.status ?? "unsolved",
           tags: cq.tags ?? [],
           isCoding: cq.isCoding ?? false,
-          year: cq.year ?? 2024,
+          question_year: cq.question_year ?? 2024,
         }));
 
         setQuestions(mappedQuestions);
@@ -450,7 +450,7 @@ const CompanyQuestions = () => {
                           </Badge>
                         )}
                         <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
-                          {question.year || 2024}
+                          {question.question_year || 2024}
                         </Badge>
                       </div>
                       <div className="flex gap-2">
@@ -684,10 +684,10 @@ const CompanyQuestions = () => {
 
                   <FormField
                     control={form.control}
-                    name="year"
+                    name="question_year"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-slate-200">Year</FormLabel>
+                        <FormLabel className="text-slate-200">question_year</FormLabel>
                         <FormControl>
                           <Input
                             type="number"

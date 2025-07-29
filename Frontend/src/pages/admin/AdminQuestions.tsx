@@ -295,7 +295,7 @@ const AdminQuestions = () => {
                           </Badge>
                         )}
                         <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
-                          {question.year}
+                          {question.question_year}
                         </Badge>
                         <Badge className={
                           question.isApproved 
@@ -481,8 +481,8 @@ const AdminQuestions = () => {
                       <p className="text-white">{selectedQuestion.solutionCount}</p>
                     </div>
                     <div>
-                      <Label className="text-slate-400">Year</Label>
-                      <p className="text-white">{selectedQuestion.year}</p>
+                      <Label className="text-slate-400">question_year</Label>
+                      <p className="text-white">{selectedQuestion.question_year}</p>
                     </div>
                     {selectedQuestion.companies && selectedQuestion.companies.length > 0 && (
                       <div>

@@ -19,8 +19,5 @@ public class CompanyQuestion {
     @JoinColumn(name = "question_id")
     private Question question;
 
-    @Column(name = "`year`")
-    private Integer year;
-
     private String position;
 }

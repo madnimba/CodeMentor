@@ -199,8 +199,8 @@ public class AdminService {
         if (request.getIsCoding() != null) {
             question.setIsCoding(request.getIsCoding());
         }
-        if (request.getYear() != null) {
-            question.setYear(request.getYear());
+        if (request.getQuestion_year() != null) {
+            question.setQuestion_year(request.getQuestion_year());
         }
         
         Track track = trackRepository.findById(request.getTrackId())
@@ -348,7 +348,7 @@ public class AdminService {
                 .testcaseCount((int) testcaseRepository.countByQuestionId(question.getId()))
                 .solutionCount((int) questionSolutionRepository.countByQuestionId(question.getId()))
                 .companies(companies)
-                .year(question.getYear())
+                .question_year(question.getQuestion_year())
                 .build();
     }
 

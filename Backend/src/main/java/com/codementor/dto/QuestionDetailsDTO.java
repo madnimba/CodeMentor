@@ -14,7 +14,7 @@ public class QuestionDetailsDTO {
     private Integer downvotes;
     private List<TestcaseDTO> testcases;
     private List<HintDTO> hints;
-    private Short year;
+    private Short question_year;
 
     @Data
     public static class TrackDTO {

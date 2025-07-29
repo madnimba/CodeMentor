@@ -9,7 +9,7 @@ export interface CreateQuestionRequest {
   subtopicId?: number;
   companyId?: number;
   isCoding?: boolean;
-  year?: number;
+  question_year?: number;
   testcases: TestcaseRequest[];
 }
 
@@ -40,7 +40,7 @@ export interface Question {
   isApproved: boolean;
   isCoding: boolean;
   createdAt: string;
-  year: number;
+  question_year: number;
   testcases: TestcaseResponse[];
 }
 

@@ -82,7 +82,7 @@ public class CompanyQuestionService {
         dto.setImportanceTag(q.getImportanceTag());
         dto.setUpvotes(q.getUpvotes());
         dto.setDownvotes(q.getDownvotes());
-        dto.setYear(q.getYear());
+                    dto.setQuestion_year(q.getQuestion_year());
         if (q.getTrack() != null) {
             QuestionDetailsDTO.TrackDTO trackDTO = new QuestionDetailsDTO.TrackDTO();
             trackDTO.setId(q.getTrack().getId());
@@ -122,7 +122,7 @@ public class CompanyQuestionService {
         dto.setTitle(companyQuestion.getQuestion().getTitle());
         dto.setDescription(companyQuestion.getQuestion().getDescription());
         dto.setDifficulty(companyQuestion.getQuestion().getDifficulty().name());
-        dto.setYear(companyQuestion.getYear());
+                    dto.setQuestion_year(companyQuestion.getQuestion().getQuestion_year());
         dto.setPosition(companyQuestion.getPosition());
         dto.setIsCoding(companyQuestion.getQuestion().getIsCoding());
         

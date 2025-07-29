@@ -66,7 +66,7 @@ public class Question {
     private Boolean isCoding = false;
 
     @Column(nullable = false)
-    private Short year = 2024;
+    private Short question_year = 2024;
 
     public enum Difficulty {
         Easy, Medium, Hard

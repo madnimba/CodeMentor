@@ -28,7 +28,7 @@ public class CreateQuestionRequest {
 
     private Boolean isCoding = false;
 
-    private Short year = 2024;
+    private Short question_year = 2024;
 
     private List<TestcaseRequest> testcases;
 

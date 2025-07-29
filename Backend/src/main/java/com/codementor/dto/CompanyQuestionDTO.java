@@ -11,7 +11,7 @@ public class CompanyQuestionDTO {
     private String status;
     private String[] tags;
     private String solution;
-    private Integer year;
+    private Short question_year;
     private String position;
     private Boolean isCoding;
 }
