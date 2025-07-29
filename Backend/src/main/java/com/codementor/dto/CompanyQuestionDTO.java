@@ -14,4 +14,5 @@ public class CompanyQuestionDTO {
     private Short question_year;
     private String position;
     private Boolean isCoding;
+    private Boolean isCompleted; // Whether the current user has completed this question
 }

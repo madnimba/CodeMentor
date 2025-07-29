@@ -27,6 +27,7 @@ public class QuestionResponse {
     private String companyName;
     private Short question_year;
     private List<TestcaseResponse> testcases;
+    private Boolean isCompleted; // Whether the current user has completed this question
 
     @Data
     public static class TestcaseResponse {

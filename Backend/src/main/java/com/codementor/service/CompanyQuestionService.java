@@ -6,11 +6,16 @@ import com.codementor.repository.CompanyQuestionRepository;
 import com.codementor.repository.QuestionSolutionRepository;
 import com.codementor.repository.TestcaseRepository;
 import com.codementor.repository.HintRepository;
+import com.codementor.repository.SubmissionRepository;
+import com.codementor.repository.UserRepository;
+import com.codementor.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,6 +41,12 @@ public class CompanyQuestionService {
 
     @Autowired
     private HintRepository hintRepository;
+
+    @Autowired
+    private SubmissionRepository submissionRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     public List<CompanyQuestionDTO> getCompanyQuestions(Integer companyId) {
         List<CompanyQuestion> questions = companyQuestionRepository.findByCompanyId(companyId);
@@ -181,6 +192,34 @@ public class CompanyQuestionService {
             dto.setSolution("Solution will be available soon"); // Or set to "Solution will be available soon" if you prefer
         }
 
+        // Check completion status for coding questions only
+        if (companyQuestion.getQuestion().getIsCoding()) {
+            try {
+                Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                if (authentication != null && authentication.isAuthenticated()) {
+                    String email = authentication.getName();
+                    User currentUser = userRepository.findByEmail(email).orElse(null);
+                    
+                    if (currentUser != null) {
+                        // Check if user has an accepted submission for this coding question
+                        List<com.codementor.domain.Submission> acceptedSubmissions = submissionRepository.findByUserIdAndQuestionIdAndStatusOrderBySubmittedAtDesc(
+                            currentUser.getId(), companyQuestion.getQuestion().getId(), "accepted");
+                        dto.setIsCompleted(!acceptedSubmissions.isEmpty());
+                    } else {
+                        dto.setIsCompleted(false);
+                    }
+                } else {
+                    dto.setIsCompleted(false);
+                }
+            } catch (Exception e) {
+                // If any error occurs, set to false
+                dto.setIsCompleted(false);
+            }
+        } else {
+            // For non-coding questions, set to false (handled by separate logic)
+            dto.setIsCompleted(false);
+        }
+        
         // System.out.println("got dto: " + dto.getTitle());
         
         return dto;

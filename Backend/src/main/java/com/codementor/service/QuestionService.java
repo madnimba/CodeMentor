@@ -26,6 +26,8 @@ public class QuestionService {
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
     private final CompanyQuestionRepository companyQuestionRepository;
+    private final CompletedQuestionRepository completedQuestionRepository;
+    private final SubmissionRepository submissionRepository;
 
     @Transactional
     public QuestionResponse createQuestion(CreateQuestionRequest request) {
@@ -164,6 +166,25 @@ public class QuestionService {
                 .map(this::mapToTestcaseResponse)
                 .collect(Collectors.toList());
         response.setTestcases(testcaseResponses);
+
+        // Check completion status
+        try {
+            User currentUser = getCurrentUser();
+            if (question.getIsCoding()) {
+                // For coding questions, check if user has an accepted submission
+                List<Submission> acceptedSubmissions = submissionRepository.findByUserIdAndQuestionIdAndStatusOrderBySubmittedAtDesc(
+                    currentUser.getId(), question.getId(), "accepted");
+                response.setIsCompleted(!acceptedSubmissions.isEmpty());
+            } else {
+                // For non-coding questions, check completed questions table
+                boolean isCompleted = completedQuestionRepository.existsByUserIdAndQuestionId(
+                    currentUser.getId(), question.getId());
+                response.setIsCompleted(isCompleted);
+            }
+        } catch (Exception e) {
+            // If user is not authenticated or other error, set to false
+            response.setIsCompleted(false);
+        }
 
         return response;
     }
