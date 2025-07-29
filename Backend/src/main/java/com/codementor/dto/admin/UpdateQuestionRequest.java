@@ -24,6 +24,7 @@ public class UpdateQuestionRequest {
     private Integer subtopicId;
     private Boolean isApproved;
     private Boolean isCoding;
+    private Short year;
     private List<TestcaseRequest> testcases;
     
     @Data

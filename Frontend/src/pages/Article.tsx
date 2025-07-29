@@ -222,6 +222,9 @@ const Article = () => {
                                     {question.importanceTag}
                                   </Badge>
                                 )}
+                                <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+                                  {question.year || 2024}
+                                </Badge>
                               </div>
                               <h3 className="text-lg font-semibold text-white mb-2">{question.title}</h3>
                               <p className="text-slate-300 text-sm mb-3 line-clamp-2">

@@ -82,6 +82,7 @@ public class CompanyQuestionService {
         dto.setImportanceTag(q.getImportanceTag());
         dto.setUpvotes(q.getUpvotes());
         dto.setDownvotes(q.getDownvotes());
+        dto.setYear(q.getYear());
         if (q.getTrack() != null) {
             QuestionDetailsDTO.TrackDTO trackDTO = new QuestionDetailsDTO.TrackDTO();
             trackDTO.setId(q.getTrack().getId());

@@ -22,4 +22,5 @@ public class AdminQuestionResponse {
     private Integer testcaseCount;
     private Integer solutionCount;
     private List<String> companies;
+    private Short year;
 } 

@@ -54,6 +54,7 @@ public class QuestionService {
         question.setDownvotes(0);
         question.setIsApproved(false);
         question.setIsCoding(request.getIsCoding() != null ? request.getIsCoding() : false);
+        question.setYear(request.getYear() != null ? request.getYear() : (short) 2024);
 
         Question savedQuestion = questionRepository.save(question);
 
@@ -148,6 +149,7 @@ public class QuestionService {
         response.setIsApproved(question.getIsApproved());
         response.setIsCoding(question.getIsCoding());
         response.setCreatedAt(question.getCreatedAt() != null ? question.getCreatedAt() : null);
+        response.setYear(question.getYear());
 
         // Get companies associated with this question
         List<CompanyQuestion> companyQuestions = companyQuestionRepository.findByQuestionId(question.getId());

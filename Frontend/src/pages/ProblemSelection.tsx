@@ -36,6 +36,7 @@ interface Problem {
   difficulty: "Easy" | "Medium" | "Hard";
   company?: string;
   isCoding: boolean;
+  year?: number;
 }
 
 const ProblemSelection = () => {
@@ -70,7 +71,8 @@ const ProblemSelection = () => {
           description: q.description || "",
           difficulty: q.difficulty as "Easy" | "Medium" | "Hard",
           company: q.companyName || "Unknown", // Use company name from response
-          isCoding: q.isCoding || true
+          isCoding: q.isCoding || true,
+          year: q.year || 2024
         }));
         
         console.log('Total coding problems found:', allCodingProblems.length);
@@ -345,6 +347,9 @@ const ProblemSelection = () => {
                               'bg-red-500/20 text-red-400 border-red-500/30'
                             }`}>
                               {problem.difficulty}
+                            </Badge>
+                            <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">
+                              {problem.year || 2024}
                             </Badge>
                           </div>
                           

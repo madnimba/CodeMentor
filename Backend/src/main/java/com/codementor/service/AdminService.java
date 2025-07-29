@@ -199,6 +199,9 @@ public class AdminService {
         if (request.getIsCoding() != null) {
             question.setIsCoding(request.getIsCoding());
         }
+        if (request.getYear() != null) {
+            question.setYear(request.getYear());
+        }
         
         Track track = trackRepository.findById(request.getTrackId())
                 .orElseThrow(() -> new ResourceNotFoundException("Track not found"));
@@ -345,6 +348,7 @@ public class AdminService {
                 .testcaseCount((int) testcaseRepository.countByQuestionId(question.getId()))
                 .solutionCount((int) questionSolutionRepository.countByQuestionId(question.getId()))
                 .companies(companies)
+                .year(question.getYear())
                 .build();
     }
 

@@ -65,6 +65,9 @@ public class Question {
     @Column(name = "is_coding", nullable = false)
     private Boolean isCoding = false;
 
+    @Column(nullable = false)
+    private Short year = 2024;
+
     public enum Difficulty {
         Easy, Medium, Hard
     }

@@ -573,6 +573,58 @@ const LiveCoding = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Test Cases */}
+              {questionData.testcases && questionData.testcases.length > 0 && (
+                <Card className="bg-slate-800/50 border-slate-700">
+                  <CardHeader>
+                    <CardTitle className="text-white">Test Cases</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {questionData.testcases.map((testcase, index) => (
+                        <div key={index} className="border border-slate-600 rounded-lg p-3">
+                          <div className="text-sm font-medium text-slate-300 mb-2">Test Case {index + 1}</div>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex items-start gap-2">
+                              <span className="text-blue-400 font-medium">Input:</span>
+                              <span className="text-slate-200">{testcase.test1}</span>
+                            </div>
+                            <div className="flex items-start gap-2">
+                              <span className="text-green-400 font-medium">Expected Output:</span>
+                              <span className="text-slate-200">{testcase.output1}</span>
+                            </div>
+                            {testcase.test2 && (
+                              <div className="flex items-start gap-2">
+                                <span className="text-blue-400 font-medium">Input 2:</span>
+                                <span className="text-slate-200">{testcase.test2}</span>
+                              </div>
+                            )}
+                            {testcase.output2 && (
+                              <div className="flex items-start gap-2">
+                                <span className="text-green-400 font-medium">Expected Output 2:</span>
+                                <span className="text-slate-200">{testcase.output2}</span>
+                              </div>
+                            )}
+                            {testcase.test3 && (
+                              <div className="flex items-start gap-2">
+                                <span className="text-blue-400 font-medium">Input 3:</span>
+                                <span className="text-slate-200">{testcase.test3}</span>
+                              </div>
+                            )}
+                            {testcase.output3 && (
+                              <div className="flex items-start gap-2">
+                                <span className="text-green-400 font-medium">Expected Output 3:</span>
+                                <span className="text-slate-200">{testcase.output3}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
             {/* Right Panel - Code Editor and Output */}
