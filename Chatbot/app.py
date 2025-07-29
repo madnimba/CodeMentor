@@ -129,6 +129,8 @@ def chat():
             "message": str(e)
         }), 500
 
+
+
 @app.route('/chat/stream', methods=['POST'])
 def chat_stream():
     """
