@@ -7,6 +7,8 @@ import com.codementor.repository.ArticleRepository;
 import com.codementor.repository.QuestionRepository;
 import com.codementor.repository.TopicRepository;
 import com.codementor.repository.UserRepository;
+import com.codementor.repository.CompletedQuestionRepository;
+import com.codementor.repository.SubmissionRepository;
 import com.codementor.exception.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -37,9 +39,15 @@ public class DashboardService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private CompletedQuestionRepository completedQuestionRepository;
+
+    @Autowired
+    private SubmissionRepository submissionRepository;
+
     /**
      * Get comprehensive topic progress for the current user
-     * Includes both articles read and coding problems solved
+     * Includes both articles read and questions solved (both coding and non-coding)
      */
     public List<TopicProgressDTO> getTopicProgress() {
         // Get current user
@@ -60,15 +68,24 @@ public class DashboardService {
                     TopicProgressDTO dto = new TopicProgressDTO();
                     dto.setTopicName(topic.getName());
                     
-                    // Calculate article progress
+                    // 1. Calculate article progress
+                    // Total articles from articles table for this topic
                     Long totalArticles = articleRepository.countByTopicId(topic.getId());
+                    // Read articles from userarticlereads table for this topic
                     Long articlesRead = articleRepository.countArticlesReadByUserAndTopic(user.getId(), topic.getId());
-                    double articleProgress = totalArticles > 0 ? (double) articlesRead / totalArticles * 100 : 0;
                     
-                    // Calculate coding problem progress
-                    Long totalQuestions = questionRepository.countByTopicId(topic.getId());
-                    Long questionsSolved = questionRepository.countSolvedQuestionsByUserAndTopic(user.getId(), topic.getId());
-                    double questionProgress = totalQuestions > 0 ? (double) questionsSolved / totalQuestions * 100 : 0;
+                    // 2. Calculate question progress
+                    // Total questions from questiontopics table for this topic
+                    Long totalQuestions = questionRepository.countByTopicIdFromQuestionTopics(topic.getId());
+                    
+                    // Solved questions: coding questions from submissions + non-coding from completedquestions
+                    Long codingQuestionsSolved = questionRepository.countSolvedCodingQuestionsByUserAndTopicFromQuestionTopics(user.getId(), topic.getId());
+                    Long nonCodingQuestionsSolved = questionRepository.countSolvedNonCodingQuestionsByUserAndTopicFromQuestionTopics(user.getId(), topic.getId());
+                    Long totalQuestionsSolved = codingQuestionsSolved + nonCodingQuestionsSolved;
+                    
+                    // Calculate progress percentages
+                    double articleProgress = totalArticles > 0 ? (double) articlesRead / totalArticles * 100 : 0;
+                    double questionProgress = totalQuestions > 0 ? (double) totalQuestionsSolved / totalQuestions * 100 : 0;
                     
                     // Calculate overall progress (average of article and question progress)
                     double overallProgress = 0;
@@ -89,15 +106,15 @@ public class DashboardService {
                     dto.setTotalArticles(totalArticles.intValue());
                     dto.setArticlesRead(articlesRead.intValue());
                     dto.setTotalQuestions(totalQuestions.intValue());
-                    dto.setQuestionsSolved(questionsSolved.intValue());
+                    dto.setQuestionsSolved(totalQuestionsSolved.intValue());
                     dto.setProgress(Math.round(overallProgress * 100.0) / 100.0);
                     
                     // Set legacy fields for backward compatibility
                     dto.setTotal(totalArticles.intValue() + totalQuestions.intValue());
-                    dto.setSolved(articlesRead.intValue() + questionsSolved.intValue());
+                    dto.setSolved(articlesRead.intValue() + totalQuestionsSolved.intValue());
                     
                     logger.info("Topic: {}, Articles: {}/{}, Questions: {}/{}, Progress: {}%", 
-                        topic.getName(), articlesRead, totalArticles, questionsSolved, totalQuestions, overallProgress);
+                        topic.getName(), articlesRead, totalArticles, totalQuestionsSolved, totalQuestions, overallProgress);
                     
                     return dto;
                 })

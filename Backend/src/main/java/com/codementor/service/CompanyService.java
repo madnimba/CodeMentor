@@ -6,6 +6,8 @@ import com.codementor.dto.CompanyStatsDTO;
 import com.codementor.repository.CompanyRepository;
 import com.codementor.repository.CompanyQuestionRepository;
 import com.codementor.repository.UserRepository;
+import com.codementor.repository.SubmissionRepository;
+import com.codementor.repository.CompletedQuestionRepository;
 import com.codementor.domain.User;
 import com.codementor.exception.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,12 @@ public class CompanyService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private SubmissionRepository submissionRepository;
+
+    @Autowired
+    private CompletedQuestionRepository completedQuestionRepository;
 
     public List<CompanyDTO> getAllCompanies() {
         List<Company> companies = companyRepository.findAll();
@@ -100,8 +108,36 @@ public class CompanyService {
 
         dto.setTotalQuestions(totalQuestions);
         
-        // TODO: Implement solved questions count when user progress tracking is implemented
-        dto.setSolvedQuestions(0);
+        // Calculate solved questions for current user
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.isAuthenticated()) {
+                String email = authentication.getName();
+                User currentUser = userRepository.findByEmail(email).orElse(null);
+                
+                if (currentUser != null) {
+                    // Get solved coding questions (accepted submissions)
+                    Long solvedCodingQuestions = submissionRepository.countAcceptedSubmissionsByUserForCompany(
+                        currentUser.getId(), company.getId());
+                    
+                    // Get solved non-coding questions (completed questions)
+                    Long solvedNonCodingQuestions = completedQuestionRepository.countCompletedNonCodingQuestionsByUserForCompany(
+                        currentUser.getId(), company.getId());
+                    
+                    int totalSolved = (solvedCodingQuestions != null ? solvedCodingQuestions.intValue() : 0) +
+                                   (solvedNonCodingQuestions != null ? solvedNonCodingQuestions.intValue() : 0);
+                    
+                    dto.setSolvedQuestions(totalSolved);
+                } else {
+                    dto.setSolvedQuestions(0);
+                }
+            } else {
+                dto.setSolvedQuestions(0);
+            }
+        } catch (Exception e) {
+            // If any error occurs, set to 0
+            dto.setSolvedQuestions(0);
+        }
         
         return dto;
     }

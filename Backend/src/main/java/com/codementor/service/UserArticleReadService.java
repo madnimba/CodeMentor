@@ -28,11 +28,9 @@ public class UserArticleReadService {
     private ArticleRepository articleRepository;
 
     /**
-     * Track when a user reads an article
-     * If user hasn't read the article before, create a new record
-     * If user has already read it, do nothing
+     * Mark an article as read by the current user
      */
-    public void trackArticleRead(Integer articleId) {
+    public void markArticleAsRead(Integer articleId) {
         // Get current authenticated user
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
@@ -53,6 +51,21 @@ public class UserArticleReadService {
             userArticleRead.setArticle(article);
             userArticleReadRepository.save(userArticleRead);
         }
+    }
+
+    /**
+     * Mark an article as unread by the current user
+     */
+    public void markArticleAsUnread(Integer articleId) {
+        // Get current authenticated user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
+
+        // Remove the read record if it exists
+        userArticleReadRepository.findByUserIdAndArticleId(user.getId(), articleId)
+                .ifPresent(userArticleReadRepository::delete);
     }
 
     /**

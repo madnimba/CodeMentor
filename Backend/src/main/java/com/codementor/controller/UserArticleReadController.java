@@ -15,14 +15,25 @@ public class UserArticleReadController {
     private final UserArticleReadService userArticleReadService;
 
     /**
-     * Track when user reads an article
-     * POST /user-article-reads/track/{articleId}
+     * Mark an article as read by the current user
+     * POST /user-article-reads/mark/{articleId}
      */
-    @PostMapping("/track/{articleId}")
+    @PostMapping("/mark/{articleId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<String>> trackArticleRead(@PathVariable Integer articleId) {
-        userArticleReadService.trackArticleRead(articleId);
-        return ResponseEntity.ok(ApiResponse.success("Article read tracked successfully", "Article read tracked"));
+    public ResponseEntity<ApiResponse<String>> markArticleAsRead(@PathVariable Integer articleId) {
+        userArticleReadService.markArticleAsRead(articleId);
+        return ResponseEntity.ok(ApiResponse.success("Article marked as read"));
+    }
+
+    /**
+     * Mark an article as unread by the current user
+     * DELETE /user-article-reads/{articleId}
+     */
+    @DeleteMapping("/{articleId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<String>> markArticleAsUnread(@PathVariable Integer articleId) {
+        userArticleReadService.markArticleAsUnread(articleId);
+        return ResponseEntity.ok(ApiResponse.success("Article marked as unread"));
     }
 
     /**

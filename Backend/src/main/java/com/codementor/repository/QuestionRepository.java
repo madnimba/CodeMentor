@@ -51,4 +51,32 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     
     @Query("SELECT COUNT(DISTINCT s.question) FROM Submission s WHERE s.user.id = :userId AND s.question.subtopic.topic.id = :topicId AND s.status = 'accepted'")
     Long countSolvedQuestionsByUserAndTopic(@Param("userId") Integer userId, @Param("topicId") Integer topicId);
+    
+    // New methods for questiontopics table queries
+    
+    /**
+     * Count total questions for a topic from questiontopics table
+     */
+    @Query(value = "SELECT COUNT(q.id) FROM questions q " +
+           "JOIN questiontopics qt ON q.id = qt.question_id " +
+           "WHERE qt.topic_id = :topicId AND q.is_approved = true", nativeQuery = true)
+    Long countByTopicIdFromQuestionTopics(@Param("topicId") Integer topicId);
+    
+    /**
+     * Count solved coding questions for a user and topic from questiontopics table
+     */
+    @Query(value = "SELECT COUNT(DISTINCT s.question_id) FROM submissions s " +
+           "JOIN questiontopics qt ON s.question_id = qt.question_id " +
+           "WHERE s.user_id = :userId AND qt.topic_id = :topicId AND s.status = 'accepted' " +
+           "AND s.question_id IN (SELECT q.id FROM questions q WHERE q.is_coding = true AND q.is_approved = true)", nativeQuery = true)
+    Long countSolvedCodingQuestionsByUserAndTopicFromQuestionTopics(@Param("userId") Integer userId, @Param("topicId") Integer topicId);
+    
+    /**
+     * Count solved non-coding questions for a user and topic from questiontopics table
+     */
+    @Query(value = "SELECT COUNT(DISTINCT cq.question_id) FROM completedquestions cq " +
+           "JOIN questiontopics qt ON cq.question_id = qt.question_id " +
+           "WHERE cq.user_id = :userId AND qt.topic_id = :topicId " +
+           "AND cq.question_id IN (SELECT q.id FROM questions q WHERE q.is_coding = false AND q.is_approved = true)", nativeQuery = true)
+    Long countSolvedNonCodingQuestionsByUserAndTopicFromQuestionTopics(@Param("userId") Integer userId, @Param("topicId") Integer topicId);
 } 

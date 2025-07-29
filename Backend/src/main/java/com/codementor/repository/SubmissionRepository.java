@@ -48,4 +48,10 @@ public interface SubmissionRepository extends JpaRepository<Submission, Integer>
     // Get all submission timestamps for user (ordered by date descending)
     @Query("SELECT DISTINCT s.submittedAt FROM Submission s WHERE s.user.id = :userId ORDER BY s.submittedAt DESC")
     List<LocalDateTime> getSubmissionTimestampsByUser(@Param("userId") Integer userId);
+    
+    // Count accepted submissions by user for a specific company
+    @Query("SELECT COUNT(DISTINCT s.question.id) FROM Submission s " +
+           "JOIN CompanyQuestion cq ON s.question.id = cq.question.id " +
+           "WHERE s.user.id = :userId AND s.status = 'accepted' AND cq.company.id = :companyId")
+    Long countAcceptedSubmissionsByUserForCompany(@Param("userId") Integer userId, @Param("companyId") Integer companyId);
 } 
