@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Markdown } from "@/components/ui/markdown";
 import {
   Building2, ArrowLeft, CheckCircle, Code2,
-  ChevronDown, ChevronUp, Plus, X, Trash2
+  ChevronDown, ChevronUp, Plus, X, Trash2, Clock
 } from "lucide-react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -34,6 +34,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { completedQuestionsApi } from "@/services/completedQuestions";
 // import DOMPurify from "dompurify"; // ✅ Added for sanitization
 
 interface Question {
@@ -72,6 +73,8 @@ const CompanyQuestions = () => {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [expandedQuestionId, setExpandedQuestionId] = useState<number | null>(null);
+  const [completedQuestions, setCompletedQuestions] = useState<Set<number>>(new Set());
+  const [loadingCompleted, setLoadingCompleted] = useState<Set<number>>(new Set());
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [companyData, setCompanyData] = useState<Company | null>(null);
@@ -184,6 +187,16 @@ const CompanyQuestions = () => {
         setQuestions(mappedQuestions);
         setTotalPages(paginatedData.totalPages);
         setTotalElements(paginatedData.totalElements);
+        
+        // Check completion status for all questions
+        if (user) {
+          mappedQuestions.forEach((question: Question) => {
+            if (!question.isCoding) {
+              checkCompletionStatus(question.id);
+            }
+          });
+        }
+        
         setLoading(false);
       })
       .catch((err) => {
@@ -195,6 +208,69 @@ const CompanyQuestions = () => {
 
   const toggleAnswer = (questionId: number) => {
     setExpandedQuestionId(expandedQuestionId === questionId ? null : questionId);
+  };
+
+  const handleMarkAsCompleted = async (questionId: number) => {
+    if (!user) {
+      toast.error("You must be logged in to mark questions as completed");
+      return;
+    }
+
+    setLoadingCompleted(prev => new Set(prev).add(questionId));
+    try {
+      await completedQuestionsApi.markQuestionCompleted({ questionId });
+      setCompletedQuestions(prev => new Set(prev).add(questionId));
+      toast.success("Question marked as completed!");
+    } catch (error) {
+      console.error('Failed to mark question as completed:', error);
+      toast.error("Failed to mark question as completed");
+    } finally {
+      setLoadingCompleted(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(questionId);
+        return newSet;
+      });
+    }
+  };
+
+  const handleMarkAsIncomplete = async (questionId: number) => {
+    if (!user) {
+      toast.error("You must be logged in to mark questions as incomplete");
+      return;
+    }
+
+    setLoadingCompleted(prev => new Set(prev).add(questionId));
+    try {
+      await completedQuestionsApi.removeQuestionCompletion(questionId);
+      setCompletedQuestions(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(questionId);
+        return newSet;
+      });
+      toast.success("Question marked as incomplete!");
+    } catch (error) {
+      console.error('Failed to mark question as incomplete:', error);
+      toast.error("Failed to mark question as incomplete");
+    } finally {
+      setLoadingCompleted(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(questionId);
+        return newSet;
+      });
+    }
+  };
+
+  const checkCompletionStatus = async (questionId: number) => {
+    if (!user) return;
+    
+    try {
+      const isCompleted = await completedQuestionsApi.hasUserCompletedQuestion(questionId);
+      if (isCompleted) {
+        setCompletedQuestions(prev => new Set(prev).add(questionId));
+      }
+    } catch (error) {
+      console.error(`Failed to check completion status for question ${questionId}:`, error);
+    }
   };
 
   const handlePageChange = (page: number) => {
@@ -479,6 +555,29 @@ const CompanyQuestions = () => {
                             }
                           >
                             Solve This
+                          </Button>
+                        )}
+                        {!question.isCoding && (
+                          <Button
+                            variant="outline"
+                            disabled={loadingCompleted.has(question.id)}
+                            className={`${
+                              completedQuestions.has(question.id)
+                                ? "border-red-500/30 text-red-400 hover:bg-red-500/10 hover:text-red-300"
+                                : "border-green-500/30 text-green-400 hover:bg-green-500/10 hover:text-green-300"
+                            }`}
+                            onClick={() => 
+                              completedQuestions.has(question.id)
+                                ? handleMarkAsIncomplete(question.id)
+                                : handleMarkAsCompleted(question.id)
+                            }
+                          >
+                            {loadingCompleted.has(question.id) ? (
+                              <Clock className="w-4 h-4 mr-2 animate-spin" />
+                            ) : completedQuestions.has(question.id) ? (
+                              <CheckCircle className="w-4 h-4 mr-2" />
+                            ) : null}
+                            {completedQuestions.has(question.id) ? "Mark as Incomplete" : "Mark as Completed"}
                           </Button>
                         )}
                       </div>

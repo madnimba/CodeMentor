@@ -28,4 +28,14 @@ public class DashboardController {
         List<TopicProgressDTO> topicProgress = dashboardService.getTopicProgress();
         return ResponseEntity.ok(topicProgress);
     }
+
+    /**
+     * Get overall progress totals for the current user (not topic-based)
+     * GET /dashboard/overall-progress
+     */
+    @GetMapping("/overall-progress")
+    public ResponseEntity<TopicProgressDTO> getOverallProgress() {
+        TopicProgressDTO overallProgress = dashboardService.getOverallProgress();
+        return ResponseEntity.ok(overallProgress);
+    }
 } 

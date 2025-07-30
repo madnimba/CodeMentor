@@ -65,19 +65,21 @@ const Dashboard = () => {
     const fetchTopicProgress = async () => {
       try {
         console.log('Fetching topic progress...');
-        const progress = await dashboardService.getTopicProgress();
+        const [progress, overallProgress] = await Promise.all([
+          dashboardService.getTopicProgress(),
+          dashboardService.getOverallProgress()
+        ]);
         console.log('Topic progress received:', progress);
+        console.log('Overall progress received:', overallProgress);
         setTopicProgress(progress);
         
-        // Calculate total progress across all topics
-        const totals = progress.reduce((acc, topic) => ({
-          totalArticles: acc.totalArticles + (topic.totalArticles || 0),
-          articlesRead: acc.articlesRead + (topic.articlesRead || 0),
-          totalQuestions: acc.totalQuestions + (topic.totalQuestions || 0),
-          questionsSolved: acc.questionsSolved + (topic.questionsSolved || 0)
-        }), { totalArticles: 0, articlesRead: 0, totalQuestions: 0, questionsSolved: 0 });
-        
-        setTotalProgress(totals);
+        // Use the overall progress from the backend instead of calculating from topics
+        setTotalProgress({
+          totalArticles: overallProgress.totalArticles || 0,
+          articlesRead: overallProgress.articlesRead || 0,
+          totalQuestions: overallProgress.totalQuestions || 0,
+          questionsSolved: overallProgress.questionsSolved || 0
+        });
       } catch (error) {
         console.error('Failed to fetch topic progress:', error);
         // Set empty array to show the "no data" message
@@ -108,11 +110,7 @@ const Dashboard = () => {
     { type: "article", title: "Graph Algorithms", status: "read", time: "2 days ago" }
   ];
 
-  const upcomingGoals = [
-    { title: "Complete 50 problems this month", progress: 78, deadline: "Dec 31, 2024" },
-    { title: "Finish Database Systems track", progress: 65, deadline: "Jan 15, 2025" },
-    { title: "Achieve 95% accuracy rate", progress: 91, deadline: "Jan 31, 2025" }
-  ];
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900">
@@ -614,29 +612,7 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
 
-              {/* Upcoming Goals */}
-              <Card className="bg-slate-800/50 border-slate-700">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <Target className="w-5 h-5" />
-                    Upcoming Goals
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {upcomingGoals.map((goal, index) => (
-                      <div key={index} className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-white">{goal.title}</span>
-                          <span className="text-slate-400">{goal.progress}%</span>
-                        </div>
-                        <Progress value={goal.progress} className="h-2" />
-                        <p className="text-xs text-slate-400">Due: {goal.deadline}</p>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+
             </div>
           </div>
         </div>

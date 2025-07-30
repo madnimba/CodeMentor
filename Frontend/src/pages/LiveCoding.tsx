@@ -770,26 +770,7 @@ const LiveCoding = () => {
                 </CardContent>
               </Card>
 
-              {/* Hints */}
-              <Card className="bg-slate-800/50 border-slate-700">
-                <CardHeader>
-                  <CardTitle className="text-white">Hints</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    {questionData.hints?.map((hint: string, index: number) => (
-                      <div key={index} className="flex items-start gap-2 text-slate-300">
-                        <span className="text-purple-400">{index + 1}.</span>
-                        <span>{hint}</span>
-                      </div>
-                    )) || (
-                      <div className="text-slate-400 text-center py-4">
-                        No hints available for this question
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+
 
               {/* Expected Input/Output Format */}
               <Card className="bg-slate-800/50 border-slate-700">

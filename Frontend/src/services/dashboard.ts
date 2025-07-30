@@ -16,5 +16,10 @@ export const dashboardService = {
   async getTopicProgress(): Promise<TopicProgress[]> {
     const response = await api.get('/dashboard/topic-progress');
     return response.data;
+  },
+
+  async getOverallProgress(): Promise<TopicProgress> {
+    const response = await api.get('/dashboard/overall-progress');
+    return response.data;
   }
 }; 

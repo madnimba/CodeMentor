@@ -25,6 +25,9 @@ public interface ArticleRepository extends JpaRepository<Article, Integer> {
     @Query("SELECT COUNT(uar) FROM UserArticleRead uar WHERE uar.user.id = :userId AND uar.article.topic.id = :topicId AND uar.article.isApproved = true")
     Long countArticlesReadByUserAndTopic(@Param("userId") Integer userId, @Param("topicId") Integer topicId);
     
+    @Query("SELECT COUNT(uar) FROM UserArticleRead uar WHERE uar.user.id = :userId AND uar.article.isApproved = true")
+    Long countArticlesReadByUser(@Param("userId") Integer userId);
+    
     @Query("SELECT a FROM Article a WHERE a.isApproved = true")
     Page<Article> findAllApproved(Pageable pageable);
     

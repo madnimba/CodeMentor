@@ -22,6 +22,9 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     @Query("SELECT COUNT(q) FROM Question q WHERE q.isApproved = false")
     long countByIsApprovedFalse();
 
+    @Query("SELECT COUNT(q) FROM Question q WHERE q.isApproved = true")
+    long countByIsApprovedTrue();
+
     @Query("SELECT q FROM Question q WHERE q.isCoding = true ORDER BY q.id ASC")
     Page<Question> findByIsCodingTrue(Pageable pageable);
     

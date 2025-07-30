@@ -54,4 +54,9 @@ public interface SubmissionRepository extends JpaRepository<Submission, Integer>
            "JOIN CompanyQuestion cq ON s.question.id = cq.question.id " +
            "WHERE s.user.id = :userId AND s.status = 'accepted' AND cq.company.id = :companyId")
     Long countAcceptedSubmissionsByUserForCompany(@Param("userId") Integer userId, @Param("companyId") Integer companyId);
+    
+    // Count accepted coding submissions by user
+    @Query("SELECT COUNT(DISTINCT s.question.id) FROM Submission s " +
+           "WHERE s.user.id = :userId AND s.status = :status AND s.question.isCoding = true")
+    Long countByUserIdAndStatusAndQuestionIsCodingTrue(@Param("userId") Integer userId, @Param("status") String status);
 } 

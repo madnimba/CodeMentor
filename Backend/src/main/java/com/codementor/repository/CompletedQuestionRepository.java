@@ -24,4 +24,8 @@ public interface CompletedQuestionRepository extends JpaRepository<CompletedQues
            "JOIN CompanyQuestion companyQ ON cq.question.id = companyQ.question.id " +
            "WHERE cq.user.id = :userId AND cq.question.isCoding = false AND companyQ.company.id = :companyId")
     Long countCompletedNonCodingQuestionsByUserForCompany(@Param("userId") Integer userId, @Param("companyId") Integer companyId);
+    
+    // Count all completed questions by user
+    @Query("SELECT COUNT(cq) FROM CompletedQuestion cq WHERE cq.user.id = :userId")
+    Long countByUserId(@Param("userId") Integer userId);
 } 

@@ -123,4 +123,68 @@ public class DashboardService {
         logger.info("Final topic progress DTOs size: {}", result.size());
         return result;
     }
+
+    /**
+     * Get overall progress totals directly from database (not topic-based)
+     * This ensures we capture all questions, even those not associated with topics
+     */
+    public TopicProgressDTO getOverallProgress() {
+        // Get current user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
+
+        logger.info("Getting overall progress for user: {}", user.getId());
+
+        TopicProgressDTO dto = new TopicProgressDTO();
+        dto.setTopicName("Overall");
+        
+        // 1. Calculate article progress (all articles)
+        Long totalArticles = articleRepository.count();
+        Long articlesRead = articleRepository.countArticlesReadByUser(user.getId());
+        
+        // 2. Calculate question progress (all questions)
+        Long totalQuestions = questionRepository.countByIsApprovedTrue();
+        
+        // Solved questions: coding questions from submissions + non-coding from completedquestions
+        Long codingQuestionsSolved = submissionRepository.countByUserIdAndStatusAndQuestionIsCodingTrue(user.getId(), "accepted");
+        Long nonCodingQuestionsSolved = completedQuestionRepository.countByUserId(user.getId());
+        Long totalQuestionsSolved = codingQuestionsSolved + nonCodingQuestionsSolved;
+        
+        // Calculate progress percentages
+        double articleProgress = totalArticles > 0 ? (double) articlesRead / totalArticles * 100 : 0;
+        double questionProgress = totalQuestions > 0 ? (double) totalQuestionsSolved / totalQuestions * 100 : 0;
+        
+        // Calculate overall progress (average of article and question progress)
+        double overallProgress = 0;
+        if (totalArticles > 0 || totalQuestions > 0) {
+            if (totalArticles > 0 && totalQuestions > 0) {
+                // Both articles and questions exist, take average
+                overallProgress = (articleProgress + questionProgress) / 2;
+            } else if (totalArticles > 0) {
+                // Only articles exist
+                overallProgress = articleProgress;
+            } else {
+                // Only questions exist
+                overallProgress = questionProgress;
+            }
+        }
+        
+        // Set the values
+        dto.setTotalArticles(totalArticles.intValue());
+        dto.setArticlesRead(articlesRead.intValue());
+        dto.setTotalQuestions(totalQuestions.intValue());
+        dto.setQuestionsSolved(totalQuestionsSolved.intValue());
+        dto.setProgress(Math.round(overallProgress * 100.0) / 100.0);
+        
+        // Set legacy fields for backward compatibility
+        dto.setTotal(totalArticles.intValue() + totalQuestions.intValue());
+        dto.setSolved(articlesRead.intValue() + totalQuestionsSolved.intValue());
+        
+        logger.info("Overall Progress - Articles: {}/{}, Questions: {}/{}, Progress: {}%", 
+            articlesRead, totalArticles, totalQuestionsSolved, totalQuestions, overallProgress);
+        
+        return dto;
+    }
 } 
