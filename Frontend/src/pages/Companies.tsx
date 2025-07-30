@@ -366,7 +366,8 @@ const Companies = () => {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="flex flex-col flex-grow">
-                      <div className="space-y-4 flex-grow">
+                      <div className="flex-grow"></div>
+                      <div className="space-y-4">
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
                             <span className="text-slate-400">Progress</span>
@@ -374,12 +375,12 @@ const Companies = () => {
                           </div>
                           <Progress value={(company.solvedQuestions / company.totalQuestions) * 100} className="h-2" />
                         </div>
+                        <Button asChild className="w-full bg-purple-600 hover:bg-purple-700">
+                          <Link to={`/companies/${company.id}`}>
+                            View Questions <ArrowRight className="ml-2 w-4 h-4" />
+                          </Link>
+                        </Button>
                       </div>
-                      <Button asChild className="w-full bg-purple-600 hover:bg-purple-700 mt-4">
-                        <Link to={`/companies/${company.id}`}>
-                          View Questions <ArrowRight className="ml-2 w-4 h-4" />
-                        </Link>
-                      </Button>
                     </CardContent>
                   </Card>
                 ))}
@@ -460,7 +461,8 @@ const Companies = () => {
                     </div>
                   </CardHeader>
                   <CardContent className="flex flex-col flex-grow">
-                    <div className="space-y-4 flex-grow">
+                    <div className="flex-grow"></div>
+                    <div className="space-y-4">
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
                           <span className="text-slate-400">Progress</span>
@@ -468,12 +470,12 @@ const Companies = () => {
                         </div>
                         <Progress value={(company.solvedQuestions / company.totalQuestions) * 100} className="h-2" />
                       </div>
+                      <Button asChild className="w-full bg-purple-600 hover:bg-purple-700">
+                        <Link to={`/companies/${company.id}`}>
+                          View Questions <ArrowRight className="ml-2 w-4 h-4" />
+                        </Link>
+                      </Button>
                     </div>
-                    <Button asChild className="w-full bg-purple-600 hover:bg-purple-700 mt-4">
-                      <Link to={`/companies/${company.id}`}>
-                        View Questions <ArrowRight className="ml-2 w-4 h-4" />
-                      </Link>
-                    </Button>
                   </CardContent>
                   
                 </Card>
