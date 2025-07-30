@@ -615,7 +615,7 @@ const Dashboard = () => {
               </Card>
 
               {/* Upcoming Goals */}
-              <Card className="bg-slate-800/50 border-slate-700">
+{/*               <Card className="bg-slate-800/50 border-slate-700">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
                     <Target className="w-5 h-5" />
@@ -636,7 +636,7 @@ const Dashboard = () => {
                     ))}
                   </div>
                 </CardContent>
-              </Card>
+              </Card> */}
             </div>
           </div>
         </div>
