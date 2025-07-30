@@ -475,17 +475,7 @@ const Companies = () => {
                       </Link>
                     </Button>
                   </CardContent>
-                  <CardFooter>
-                    <Button 
-                      asChild 
-                      className="w-full bg-blue-600 hover:bg-purple-700"
-                      onClick={() => navigate(`/companies/${company.id}`)}
-                    >
-                      <Link to={`/companies/${company.id}`}>
-                        View Questions
-                      </Link>
-                    </Button>
-                  </CardFooter>
+                  
                 </Card>
               ))}
             </div>

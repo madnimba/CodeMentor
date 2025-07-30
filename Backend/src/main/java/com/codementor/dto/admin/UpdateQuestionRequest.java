@@ -18,8 +18,11 @@ public class UpdateQuestionRequest {
     
     private String importanceTag;
     
-    @NotNull(message = "Track ID is required")
+    // Track ID is now optional for updates - only update track if provided
     private Integer trackId;
+    
+    // Topic ID is optional for updates
+    private Integer topicId;
     
     private Integer subtopicId;
     private Boolean isApproved;

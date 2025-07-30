@@ -16,13 +16,13 @@ export const Markdown: React.FC<MarkdownProps> = ({ content, className }) => {
             const match = /language-(\w+)/.exec(className || '');
             const isInline = !match;
             return !isInline ? (
-              <pre className="bg-slate-900 p-4 rounded-lg overflow-x-auto">
-                <code className={className} {...props}>
+              <pre className="bg-slate-900 border border-slate-700 p-4 rounded-lg overflow-x-auto">
+                <code className={`${className} text-slate-100`} {...props}>
                   {children}
                 </code>
               </pre>
             ) : (
-              <code className="bg-slate-800 px-1 py-0.5 rounded text-sm" {...props}>
+              <code className="bg-slate-800 px-1.5 py-0.5 rounded text-sm text-slate-100 border border-slate-600" {...props}>
                 {children}
               </code>
             );

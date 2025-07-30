@@ -207,7 +207,7 @@ public class AdminService {
         question.setDescription(request.getDescription());
         question.setDifficulty(Question.Difficulty.valueOf(request.getDifficulty()));
         question.setImportanceTag(request.getImportanceTag());
-        question.setIsApproved(request.getIsApproved());
+        question.setIsApproved(request.getIsApproved() == null? false : request.getIsApproved());
         if (request.getIsCoding() != null) {
             question.setIsCoding(request.getIsCoding());
         }
@@ -215,13 +215,24 @@ public class AdminService {
             question.setQuestion_year(request.getQuestion_year());
         }
         
-        Track track = trackRepository.findById(request.getTrackId())
-                .orElseThrow(() -> new ResourceNotFoundException("Track not found"));
-        question.setTrack(track);
+        // Only update track if trackId is provided and valid (not null and not 0)
+        if (request.getTrackId() != null && request.getTrackId() > 0) {
+            Track track = trackRepository.findById(request.getTrackId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Track not found"));
+            question.setTrack(track);
+        }
         
-        if (request.getSubtopicId() != null) {
+        if (request.getSubtopicId() != null && request.getSubtopicId() > 0) {
             Subtopic subtopic = subtopicRepository.findById(request.getSubtopicId())
                     .orElseThrow(() -> new ResourceNotFoundException("Subtopic not found"));
+            
+            // Validate that if both track and subtopic are provided, they are consistent
+            if (request.getTrackId() != null && request.getTrackId() > 0) {
+                if (!subtopic.getTopic().getTrack().getId().equals(request.getTrackId())) {
+                    throw new IllegalArgumentException("Subtopic does not belong to the selected track");
+                }
+            }
+            
             question.setSubtopic(subtopic);
         }
         
